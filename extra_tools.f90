@@ -274,7 +274,7 @@
       End
 
 
-      Subroutine Get_exobaseBC(BC_dir, nH_BC, TH_BC, rank)
+      Subroutine Get_exobaseBC(nH_BC, TH_BC, rank)
 
          include "constants.inc"
          external read_exobaseBC
@@ -283,7 +283,6 @@
          real*8, dimension(nbx,nby,nbtperday) :: nH_temp, TH_temp
          integer iday, rank, maxdoy
          character*7 ydoy_str, yearst
-         character*70 BC_dir
          character*100 filename_BC
 
          if (start_ydoy/1000 .eq. end_ydoy/1000) then
@@ -293,8 +292,7 @@
             nH_temp = 0.d0 ; TH_temp=0.d0
             write(ydoy_str,'(I7.7)') iday
             write(yearst, '(I4.4)') start_ydoy/1000
-            filename_BC = trim(BC_dir) // trim(yearst) // "/" // "MSIS_" // trim(ydoy_str) //  ".bc"
-!            filename_BC = trim(BC_dir) // trim(yearst) // "/" // "TIMEGCM_" // trim(ydoy_str) //  ".bc"
+            filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(exobaseBC_type) // "_" // trim(ydoy_str) //  ".bc"
             call read_exobaseBC(filename_BC, nH_temp,TH_temp, rank+12)
             nH_BC(:,:,:,iday) = nH_temp
             TH_BC(:,:,:,iday) = TH_temp
@@ -318,8 +316,7 @@
             nH_temp = 0.d0 ; TH_temp=0.d0
             write(ydoy_str,'(I7.7)') iday
             write(yearst, '(I4.4)') start_ydoy/1000
-            filename_BC = trim(BC_dir) // trim(yearst) // "/" // "MSIS_" // trim(ydoy_str) //  ".bc"
-!            filename_BC = trim(BC_dir) // trim(yearst) // "/" // "TIMEGCM_" // trim(ydoy_str) //  ".bc"
+            filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(exobaseBC_type) // "_" // trim(ydoy_str) //  ".bc"
             call read_exobaseBC(filename_BC, nH_temp,TH_temp, rank+12)
             nH_BC(:,:,:,iday) = nH_temp
             TH_BC(:,:,:,iday) = TH_temp
@@ -335,8 +332,7 @@
             nH_temp = 0.d0 ; TH_temp=0.d0
             write(ydoy_str,'(I7.7)') iday
             write(yearst, '(I4.4)') end_ydoy/1000
-            filename_BC = trim(BC_dir) // trim(yearst) // "/" // "MSIS_" // trim(ydoy_str) //  ".bc"
-!            filename_BC = trim(BC_dir) // trim(yearst) // "/" // "TIMEGCM_" // trim(ydoy_str) //  ".bc"
+            filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(exobaseBC_type) // "_" // trim(ydoy_str) //  ".bc"
             call read_exobaseBC(filename_BC, nH_temp,TH_temp, rank+12)
             nH_BC(:,:,:,iday) = nH_temp
             TH_BC(:,:,:,iday) = TH_temp

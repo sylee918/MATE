@@ -52,4 +52,10 @@
       integer, parameter :: nbx = 360/bc_res, nby = 180/bc_res    ! 360-longitude and 180-latitude degree
       integer, parameter :: nbtperday = 86400/tb_res              ! Total number of time grid for BC
 
+!  Setting
+      character*10, parameter :: exobaseBC_type = "TIMEGCM"       ! "MSIS", "TIMEGCM", "WACCMX"
 
+! Directories...
+      character*70, parameter :: Lya_dir = "indices_for_MSIS_1963-2023_2.txt"
+      character*70, parameter :: BC_dir ="./exobaseBC/"
+      character*70, parameter :: outdir = "/nobackup/slee122/MATE/0826/GRC/"

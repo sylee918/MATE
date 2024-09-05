@@ -230,14 +230,13 @@
       End
 
 
-      Subroutine write_density_3D(density_3D,outdir,tag)
+      Subroutine write_density_3D(density_3D,tag)
 
          include "constants.inc"
          real*8 density_3D(nRadial,nLong,nLat_NS)
          real, dimension(:,:,:), allocatable :: real_density_3D
          integer nlen
          character*30 tag
-         character*70 outdir
          character*100 filename
 
          allocate(real_density_3D(nRadial,nLong,nLat_NS))
@@ -262,13 +261,11 @@
          real*8, dimension(nx,ny) :: arr2D
          real, dimension(:,:), allocatable :: real_arr2D
          character*30 fn2D
-         character*70 outdir
          character*100 filename
 
          allocate(real_arr2D(nx,ny))
          real_arr2D = real(arr2D)
 
-         outdir=''
          filename = trim(outdir) // trim(fn2D) // '.data'
          inquire(iolength=nlen) real_arr2D
          open(file=filename, unit=45, form='unformatted',access='direct',recl=nlen,status='replace')
@@ -288,13 +285,11 @@
          real*8, dimension(nx,ny,nz) :: arr3D
          real, dimension(:,:,:), allocatable :: real_arr3D
          character*30 fn3D
-         character*70 outdir
          character*100 filename
 
          allocate(real_arr3D(nx,ny,nz))
          real_arr3D = real(arr3D)
 
-         outdir=''
          filename = trim(outdir) // trim(fn3D) // '.data'
             print*, filename
          inquire(iolength=nlen) real_arr3D
@@ -308,14 +303,13 @@
       End
 
 
-      Subroutine write_density_4D(density_4D,outdir,tag)
+      Subroutine write_density_4D(density_4D,tag)
 
          include "constants.inc"
          real*8 density_4D(nRadial,nLong,nLat_NS,ntperday)
          real, dimension(:,:,:,:), allocatable :: real_density_4D
          integer nlen
          character*30 tag
-         character*70 outdir
          character*100 filename
 
          allocate(real_density_4D(nRadial,nLong,nLat_NS,ntperday))
@@ -366,11 +360,10 @@
       End
 
 
-      Subroutine read_Lya_Bph(Lya_dir, Lya, bph)
+      Subroutine read_Lya_Bph(Lya, bph)
          include "constants.inc"
 
          real*8, dimension(start_ydoy_index:end_ydoy_index) :: Lya, bph
-         character(len=70) :: Lya_dir
          character(len=80) :: line
          integer :: year, doy, i, yyyydoy
          real :: f10_7, f107a, ap, lyman_alpha, beta_ph, factor
