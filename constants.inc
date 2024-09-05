@@ -15,7 +15,21 @@
       real*8, parameter :: arad = 0.1774d-2                 ! For radiation pressure [m/s^2]
       real*8, parameter :: Wrot = 1.9910d-7                 ! Earth's angular speed [rad/s]
 
-!  Simulational Constants (e.g. Number of grids)
+
+!  Setting 
+      character*10, parameter :: exobaseBC_type = "TIMEGCM"       ! "MSIS", "TIMEGCM", "WACCMX"
+      character*10, parameter :: tag0 = "test"
+
+      integer, parameter :: start_ydoy = 2008164
+      integer, parameter :: end_ydoy   = 2008164
+
+! Directories...
+      character*70, parameter :: Lya_dir = "indices_for_MSIS_1963-2023_2.txt"
+      character*70, parameter :: BC_dir ="./exobaseBC/"
+      character*70, parameter :: outdir = "/nobackup/slee122/MATE/0826/GRC/"
+
+
+!  Simulation Constants Setting (eg. Number of grids)
 !      integer, parameter :: nTheta = 91                    ! # of theta grids
 !      integer, parameter :: N_vel_directions = 10318       ! # of velocity directions determined by nTheta
 !      integer, parameter :: nEnergy = 121                   ! # of energy grid
@@ -28,15 +42,13 @@
       integer, parameter :: nLong = 24                      ! # of longitude grid (24 for '' )
       integer, parameter :: nLon = nLong                    ! To avoid confusion...^^;
 
-      integer, parameter :: start_ydoy = 2014174
-      integer, parameter :: end_ydoy   = 2014200
       integer, parameter :: start_year = start_ydoy/1000
       integer, parameter :: end_year   = end_ydoy/1000
       integer, parameter :: start_doy  = mod(start_ydoy,1000)
       integer, parameter :: end_doy    = mod(end_ydoy,1000)
       integer, parameter :: ndays = end_ydoy - start_ydoy +1            ! Revise it if end_year =/ start_year
       integer, parameter :: ntmax = 60                                  ! # of days of tmax for tracing (n_tmax, not nt_max)
-      integer, parameter :: nt_bwd_bc = 10                              ! # of days earlier than start_doy for BC
+      integer, parameter :: nt_bwd_bc = 0                              ! # of days earlier than start_doy for BC
 
       integer, parameter :: previous_year = end_year - 1                ! For daily-varying indices (e.g. Lya, F10.7),
       integer, parameter :: start_ydoy_index = previous_year*1000 + 1   ! Load two-year data
@@ -52,10 +64,4 @@
       integer, parameter :: nbx = 360/bc_res, nby = 180/bc_res    ! 360-longitude and 180-latitude degree
       integer, parameter :: nbtperday = 86400/tb_res              ! Total number of time grid for BC
 
-!  Setting
-      character*10, parameter :: exobaseBC_type = "TIMEGCM"       ! "MSIS", "TIMEGCM", "WACCMX"
 
-! Directories...
-      character*70, parameter :: Lya_dir = "indices_for_MSIS_1963-2023_2.txt"
-      character*70, parameter :: BC_dir ="./exobaseBC/"
-      character*70, parameter :: outdir = "/nobackup/slee122/MATE/0826/GRC/"
