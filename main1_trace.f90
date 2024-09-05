@@ -40,15 +40,13 @@
       year = int(start_ydoy/1000)
       write(yearst, '(I4.4)') year
 !      BC_dir = '/nobackup/slee122/MATE/MSIS/BC/' // trim(yearst) // '/'
-!      BC_dir = '/nobackup/slee122/MATE/MSIS/BC/'
-      BC_dir = '/home/sylee/exospherecode/MSIS/Fortran/BC/'
+      BC_dir = '/nobackup/slee122/MATE/MSIS/BC/'
       call Get_exobaseBC(BC_dir, nH_BC, TH_BC, rank)
 !      print*, 'main', minval(nH_BC), minval(TH_BC)
 
       ! load Lya
-!      Lya_dir = '/home/sylee/exospherecode/MSIS/Fortran/indices_for_MSIS_1963-2023_2.txt'
-!      call read_Lya_Bph(Lya_dir, Lya, bph)
-      Lya=0.d0
+      Lya_dir = '/nobackup/slee122/MATE/OMNI/indices_for_MSIS_1963-2023_2.txt'
+      call read_Lya_Bph(Lya_dir, Lya, bph)
       
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
@@ -69,8 +67,8 @@
                   if (rank .eq. il) then
                      print*, 'LON & LAT = ', int(lon*180/pi), int(lat*180/pi), '[deg]'
 
-!                     call Init_Particles(ptl, radial_distance_range, energy_range, lon,lat)
-!                     call Trace_particle(ptl, flags, radial_boundary, tmax, Lya, current_time)
+                     call Init_Particles(ptl, radial_distance_range, energy_range, lon,lat)
+                     call Trace_particle(ptl, flags, radial_boundary, tmax, Lya, current_time)
                      call Calculate_Density(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
                      number_density_4D_MPI(:,ilon,ilat,it) = number_density_1D
 
@@ -100,8 +98,7 @@
                enddo
             enddo ! it
 
-!            outdir = "/nobackup/slee122/MATE/0524/GRC/"
-            outdir = ""
+            outdir = "/nobackup/slee122/MATE/0826/GRC/"
             write(dayst, '(I7.7)') iday
             tag = '_GRC_' // trim(dayst)
             call write_density_4D(number_density_4D, outdir, tag)
