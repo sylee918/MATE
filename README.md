@@ -8,4 +8,4 @@ Model for Atmospheric Terrestrial Exosphere (MATE) simulation codes are shared h
      - MATE is parallelized in MPI. OpenMP is not used.
 
 # Update Notes
-(09.05.2024) Sang-Yun created git to share the code with Jaewoong.
+(09.05.2024) Sang-Yun created this git repository to share the code with Jaewoong.
