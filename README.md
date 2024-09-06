@@ -7,7 +7,7 @@ Model for Atmospheric Terrestrial Exosphere (MATE) simulation codes are shared h
      - Intel compiler is recommended, or you can revise the Makefile for other compilers.
      - MATE is parallelized in MPI. OpenMP is not used.
  - Required input files
-    1) indices_for_MSIS_1963-2023_2.txt: Daily OMNI data for Lyman-alpha and photoionization rates (updated by SYLee)
+    1) indices_for_MSIS_1963-2023_2.txt: Daily OMNI data for Lyman-alpha, photoionization rates, and MSIS inputs.
     2) exobase boundary conditions (BC): Daily input files in bindary format are required in current version.
 
 # Limitation 
