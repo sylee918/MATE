@@ -9,8 +9,9 @@ Model for Atmospheric Terrestrial Exosphere (MATE) simulation codes are shared h
  - Required input files
     1) indices_for_MSIS_1963-2023_2.txt: Daily OMNI data for Lyman-alpha and photoionization rates (updated by SYLee)
     2) exobase boundary conditions (BC): Daily input files in bindary format are required in current version.
- - Current version does not support running across year. Please run within a time range in a calendar year.
 
+# Limitation 
+ - Current version does not support running across year. Please run within a time range in a calendar year.
 
 # Update Notes
 (09.05.2024) SYLee created this git repository.
