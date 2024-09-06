@@ -85,7 +85,7 @@
             enddo ! it
 
             write(dayst, '(I7.7)') iday
-            tag = trim(tag0) // '_' // trim(dayst)
+            tag = '_' // trim(tag0) // '_' // trim(dayst)
             call write_density_4D(number_density_4D, tag)
          endif
 
