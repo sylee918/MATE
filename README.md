@@ -15,10 +15,15 @@ Model for Atmospheric Terrestrial Exosphere (MATE) simulation codes are shared h
 
 # Update Notes
 (09.05.2024) SYLee created this git repository.
+<<<<<<< HEAD
  Version: Earth gravity + solar radiation pressure + Coriolis force around the Sun + Photoionization
 
 
 
+=======
+
+123
+>>>>>>> refs/remotes/origin/main
 
 
 
