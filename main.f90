@@ -46,7 +46,7 @@
             current_time = iday*1.d0 + it*(time_resolution/86400.d0)
             ihour = it*(time_resolution/3600.d0)
             iminute = it*(time_resolution/60.d0)-ihour*60
-            print*, 'Current time:', iday, it*(time_resolution/3600.d0), ihour, ":", iminute, ":00"
+            print*, 'Current time:', iday, ihour, iminute
 
             do ilat=7,nLat_NS
                lat = latitudeNS_range(ilat)
@@ -56,7 +56,7 @@
                   lon = longitude_range(ilon)
                   il = ilon-1 + (ilat-1-6)*nLong
                   if (rank .eq. il) then
-                     print*, 'LON & LAT = ', int(lon*180/pi), int(lat*180/pi), '[deg]'
+                     print*, '  LON & LAT = ', int(lon*180/pi), int(lat*180/pi), '[deg]'
 
                      call Init_Particles(ptl, radial_distance_range, energy_range, lon,lat)
                      call Trace_particle(ptl, flags, radial_boundary, tmax, Lya, current_time)
