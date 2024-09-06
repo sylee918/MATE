@@ -1,5 +1,5 @@
 # MATE
-Model for Atmospheric Terrestrial Exosphere (MATE) simulation codes are shared here.
+Model for Atmospheric Terrestrial Exosphere (MATE) simulation codes
 
 # Basic environment
  - MATE is developed in NAS Pleiades system. Please load the following modules.
