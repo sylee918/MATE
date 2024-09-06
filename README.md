@@ -15,10 +15,7 @@ Model for Atmospheric Terrestrial Exosphere (MATE) simulation codes are shared h
 # Update Notes
 (09.05.2024) SYLee created this git repository.
 
-
-Test in Window
-
-Test in NAS
+123
 
 
 
