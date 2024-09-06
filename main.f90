@@ -21,7 +21,7 @@
       character*30 tag
       integer rank, nprocs, ierr, il, N_REDUCE
 
-      integer doy, iday, ihour, it, year, hour
+      integer doy, iday, ihour, iminute, it, year, hour
       real*8, dimension(start_ydoy_index:end_ydoy_index) :: Lya, bph
       real*8 current_time
       character*10 yearst, dayst
@@ -40,10 +40,13 @@
       
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
-         do ihour=0,23
-            it=ihour+1
-            current_time = iday*1.d0 + ihour/24.d0
-            print*, 'Current time:', iday, ihour
+         do it=1,ntperday
+!         do ihour=0,23
+!            it=ihour+1
+            current_time = iday*1.d0 + it*(time_resolution/86400.d0)
+            ihour = it*(time_resolution/3600.d0)
+            iminute = it*(time_resolution/60.d0)-ihour*60
+            print*, 'Current time:', iday, it*(time_resolution/3600.d0), ihour, ":" iminute, ":00"
 
             do ilat=7,nLat_NS
                lat = latitudeNS_range(ilat)

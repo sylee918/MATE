@@ -122,7 +122,7 @@
          enddo
          deallocate(each_n)
 
-         print*, number_density_1D
+!         print*, number_density_1D
 
          return
       End

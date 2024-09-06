@@ -15,28 +15,29 @@
       real*8, parameter :: arad = 0.1774d-2                 ! For radiation pressure [m/s^2]
       real*8, parameter :: Wrot = 1.9910d-7                 ! Earth's angular speed [rad/s]
 
-
-!  Setting 
-      character*10, parameter :: exobaseBC_type = "TIMEGCM"       ! "MSIS", "TIMEGCM", "WACCMX"
-      character*10, parameter :: tag0 = "test"
+!!**************<<User Setting>>**************!!
 
       integer, parameter :: start_ydoy = 2008164
       integer, parameter :: end_ydoy   = 2008164
 
-! Directories...
+      character*10, parameter :: exobaseBC_type = "TIMEGCM"       ! "MSIS", "TIMEGCM", "WACCMX"
+      character*10, parameter :: tag0 = "5min"
+
+   ! Directories...
       character*70, parameter :: Lya_dir = "indices_for_MSIS_1963-2023_2.txt"
       character*70, parameter :: BC_dir ="./exobaseBC/"
       character*70, parameter :: outdir = "/nobackup/slee122/MATE/0826/GRC/"
-
+      
+!!**************<<End User Setting>>**************!!
 
 !  Simulation Constants Setting (eg. Number of grids)
 !      integer, parameter :: nTheta = 91                    ! # of theta grids
 !      integer, parameter :: N_vel_directions = 10318       ! # of velocity directions determined by nTheta
-!      integer, parameter :: nEnergy = 121                   ! # of energy grid
+!      integer, parameter :: nEnergy = 121                  ! # of energy grid
       integer, parameter :: nTheta = 19                     ! # of theta grids
-      integer, parameter :: N_vel_directions = 412         ! # of velocity directions determined by nTheta
+      integer, parameter :: N_vel_directions = 412          ! # of velocity directions determined by nTheta
       integer, parameter :: nRadial = 27                    ! # of grids for radial distance (17 for 10 Re & 37 for 20 Re)
-      integer, parameter :: nEnergy = 61                   ! # of energy grid
+      integer, parameter :: nEnergy = 61                    ! # of energy grid
       integer, parameter :: nLat = 7                        ! # of latitude grid for Northern hemisphere including lat=0
       integer, parameter :: nLat_NS = nLat*2-1              ! # of latitude grid for both hemisphere
       integer, parameter :: nLong = 24                      ! # of longitude grid (24 for '' )
@@ -48,15 +49,15 @@
       integer, parameter :: end_doy    = mod(end_ydoy,1000)
       integer, parameter :: ndays = end_ydoy - start_ydoy +1            ! Revise it if end_year =/ start_year
       integer, parameter :: ntmax = 60                                  ! # of days of tmax for tracing (n_tmax, not nt_max)
-      integer, parameter :: nt_bwd_bc = 0                              ! # of days earlier than start_doy for BC
+      integer, parameter :: nt_bwd_bc = 0                               ! # of days earlier than start_doy for BC
 
       integer, parameter :: previous_year = end_year - 1                ! For daily-varying indices (e.g. Lya, F10.7),
       integer, parameter :: start_ydoy_index = previous_year*1000 + 1   ! Load two-year data
       integer, parameter :: end_ydoy_index = end_year*1000 + 366        ! By assuming the simulation perious is < 1 year.
 
-      integer, parameter :: tres = 60*60                         ! Time resolution for nH (30-min resolution = 1800s)
-      integer, parameter :: ntperday = 86400/tres                ! Number of time grid per day
-      integer, parameter :: nt = ntperday*ndays                  ! Total number of time grid for nH
+      integer, parameter :: time_resolution = 5*60                        ! Time resolution in second for nH (30-min resolution = 1800s)
+      integer, parameter :: ntperday = 86400/time_resolution              ! Number of time grid per day
+      integer, parameter :: nt = ntperday*ndays                           ! Total number of time grid for nH
 
 !  Grid for Exobase Boundary Condition
       integer, parameter :: bc_res = 5                            ! 5-degree resolution for both LON & LAT
