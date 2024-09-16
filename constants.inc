@@ -17,8 +17,8 @@
 
 !!**************<<User Setting>>**************!!
 
-      integer, parameter :: start_ydoy = 2008164
-      integer, parameter :: end_ydoy   = 2008164
+      integer, parameter :: start_ydoy = 2008166
+      integer, parameter :: end_ydoy   = 2008174
 
       character*10, parameter :: exobaseBC_type = "TIMEGCM"       ! "MSIS", "TIMEGCM", "WACCMX"
       character*10, parameter :: tag0 = "5min"
@@ -33,9 +33,16 @@
 !  Simulation Constants Setting (eg. Number of grids)
 !      integer, parameter :: nTheta = 91                    ! # of theta grids
 !      integer, parameter :: N_vel_directions = 10318       ! # of velocity directions determined by nTheta
-!      integer, parameter :: nEnergy = 121                  ! # of energy grid
+!      integer, parameter :: nTheta = 61                    ! # of theta grids
+!      integer, parameter :: N_vel_directions = 4586        ! # of velocity directions determined by nTheta
+!      integer, parameter :: nTheta = 46                    ! # of theta grids
+!      integer, parameter :: N_vel_directions = 2586        ! # of velocity directions determined by nTheta
+!      integer, parameter :: nTheta = 31                    ! # of theta grids
+!      integer, parameter :: N_vel_directions = 1148        ! # of velocity directions determined by nTheta
       integer, parameter :: nTheta = 19                     ! # of theta grids
       integer, parameter :: N_vel_directions = 412          ! # of velocity directions determined by nTheta
+
+!      integer, parameter :: nEnergy = 121                  ! # of energy grid
       integer, parameter :: nRadial = 27                    ! # of grids for radial distance (17 for 10 Re & 37 for 20 Re)
       integer, parameter :: nEnergy = 61                    ! # of energy grid
       integer, parameter :: nLat = 7                        ! # of latitude grid for Northern hemisphere including lat=0
@@ -49,7 +56,7 @@
       integer, parameter :: end_doy    = mod(end_ydoy,1000)
       integer, parameter :: ndays = end_ydoy - start_ydoy +1            ! Revise it if end_year =/ start_year
       integer, parameter :: ntmax = 60                                  ! # of days of tmax for tracing (n_tmax, not nt_max)
-      integer, parameter :: nt_bwd_bc = 0                               ! # of days earlier than start_doy for BC
+      integer, parameter :: nt_bwd_bc = 2                               ! # of days earlier than start_doy for BC
 
       integer, parameter :: previous_year = end_year - 1                ! For daily-varying indices (e.g. Lya, F10.7),
       integer, parameter :: start_ydoy_index = previous_year*1000 + 1   ! Load two-year data
