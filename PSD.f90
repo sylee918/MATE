@@ -60,9 +60,9 @@
          do iR=1,nRadial      ! Outermost iR-loop
             do iE=1,nEnergy
                do iv=1,N_vel_directions
-                  t0 = current_time + fin(iv,iR,iE,1)/86400    ! unit day
+                  t0 = current_time + fin(iv,iR,iE,1)/86400.    ! unit day
                   idoy = int(t0)                               ! yyyy+doy
-                  t1 = (t0 - idoy)*86400                       ! hms in seconds
+                  t1 = (t0 - idoy)*86400.                       ! hms in seconds
                   it = floor(t1/tb_res)+1
                   if (idoy .lt. start_ydoy-nt_bwd_bc) then ; idoy=start_ydoy-nt_bwd_bc ; it=1 ; endif
                   if (flags(iv,iR,iE) .eq. 1) then
@@ -102,11 +102,11 @@
                      if (idoy .eq. int(current_time)) then
                         Iph = bph(idoy) * abs(fin(iv,iR,iE,1))
                      else
-                        Iph = bph(idoy) * (86400-t1)
+                        Iph = bph(idoy) * (86400.-t1)
                         do iday=idoy+1,int(current_time)-1
-                           Iph = Iph + bph(iday)*86400
+                           Iph = Iph + bph(iday)*86400.
                         enddo
-                        Iph = Iph + bph(iday) * (current_time-int(current_time))
+                        Iph = Iph + bph(iday) * (current_time-int(current_time))*86400.
                      endif
 
 !                     vel = (vel - vel_BC)
