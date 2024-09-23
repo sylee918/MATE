@@ -48,13 +48,13 @@
             iminute = it*(time_resolution/60.d0)-ihour*60
             print*, 'Current time:', iday, ihour, iminute
 
-            do ilat=7,nLat_NS
+            do ilat=nLat,nLat_NS
                lat = latitudeNS_range(ilat)
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then;  nLon0=1  ! North & South poles
                else;  nLon0=nLong;  endif
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
-                  il = ilon-1 + (ilat-1-6)*nLong
+                  il = ilon-1 + (ilat-nLat)*nLong
                   if (rank .eq. il) then
                      print*, '  LON & LAT = ', int(lon*180/pi), int(lat*180/pi), '[deg]'
 
