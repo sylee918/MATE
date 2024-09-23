@@ -1,29 +1,36 @@
       Subroutine rk1(temp, dt, k_out, f0)
 
-         include "constants.inc"
+         include "Setting.inc"
 
          real*8 temp(6), dt
          real*8, dimension(3) :: pos, vel
-         real*8, dimension(6) :: deriv, k_out
+         real*8, dimension(6) :: deriv_G, deriv_R, deriv_C, k_out
          real*8 rho, f0
 
          pos = temp(1:3)
          vel = temp(4:6)
 
+         deriv = 0.d0
          deriv(1:3) = vel 
-         deriv(4:6) = -GM * pos / (pos(1)**2 + pos(2)**2 + pos(3)**2)**1.5   
+
+         deriv_G = 0.d0
+         deriv_R = 0.d0
+         deriv_C = 0.d0
+
+         deriv_G(4:6) = -GM * pos / (pos(1)**2 + pos(2)**2 + pos(3)**2)**1.5   
 
          ! Add Radialtion Pressure
             ! No radiation by Earth's shadow
          rho = sqrt(pos(2)**2 + pos(3)**2)
          if (pos(1) .gt. 0 .or. rho .gt. Re) then
-            deriv(4) = deriv(4) - arad*f0
+            deriv_R(4) = - arad*f0
          endif
 
          ! Add Coriolis Force
-         deriv(4) = deriv(4) + 2*Wrot*vel(2) 
-         deriv(5) = deriv(5) - 2*Wrot*vel(1)
+         deriv_C(4) = 2*Wrot*vel(2) 
+         deriv_C(5) = -2*Wrot*vel(1)
 
+         deriv = deriv_G*i_EarthGravity + deriv_R*i_SolarRadiationPressure + deriv_C*i_CoriolisForce_GSE
          k_out = dt * deriv
 
          return
@@ -32,7 +39,7 @@
 
       Subroutine rk4(one,dt,f0)
 
-         include "constants.inc"
+         include "Setting.inc"
          external rk1
 
          real*8 one(7), temp(6), dt, f0
@@ -62,7 +69,7 @@
 
       Subroutine calculate_final_timestep(old,new,radial_boundary,dt,f0)      ! Do interpolation for dt_final
 
-         include "constants.inc"
+         include "Setting.inc"
          external rk4
 
          real*8, dimension(7) :: old, new
@@ -93,7 +100,7 @@
       Subroutine Trace_particle(ptl,flags, radial_boundary, tmax, Lya, current_time)
 
 !         use omp_lib
-         include "constants.inc"
+         include "Setting.inc"
          external rk4, calculate_final_timestep
 
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: ptl

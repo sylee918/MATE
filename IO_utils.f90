@@ -1,6 +1,6 @@
       Subroutine outptl(ptl,filename)
 
-         include "constants.inc"
+         include "Setting.inc"
 
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: ptl
          real one(7)
@@ -24,7 +24,7 @@
 
       Subroutine outind(flags,filename)
 
-         include "constants.inc"
+         include "Setting.inc"
 
          integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
          integer iR,iE,iv
@@ -46,7 +46,7 @@
 
       Subroutine out_init_binary(init,input_dir,tag)
 
-         include "constants.inc"
+         include "Setting.inc"
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: init
          real, dimension(:,:,:,:), allocatable :: real_init
          integer nlen
@@ -73,7 +73,7 @@
 
       Subroutine out_fin_binary(fin,input_dir,tag)
 
-         include "constants.inc"
+         include "Setting.inc"
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: fin
          real, dimension(:,:,:,:), allocatable :: real_fin
          integer nlen
@@ -97,7 +97,7 @@
 
       Subroutine out_ind_binary(flags,input_dir,tag)
 
-         include "constants.inc"
+         include "Setting.inc"
          integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
          integer nlen
          character*70 input_dir
@@ -117,7 +117,7 @@
 
      Subroutine outRuntime(Runtime_dist,filename)
 
-         include "constants.inc"
+         include "Setting.inc"
 
          real, dimension(nRadial,nEnergy) :: Runtime_dist
          integer iR,iE
@@ -138,7 +138,7 @@
       
       Subroutine read_ind_binary(flags,input_dir,tag,thread_num)
 
-         include "constants.inc"
+         include "Setting.inc"
          integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
          integer nlen, iexist, thread_num, IO_unit
          character*70 input_dir
@@ -170,7 +170,7 @@
 
       Subroutine read_fin_binary(fin,input_dir,tag,thread_num)
 
-         include "constants.inc"
+         include "Setting.inc"
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: fin
          real, dimension(:,:,:,:), allocatable :: real_fin
          integer nlen, thread_num, IO_unit, iexist
@@ -208,7 +208,7 @@
 
       Subroutine write_density_1D(density_1D,tag)
 
-         include "constants.inc"
+         include "Setting.inc"
          real*8 density_1D(nRadial)
          real, dimension(:), allocatable :: real_density_1D
          integer nlen
@@ -232,7 +232,7 @@
 
       Subroutine write_density_3D(density_3D,tag)
 
-         include "constants.inc"
+         include "Setting.inc"
          real*8 density_3D(nRadial,nLong,nLat_NS)
          real, dimension(:,:,:), allocatable :: real_density_3D
          integer nlen
@@ -256,7 +256,7 @@
 
       Subroutine Write_2D_Real(fn2D, arr2D, nx,ny)
 
-         include "constants.inc"
+         include "Setting.inc"
          integer nx, ny, nlen
          real*8, dimension(nx,ny) :: arr2D
          real, dimension(:,:), allocatable :: real_arr2D
@@ -280,7 +280,7 @@
 
       Subroutine Write_3D_Real(fn3D, arr3D, nx,ny,nz)
 
-         include "constants.inc"
+         include "Setting.inc"
          integer nx, ny, nz, nlen
          real*8, dimension(nx,ny,nz) :: arr3D
          real, dimension(:,:,:), allocatable :: real_arr3D
@@ -305,7 +305,7 @@
 
       Subroutine write_density_4D(density_4D,tag)
 
-         include "constants.inc"
+         include "Setting.inc"
          real*8 density_4D(nRadial,nLong,nLat_NS,ntperday)
          real, dimension(:,:,:,:), allocatable :: real_density_4D
          integer nlen
@@ -329,7 +329,7 @@
 
       Subroutine read_exobaseBC(filename, nH_temp,TH_temp, thread_num)
 
-         include "constants.inc"
+         include "Setting.inc"
          real*8, dimension(nbx,nby,nbtperday) :: nH_temp, TH_temp
          real, dimension(:,:,:), allocatable :: nH_real, TH_real
          integer nlen, thread_num, IO_unit, iexist
@@ -361,7 +361,7 @@
 
 
       Subroutine read_Lya_Bph(Lya, bph)
-         include "constants.inc"
+         include "Setting.inc"
 
          real*8, dimension(start_ydoy_index:end_ydoy_index) :: Lya, bph
          character(len=80) :: line

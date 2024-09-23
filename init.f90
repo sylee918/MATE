@@ -1,7 +1,7 @@
       Subroutine Init_Parameter(radial_distance_range, energy_range, &
                  longitude_range, latitude_range, latitudeNS_range,  radial_boundary, tmax)
 
-            include "constants.inc"
+            include "Setting.inc"
             integer iR, iE, ilon, ilat
             real*8 radial_distance_range(nRadial), energy_range(nEnergy)
             real*8 longitude_range(nLong), latitude_range(nLat), latitudeNS_range(nLat_NS)
@@ -9,7 +9,7 @@
             integer index_Emin
 
             do iR=1,nRadial
-               radial_distance_range(iR) = 1.5d0 + iR*0.5d0
+               radial_distance_range(iR) = RadialRange_min + (iR-1)*dR
 !               radial_distance_range(iR) = 2.d0**(1.d0+(iR-1)/3.d0)   !  log-scale
             enddo
             radial_distance_range = radial_distance_range * Re
@@ -31,18 +31,17 @@
             endif
  
             do ilon=1,nLong
-                  longitude_range(ilon) = (ilon-1)*15.d0 *pi/180.d0
+                  longitude_range(ilon) = (ilon-1)*pi/180.d0*geores
             enddo
             do ilat=1,nLat
-                  latitude_range(ilat) = (ilat-1)*15.d0 *pi/180.d0
-!                  latitude_range(ilat) = ((ilat-1)*15.d0+7.5d0-90.d0) *pi/180.d0
+                  latitude_range(ilat) = (ilat-1)*pi/180.d0*geores
             enddo
             do ilat=1,nLat_NS
-                  latitudeNS_range(ilat) = ((ilat-1)*15.d0-90.d0) *pi/180.d0
+                  latitudeNS_range(ilat) = ((ilat-1.d0)*geores-90.d0) *pi/180.d0
             enddo
 
-            radial_boundary(1) = Re + 500.d3
-            radial_boundary(2) = 100.d0*Re
+            radial_boundary(1) = inner_boundary
+            radial_boundary(2) = outer_boundary
 
             tmax = ntmax * 86400.d0          ! 60 days
 
@@ -52,7 +51,7 @@
 
       Subroutine Init_Particles(ptl, radial_distance_range, energy_range, lon,lat)
 
-            include "constants.inc"
+            include "Setting.inc"
             external gen_points
 
             integer iR, iE

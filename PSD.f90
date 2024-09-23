@@ -1,6 +1,6 @@
       Subroutine Initialize(input_dir, init, fin, flags, tag, thread_num)
 
-         include "constants.inc"
+         include "Setting.inc"
          external Init_Parameter, read_ind_binary, read_fin_binary
 
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: init, fin
@@ -28,7 +28,7 @@
          ! "cdensity" in python code
 !         use omp_lib
          use, intrinsic :: ieee_arithmetic
-         include "constants.inc"
+         include "Setting.inc"
          external calculate_Velocity_Volume_Element
          external GSE2SPH
 
@@ -131,7 +131,7 @@
 
       Subroutine MSIS_averaged_over_exobase(MSIS_nH,MSIS_TH)
 
-         include "constants.inc"
+         include "Setting.inc"
 !         real*8, dimension(nRadial) :: MSIS_nH, MSIS_TH
          real*8, dimension(41) :: MSIS_nH, MSIS_TH
 
@@ -150,7 +150,7 @@
       Subroutine GSE2SPH(pos,finlon,finlat)
       !  Just transform GSE to GEO without considering Earth's rotation. FIX IT when considering the temporal effect of Earth's rotation.
 
-         include "constants.inc"
+         include "Setting.inc"
          real*8 pos(3)
          real*8 finlon,finlat
 

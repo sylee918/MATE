@@ -1,7 +1,7 @@
       Program main
 
       include "mpif.h"
-      include "constants.inc"
+      include "Setting.inc"
  
       external Init_Parameter, Init_Particles, Trace_particle, Calculate_Density
       external Get_exobaseBC, read_Lya_Bph, write_density_4D
@@ -33,10 +33,9 @@
       call Init_Parameter(radial_distance_range, energy_range, longitude_range, latitude_range, latitudeNS_range, radial_boundary, tmax)
 
       ! load BC
-      year = int(start_ydoy/1000)
-      write(yearst, '(I4.4)') year
+      year = int(start_ydoy/1000);  write(yearst, '(I4.4)') year
       call Get_exobaseBC(nH_BC, TH_BC, rank)
-      call read_Lya_Bph(Lya, bph)
+      call read_Lya_Bph(Lya, bph);  if (i_Photoionization .eq. 0) then bph = 0.d0
       
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
