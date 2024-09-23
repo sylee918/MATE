@@ -20,32 +20,32 @@
    !! Number of Particle Direction !!
       integer, Angular_Resolution_of_Velocity_Direction_in_Degree = 6                        ! DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
       integer, parameter ::      nTheta                           = 180/Angular_Resolution_of_Velocity_Direction + 1   ! # of theta grids
-      integer, parameter ::      N_vel_directions                 = 1148                       ! # of velocity directions. [10318, 4586, 2586, 1148, 412] for [2, 3, 4, 6, 10]
+      integer, parameter ::      N_vel_directions                 = 1148                     ! # of velocity directions. [10318, 4586, 2586, 1148, 412] for [2, 3, 4, 6, 10]
 
    !! (FIX ME!!) Energy Grid !!
-      integer, parameter :: nEnergy                               = 61                         ! # of energy grid
+      integer, parameter :: nEnergy                               = 61                       ! # of energy grid
 
    !! DIRECTORIES SETTING !!
-      character*70, parameter :: Lya_dir = "indices_for_MSIS_1963-2023_2.txt"
-      character*70, parameter :: BC_dir = "./exobaseBC/"
-      character*70, parameter :: outdir = "/nobackup/slee122/MATE/0826/GRC/"
+      character*70, parameter :: Lya_dir                          = "indices_for_MSIS_1963-2023_2.txt"
+      character*70, parameter :: BC_dir                           = "./exobaseBC/"
+      character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0826/GRC/"
 
    !! Including Physical Properties !!
-      integer, parameter :: i_EarthGravity                      = 1                          ! 0 for turn off / 1 for turn on
-      integer, parameter :: i_SolarRadiationPressure            = 1
-      integer, parameter :: i_CoriolisForce_GSE                 = 1
-      integer, parameter :: i_Photoionization                   = 1
+      integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
+      integer, parameter ::      i_SolarRadiationPressure         = 1
+      integer, parameter ::      i_CoriolisForce_GSE              = 1
+      integer, parameter ::      i_Photoionization                = 1
 
    !! Exobase Boundary Condition (BC) Setting !!
-      character*10, parameter :: ExobaseBC_Model_Name           = "TIMEGCM"                  ! "MSIS", "TIMEGCM", "WACCMX"
-      integer, parameter :: BC_GEO_Resolution_in_Degree         = 5
-      integer, parameter :: BC_Time_Resolution_in_Minute        = 5
-      integer, parameter :: BC_Start_Time_in_YYYYDOY            = 2014164                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+      character*10, parameter :: ExobaseBC_Model_Name             = "TIMEGCM"                  ! "MSIS", "TIMEGCM", "WACCMX"
+      integer, parameter ::      BC_GEO_Resolution_in_Degree      = 5
+      integer, parameter ::      BC_Time_Resolution_in_Minute     = 5
+      integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 2014164                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
    !! Particle Tracing Range !!
-      real*8, parameter :: inner_boundary                       = Re + 500.d0                ! Exobase location
-      real*8, parameter :: outer_boundary                       = 100*Re
-      real*8, parameter :: Max_Travel_Time_in_Days              = 60                         ! DEFAULT = 60
+      real*8, parameter :: inner_boundary                         = Re + 500.d0                ! Exobase location
+      real*8, parameter :: outer_boundary                         = 100*Re
+      real*8, parameter :: Max_Travel_Time_in_Days                = 60                         ! DEFAULT = 60
 
 
 
