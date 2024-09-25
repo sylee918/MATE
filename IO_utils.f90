@@ -318,7 +318,7 @@
 
          tag_phys = ''
          do i=1,n_physics
-            tag_phys = trim(tag_phys) // trim(phy_name)
+            tag_phys = trim(tag_phys) // trim(phy_name(i))
          enddo
 
          return
