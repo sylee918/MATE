@@ -19,7 +19,7 @@
 
    !! Number of Particle Direction !!
       integer, parameter ::      Angular_Resolution_of_Velocity_Direction_in_Degree = 6                        ! DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
-      integer, parameter ::      nTheta                           = 180/Angular_Resolution_of_Velocity_Direction + 1   ! # of theta grids
+      integer, parameter ::      nTheta                           = 180/Angular_Resolution_of_Velocity_Direction_in_Degree + 1   ! # of theta grids
       integer, parameter ::      N_vel_directions                 = 1148                     ! # of velocity directions. [10318, 4586, 2586, 1148, 412] for [2, 3, 4, 6, 10]
 
    !! (FIX ME!!) Energy Grid !!
