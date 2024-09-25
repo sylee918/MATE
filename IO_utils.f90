@@ -303,19 +303,42 @@
       End
 
 
-      Subroutine write_density_4D(density_4D,tag)
+      Subroutine Physics_tag(tag_phys)
+         ! Generate "tag_phys".
+         ! Example: tag = "GRCPX" or "GRC"
+         include "Setting.inc"
+         character*10 tag_phys
+         character(len=1), dimension(n_physics) :: phy_name
+
+         if (i_EarthGravity .eq. 1)           phy_name(1)='G'
+         if (i_SolarRadiationPressure .eq. 1) phy_name(2)='R'
+         if (i_CoriolisForce_GSE .eq. 1)      phy_name(3)='C'
+         if (i_Photoionization .eq. 1)        phy_name(4)='P'
+         if (i_ChargeExchange .eq. 1)         phy_name(5)='X'
+
+         tag_phys = ''
+         do i=1,n_physics
+            tag_phys = trim(tag_phys) // trim(arr)
+         enddo
+
+         return
+      End
+
+
+      Subroutine write_density_4D(density_4D,iday)
 
          include "Setting.inc"
          real*8 density_4D(nRadial,nLong,nLat_NS,ntperday)
          real, dimension(:,:,:,:), allocatable :: real_density_4D
-         integer nlen
-         character*30 tag
+         integer iday, nlen
+         character*10 tag_phys, dayst
          character*100 filename
 
          allocate(real_density_4D(nRadial,nLong,nLat_NS,ntperday))
          real_density_4D = real(density_4D)
 
-         filename = trim(outdir) // 'EXO_Density_4D' // trim(tag) //    '.data'
+         write(dayst, '(I7.7)') iday
+         filename = trim(outdir) // 'MATE_nH_' // trim(tag_phys) // '_' // trim(tag0) // '_' // trim(dayst) // '.data'
          inquire(iolength=nlen) real_density_4D
          open(file=filename,unit=45,form='unformatted',access='direct',recl=nlen,status='replace')
          write(45,rec=1) real_density_4D

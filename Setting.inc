@@ -3,8 +3,8 @@
 !!********************<< User Setting >>********************!!
 !!**** Recommended to change the parameters for your run ***!!
 
-   !! TAG for Runname !!
-      character*10, parameter :: TAG_within_10_characters       = "5min"                     ! ex: output_filename = "EXO_Density_4D_GRC_(tag).data"
+   !! TAG for an Unique Runname !!
+      character*10, parameter :: TAG_within_10_characters       = "5min"                     ! ex: output_filename = "MATE_nH_GRC_{tag}_2008174.data"
 
    !! TIME SETTING !!
       integer, parameter ::      Start_Time_in_YYYYDOY          = 2014174
@@ -30,11 +30,12 @@
       character*70, parameter :: BC_dir                           = "./exobaseBC/"
       character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0826/GRC/"
 
-   !! Including Physical Properties !!
+   !! Including Physics !!
       integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
-      integer, parameter ::      i_SolarRadiationPressure         = 1
+      integer, parameter ::      i_SolarRadiationPressure         = 1                          ! If you set these values as N, then the force is N-times stronger as a coefficient.
       integer, parameter ::      i_CoriolisForce_GSE              = 1
       integer, parameter ::      i_Photoionization                = 1
+      integer, parameter ::      i_ChargeExchange                 = 0                          ! Not developed yet
 
    !! Exobase Boundary Condition (BC) Setting !!
       character*10, parameter :: ExobaseBC_Model_Name             = "TIMEGCM"                  ! "MSIS", "TIMEGCM", "WACCMX"
@@ -80,6 +81,7 @@
       integer, parameter :: ntperday = 86400/time_resolution              ! Number of time grid per day
       integer, parameter :: nt = ntperday*ndays                           ! Total number of time grid for nH
       integer, parameter :: ntmax = Max_Travel_Time_in_Days
+      integer, parameter :: n_physics = 5                               ! # of physics (Gravity, ..., ChargeExchange)
 
       integer, parameter :: previous_year = end_year - 1                ! For daily-varying indices (e.g. Lya, F10.7),
       integer, parameter :: start_ydoy_index = previous_year*1000 + 1   ! Load two-year data
