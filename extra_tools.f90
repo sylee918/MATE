@@ -212,19 +212,19 @@
          ! For RadPres...
          include "Setting.inc"
          real*8 radial_distance_range(nRadial)
-         real*8 r, lat, dr, dV1(nRadial)
+         real*8 r, lat, dr1, dV1(nRadial)
          real*8 dlat, dphi
          integer iR, ilat
 
-         dr = 0.5d0
+         dr1 = 0.5d0
          dlat = 15.d0 *pi/180
          dphi = 15.d0 *pi/180
          ! Solid angle for configuration volume element
          do iR=1,nRadial
             r = radial_distance_range(iR)
 !            lat = latitude_range(ilat)
-!            dV1(iR,ilat) = ((r+dr)**3 - r**3)/3.d0 * (cos(lat-dlat/2)-cos(lat+dlat/2))*dphi
-            dV1(iR) = ((r+dr)**3 - r**3)/3.d0 * (cos(lat-dlat/2)-cos(lat+dlat/2))*dphi
+!            dV1(iR,ilat) = ((r+dr1)**3 - r**3)/3.d0 * (cos(lat-dlat/2)-cos(lat+dlat/2))*dphi
+            dV1(iR) = ((r+dr1)**3 - r**3)/3.d0 * (cos(lat-dlat/2)-cos(lat+dlat/2))*dphi
          enddo
 
          return
