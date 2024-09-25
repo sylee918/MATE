@@ -4,7 +4,7 @@
 
          real*8 temp(6), dt
          real*8, dimension(3) :: pos, vel
-         real*8, dimension(6) :: deriv_G, deriv_R, deriv_C, k_out
+         real*8, dimension(6) :: deriv, deriv_G, deriv_R, deriv_C, k_out
          real*8 rho, f0
 
          pos = temp(1:3)
