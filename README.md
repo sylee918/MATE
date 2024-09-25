@@ -18,7 +18,10 @@ Model for Atmospheric Terrestrial Exosphere (MATE) simulation codes
 <<<<<<< HEAD
  Version: Earth gravity + solar radiation pressure + Coriolis force around the Sun + Photoionization
 
-
+# Calculation Time
+ NAS Pleiades Broadwell (bro)
+ - 15-degree GEO resolution & 10-degree N_Vdirection (412): 30 minutes walltime for 1-day simulation
+ - 5-degree GEO resolution & 6-degree N_Vdirection (1148): 150 minutes walltime for 1-day simulation 
 
 =======
 
