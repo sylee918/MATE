@@ -108,7 +108,7 @@
 
 !      enddo ! iday
 
-      deallocate(ptl,flags)
+      deallocate(b_ptl,b_flags,f_ptl,f_flags)
 
       call MPI_FINALIZE(ierr)
 
