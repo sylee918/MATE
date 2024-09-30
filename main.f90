@@ -3,6 +3,8 @@
       include "mpif.h"
       include "Setting.inc"
  
+      use Module_for_NVelocityDirection
+
       external Init_Parameter, Init_Particles, Trace_particle, Calculate_Density
       external Get_exobaseBC, read_Lya_Bph, write_density_4D
       external MPI_INIT, MPI_COMM_RANK, MPI_COMM_SIZE, MPI_FINALIZE, MPI_BARRIER, MPI_REDUCE
@@ -38,9 +40,13 @@
       year = int(start_ydoy/1000);  write(yearst, '(I4.4)') year
       call Get_exobaseBC(nH_BC, TH_BC, rank)
       call read_Lya_Bph(Lya, bph);  if (i_Photoionization .eq. 0) bph = 0.d0
-      
-      allocate(ptl(n_vel_directions,nRadial,nEnergy,7))
-      allocate(flags(n_vel_directions,nRadial,nEnergy))
+
+      call gen_points_for_NV()
+      print*, "N_vel_directions = ", N_vel_directions
+
+
+      allocate(ptl(N_vel_directions,nRadial,nEnergy,7))
+      allocate(flags(N_vel_directions,nRadial,nEnergy))
 
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
@@ -54,8 +60,7 @@
 
             do ilat=nLat,nLat_NS
                lat = latitudeNS_range(ilat)
-               if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then;  nLon0=1  ! North & South poles
-               else;  nLon0=nLong;  endif
+               if (ilat .eq. 1 .or. ilat .eq. nLat_NS) nLon0=1; else  nLon0=nLong  ! North & South poles
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
                   il = ilon-1 + (ilat-nLat)*nLong
