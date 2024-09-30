@@ -414,13 +414,14 @@
          write(123,*) nRadial, nLon, nLat_NS, ntperday
 
          write(123,*) "Above paramters are ..."
-         write(123,*) "N_vel_directions, nRadial, nEnergy"
-         write(123,*) "nRadial, nLon, nLat_NS, ntperday"
+         write(123,*) "    [N_vel_directions, nRadial, nEnergy]"
+         write(123,*) "    [nRadial, nLon, nLat_NS, ntperday]"
          write(123,*) "Start_Time_in_YYYYDOY = ", Start_Time_in_YYYYDOY
-         write(123,*) "End_Time_in_YYYYDOY = ", End_Time_in_YYYYDOY
-         write(123,*) "Output interval = ", Output_Time_Interval_in_Minute, " [minutes]"
-         write(123,*) "Exobase BC:", ExobaseBC_Model_Name
-         write(123,*) "Physics:", tag_phys
+         write(123,*) "End_Time_in_YYYYDOY   = ", End_Time_in_YYYYDOY
+         write(123,*) "Output interval       = ", Output_Time_Interval_in_Minute, " [minutes]"
+         write(123,*) "Exobase BC:             ", ExobaseBC_Model_Name
+         write(123,*) "Physics:                ", tag_phys
+         write(123,*) ""
 
          close(123)
 

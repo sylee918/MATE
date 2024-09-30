@@ -20,7 +20,6 @@
    !! Number of Particle Direction !!
       integer, parameter ::      dV_theta                         = 6                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
       integer, parameter ::      nTheta                           = 180/dV_theta + 1          ! # of theta grids
-!      integer, parameter ::      N_vel_directions                 = 1148                      ! # of velocity directions. [10318, 4586, 2586, 1148, 412] for [2, 3, 4, 6, 10]
 
    !! (FIX ME!!) Energy Grid !!
       integer, parameter :: nEnergy                               = 61                        ! # of energy grid
@@ -57,7 +56,7 @@
       integer, parameter :: end_ydoy   = End_Time_in_YYYYDOY
       character*10, parameter :: tag0 = TAG_within_10_characters
 
-      integer, parameter :: nRadial = (RadialRange_max-RadialRange_min)/dR   
+      integer, parameter :: nRadial = (RadialRange_max-RadialRange_min)/dR + 1  
 
       integer, parameter :: geores = GEO_Resolution_in_Degree
       integer, parameter :: nLat = 180/geores +1
