@@ -1,5 +1,6 @@
       Subroutine outptl(ptl,filename)
 
+         use Module_for_NVelocityDirection
          include "Setting.inc"
 
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: ptl
@@ -24,6 +25,7 @@
 
       Subroutine outind(flags,filename)
 
+         use Module_for_NVelocityDirection
          include "Setting.inc"
 
          integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
@@ -46,6 +48,7 @@
 
       Subroutine out_init_binary(init,input_dir,tag)
 
+         use Module_for_NVelocityDirection
          include "Setting.inc"
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: init
          real, dimension(:,:,:,:), allocatable :: real_init
@@ -73,6 +76,7 @@
 
       Subroutine out_fin_binary(fin,input_dir,tag)
 
+         use Module_for_NVelocityDirection
          include "Setting.inc"
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: fin
          real, dimension(:,:,:,:), allocatable :: real_fin
@@ -97,6 +101,7 @@
 
       Subroutine out_ind_binary(flags,input_dir,tag)
 
+         use Module_for_NVelocityDirection
          include "Setting.inc"
          integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
          integer nlen
@@ -138,6 +143,7 @@
       
       Subroutine read_ind_binary(flags,input_dir,tag,thread_num)
 
+         use Module_for_NVelocityDirection
          include "Setting.inc"
          integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
          integer nlen, iexist, thread_num, IO_unit
@@ -170,6 +176,7 @@
 
       Subroutine read_fin_binary(fin,input_dir,tag,thread_num)
 
+         use Module_for_NVelocityDirection
          include "Setting.inc"
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: fin
          real, dimension(:,:,:,:), allocatable :: real_fin
