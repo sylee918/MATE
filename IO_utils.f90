@@ -237,11 +237,11 @@
       End
 
 
-      Subroutine write_density_2D(density_2D,tag)
+      Subroutine Write_ESC_FLUX_2D(density_2D,tag)
 
          include "Setting.inc"
          real*8 density_2D(nbx,nby)
-         real, dimension(:,:,:), allocatable :: real_density_2D
+         real, dimension(:,:), allocatable :: real_density_2D
          integer nlen
          character*30 tag
          character*100 filename
