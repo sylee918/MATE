@@ -315,10 +315,11 @@
 
          use Module_Physics_tag
          include "Setting.inc"
+         
          real*8 density_4D(nRadial,nLong,nLat_NS,ntperday)
          real, dimension(:,:,:,:), allocatable :: real_density_4D
          integer iday, nlen
-         character*10 tag_phys, dayst
+         character*10 dayst
          character*100 filename
 
          allocate(real_density_4D(nRadial,nLong,nLat_NS,ntperday))
@@ -371,8 +372,8 @@
 
 
       Subroutine read_Lya_Bph(Lya, bph)
-         include "Setting.inc"
 
+         include "Setting.inc"
          real*8, dimension(start_ydoy_index:end_ydoy_index) :: Lya, bph
          character(len=80) :: line
          integer :: year, doy, i, yyyydoy
@@ -405,7 +406,6 @@
          use Module_for_NVelocityDirection
          use Module_Physics_tag
          include "Setting.inc"
-
          character*100 filename
 
          filename = 'MATE_Parameters_' // trim(TAG_within_10_characters) // '.in'
@@ -420,7 +420,7 @@
          write(123,*) "End_Time_in_YYYYDOY = ", End_Time_in_YYYYDOY
          write(123,*) "Output interval = ", Output_Time_Interval_in_Minute, " [minutes]"
          write(123,*) "Exobase BC:", ExobaseBC_Model_Name
-         write(123,*) "Physics:", Physics_tag
+         write(123,*) "Physics:", tag_phys
 
          close(123)
 
