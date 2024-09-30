@@ -41,6 +41,7 @@
             ! Generate "tag_phys".
             ! Example: tag = "GRCPX" or "GRC"
             include "Setting.inc"
+            integer i
             character(len=1), dimension(n_physics) :: phy_name=''
 
             if (i_EarthGravity .eq. 1)           phy_name(1)='G'
