@@ -7,7 +7,7 @@
       include "Setting.inc"
 
       external Init_Parameter, Init_Particles, Trace_particle, Calculate_Density
-      external Get_exobaseBC, read_Lya_Bph, write_density_4D
+      external Get_exobaseBC, read_Lya_Bph, write_density_4D, Make_Parameters_OutFile
       external MPI_INIT, MPI_COMM_RANK, MPI_COMM_SIZE, MPI_FINALIZE, MPI_BARRIER, MPI_REDUCE
 
 !      real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: ptl
@@ -97,8 +97,7 @@
             enddo ! it
 
             write(dayst, '(I7.7)') iday
-            tag = '_' // trim(tag0) // '_' // trim(dayst)
-            call write_density_4D(number_density_4D, tag)
+            call write_density_4D(number_density_4D, iday)
          endif
 
       enddo ! iday
