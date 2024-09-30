@@ -10,7 +10,7 @@
       external Get_exobaseBC, read_Lya_Bph, write_density_4D
       external MPI_INIT, MPI_COMM_RANK, MPI_COMM_SIZE, MPI_FINALIZE, MPI_BARRIER, MPI_REDUCE
       external Forward_Tracing_particle, Calculate_Escaping_Flux_constBC
-      external Physics_tag, gen_points_for_NV, Make_Parameters_OutFile
+!      external Physics_tag, gen_points_for_NV, Make_Parameters_OutFile
 
       real*8, allocatable, dimension(:,:,:,:) :: b_ptl, f_ptl
       integer, allocatable, dimension(:,:,:) :: b_flags, f_flags

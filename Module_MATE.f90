@@ -1,5 +1,6 @@
       Module Module_for_NVelocityDirection
          integer :: N_vel_directions
+         public :: gen_points_for_NV
       contains
 
          Subroutine gen_points_for_NV()
@@ -33,6 +34,7 @@
 
       Module Module_Physics_tag
          character*10 tag_phys
+         public :: Physics_tag
       contains
          
          Subroutine Physics_tag()
