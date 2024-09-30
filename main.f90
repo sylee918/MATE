@@ -1,9 +1,9 @@
       Program main
 
+      use Module_for_NVelocityDirection
+
       include "mpif.h"
       include "Setting.inc"
- 
-      use Module_for_NVelocityDirection
 
       external Init_Parameter, Init_Particles, Trace_particle, Calculate_Density
       external Get_exobaseBC, read_Lya_Bph, write_density_4D
@@ -43,7 +43,6 @@
 
       call gen_points_for_NV()
       print*, "N_vel_directions = ", N_vel_directions
-
 
       allocate(ptl(N_vel_directions,nRadial,nEnergy,7))
       allocate(flags(N_vel_directions,nRadial,nEnergy))
