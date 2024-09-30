@@ -20,7 +20,7 @@
 
       real*8 number_density_1D(nRadial), esc_flux
 !      real*8, dimension(nLon,nLat_NS,ntperday) :: number_density_3D, number_density_3D_MPI
-      real*8, dimension(nLon,nLat_NS,ntperday) :: number_density_2D, number_density_2D_MPI
+      real*8, dimension(nLon,nLat_NS) :: number_density_2D, number_density_2D_MPI
       real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
       character*30 tag
       integer rank, nprocs, ierr, il, N_REDUCE
@@ -87,7 +87,7 @@
                   endif
                enddo ! ilon
             enddo ! ilat
-         enddo ! ihour
+!         enddo ! ihour
 
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
          N_REDUCE = nRadial * nLon * nLat_NS * ntperday
@@ -106,7 +106,7 @@
             call write_density_2D(number_density_2D, tag)
          endif
 
-      enddo ! iday
+!      enddo ! iday
 
       deallocate(ptl,flags)
 
