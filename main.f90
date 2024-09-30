@@ -1,6 +1,7 @@
       Program main
 
       use Module_for_NVelocityDirection
+      use Module_Physics_tag
 
       include "mpif.h"
       include "Setting.inc"
