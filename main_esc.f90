@@ -95,8 +95,8 @@
 !            enddo ! it
 
             write(dayst, '(I7.7)') iday
-            tag = '_' // trim(tag0) // '_' // trim(dayst)
-            call write_density_2D(esc_flux, tag)
+            tag = '_' // trim(tag0)
+            call Write_ESC_FLUX_2D(esc_flux, tag)
          endif
 
 !      enddo ! iday

@@ -240,13 +240,13 @@
       Subroutine write_density_2D(density_2D,tag)
 
          include "Setting.inc"
-         real*8 density_2D(nRadial,nLong,nLat_NS)
+         real*8 density_2D(nbx,nby)
          real, dimension(:,:,:), allocatable :: real_density_2D
          integer nlen
          character*30 tag
          character*100 filename
 
-         allocate(real_density_2D(nRadial,nLong,nLat_NS))
+         allocate(real_density_2D(nbx,nby))
          real_density_2D = real(density_2D)
 
          filename = trim(outdir) // 'ESC_FLUX_2D' // trim(tag) // '.data' 
