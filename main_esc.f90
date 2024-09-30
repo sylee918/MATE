@@ -20,7 +20,6 @@
       real*8 lon,lat
       integer ilon, ilat, nLon0
 
-      real*8 number_density_1D(nRadial)
       real*8, dimension(nbx,nby) :: esc_flux, esc_flux_MPI
       real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
       character*30 tag
