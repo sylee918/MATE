@@ -5,6 +5,7 @@
          !  output : boolean; if 0, returns points as normal;
          !           if 1, returns array specifying how many points are at each theta value"
 
+         use Module_for_NVelocityDirection
          include "Setting.inc"
          integer :: nsize, n2
          integer :: i, j, i0
@@ -112,6 +113,7 @@
       Subroutine Solid_Angle_For_Velocity_Volume_Element(solid_angle)
          ! 'solid_angle' = sin(theta).d(theta).d(phi)
          ! 'solanglist' in python code
+         use Module_for_NVelocityDirection
          include "Setting.inc"
          external gen_points_for_each_row
 
@@ -187,6 +189,7 @@
 
       Subroutine calculate_Velocity_Volume_Element(dV2)
 
+         use Module_for_NVelocityDirection
          include "Setting.inc"
          external Solid_Angle_For_Velocity_Volume_Element, Radial_Component_For_Velocity_Volume_Element
 
@@ -233,6 +236,7 @@
 
       Subroutine Volume_Element(radial_distance_range,lat, dV)
          ! dV = dx^3 * dv^3
+         use Module_for_NVelocityDirection
          include "Setting.inc"
          external calculate_Configuration_Volume_Element, calculate_Velocity_Volume_Element
 
