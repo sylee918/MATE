@@ -1,4 +1,4 @@
-      module Module_for_NVelocityDirection
+      Module Module_for_NVelocityDirection
 
       integer :: N_vel_directions
 
@@ -30,7 +30,7 @@
             return
          End
 
-      End
+      End Module
 
 
       Subroutine gen_points(vel_dir)
