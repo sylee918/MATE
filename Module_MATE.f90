@@ -7,7 +7,7 @@
 
             include "Setting.inc"
             integer :: nsize, n2
-            integer :: i, j, i0
+            integer :: i, j
             real*8 piset(nTheta), piset2(0:nTheta)
 
             do i=1,nTheta
