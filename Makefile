@@ -19,7 +19,7 @@ MATE.x: Module_MATE.o main.o init.o trace.o PSD.o extra_tools.o IO_utils.o
 	$(FC) -o MATE.x Module_MATE.o main.o init.o trace.o PSD.o extra_tools.o IO_utils.o
 
 MATE_esc.x: Module_MATE.o main_esc.o init.o trace.o PSD.o extra_tools.o IO_utils.o
-	$(FC) -o MATE.x Module_MATE.o main_esc.o init.o trace.o PSD.o extra_tools.o IO_utils.o
+	$(FC) -o MATE_esc.x Module_MATE.o main_esc.o init.o trace.o PSD.o extra_tools.o IO_utils.o
 
 Module_MATE.o: Module_MATE.f90
 	$(FC) -c $(flags) Module_MATE.f90
