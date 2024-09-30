@@ -6,9 +6,11 @@
       include "mpif.h"
       include "Setting.inc"
 
-      external Init_Parameter, Init_Particles, Trace_particle, Calculate_Density
+      external Init_Parameter, Init_Particles, Trace_particle
       external Get_exobaseBC, read_Lya_Bph, write_density_4D
       external MPI_INIT, MPI_COMM_RANK, MPI_COMM_SIZE, MPI_FINALIZE, MPI_BARRIER, MPI_REDUCE
+      external Forward_Tracing_particle, Calculate_Escaping_Flux_constBC
+      external Physics_tag, gen_points_for_NV, Make_Parameters_OutFile
 
       real*8, allocatable, dimension(:,:,:,:) :: b_ptl, f_ptl
       integer, allocatable, dimension(:,:,:) :: b_flags, f_flags
@@ -88,10 +90,10 @@
          
          if (rank .eq. 0) then
 !            do it=1,ntperday
-               do ilon=2,nLong
-                  esc_flux(ilon,1)       = esc_flux(1,1)         ! South pole
-                  esc_flux(ilon,nLat_NS) = esc_flux(1,nLat_NS)   ! North pole
-               enddo
+!               do ilon=2,nLong
+!                  esc_flux(ilon,1)       = esc_flux(1,1)         ! South pole
+!                  esc_flux(ilon,nLat_NS) = esc_flux(1,nLat_NS)   ! North pole
+!               enddo
 !            enddo ! it
 
             write(dayst, '(I7.7)') iday
