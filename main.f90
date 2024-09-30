@@ -35,14 +35,14 @@
       call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierr)
 
       call Init_Parameter(radial_distance_range, energy_range, longitude_range, latitude_range, latitudeNS_range, radial_boundary, tmax)
-
       ! load BC
       year = int(start_ydoy/1000);  write(yearst, '(I4.4)') year
       call Get_exobaseBC(nH_BC, TH_BC, rank)
       call read_Lya_Bph(Lya, bph);  if (i_Photoionization .eq. 0) bph = 0.d0
-
-      call gen_points_for_NV()
-      print*, "N_vel_directions = ", N_vel_directions
+      ! call modules
+      call Physics_tag(); call gen_points_for_NV(); print*, "N_vel_directions = ", N_vel_directions
+      call Make_Parameters_OutFile()
+      ! End Initialization
 
       allocate(ptl(N_vel_directions,nRadial,nEnergy,7))
       allocate(flags(N_vel_directions,nRadial,nEnergy))
