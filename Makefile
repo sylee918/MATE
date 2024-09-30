@@ -13,11 +13,19 @@ flags = -O2 -mcmodel=medium
 
 all: MATE.x
 
+esc: MATE_esc.x
+
 MATE.x: Module_MATE.o main.o init.o trace.o PSD.o extra_tools.o IO_utils.o
 	$(FC) -o MATE.x Module_MATE.o main.o init.o trace.o PSD.o extra_tools.o IO_utils.o
 
+MATE_esc.x: Module_MATE.o main_esc.o init.o trace.o PSD.o extra_tools.o IO_utils.o
+	$(FC) -o MATE.x Module_MATE.o main_esc.o init.o trace.o PSD.o extra_tools.o IO_utils.o
+
 Module_MATE.o: Module_MATE.f90
 	$(FC) -c $(flags) Module_MATE.f90
+
+main_esc.o: main_esc.f90
+	$(FC) -c $(flags) main_esc.f90
 
 main.o: main.f90
 	$(FC) -c $(flags) main.f90

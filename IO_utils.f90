@@ -237,6 +237,30 @@
       End
 
 
+      Subroutine write_density_2D(density_2D,tag)
+
+         include "Setting.inc"
+         real*8 density_2D(nRadial,nLong,nLat_NS)
+         real, dimension(:,:,:), allocatable :: real_density_2D
+         integer nlen
+         character*30 tag
+         character*100 filename
+
+         allocate(real_density_2D(nRadial,nLong,nLat_NS))
+         real_density_2D = real(density_2D)
+
+         filename = trim(outdir) // 'ESC_FLUX_2D' // trim(tag) // '.data' 
+         inquire(iolength=nlen) real_density_2D
+         open(file=filename,unit=42,form='unformatted',access='direct',recl=nlen,status='replace')
+         write(42,rec=1) real_density_2D
+         close(42)
+
+         deallocate(real_density_2D)
+
+         return
+      End
+
+
       Subroutine write_density_3D(density_3D,tag)
 
          include "Setting.inc"

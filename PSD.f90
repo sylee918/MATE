@@ -130,6 +130,109 @@
       End
 
 
+!      Subroutine Calculate_Density_Hodge(fin, flags, nH_BC,TH_BC, number_density_at_single_LON_LAT, rank)
+      Subroutine Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux, rank)
+
+         use Module_for_NVelocityDirection
+         use, intrinsic :: ieee_arithmetic
+         include "Setting.inc"
+         external calculate_Velocity_Volume_Element
+         external GSE2SPH
+
+         real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: b_ptl, f_ptl
+         integer, dimension(N_vel_directions,nRadial,nEnergy) :: f_flags
+         real*8, dimension(nEnergy,N_vel_directions) :: dV2
+         real*8 each_n, esc_flux, cexo2
+         real*8 pos(3), vel(3), vel2
+         real*8 temp_BC, n_BC, vel_BC(3), fac, number_density
+         integer iR,iE,iv, i
+         real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
+         real*8 finlon, finlat
+         real*8 current_time, t0, t1, Iph
+         integer iflon, iflat, it, rank, quotient
+         character*30 fn2D, fn3D
+         integer idoy, iday
+
+         vel_BC = 0.d0;
+         call calculate_Velocity_Volume_Element(dV2)
+
+         each_n = 0.d0
+
+         fac = 2.d0*kb/mH
+
+         do iR=1,nRadial      ! Outermost iR-loop
+            do iE=1,nEnergy
+               do iv=1,N_vel_directions
+!                  t0 = current_time + fin(iv,iR,iE,1)/86400.    ! unit day
+!                  idoy = int(t0)                               ! yyyy+doy
+!                  t1 = (t0 - idoy)*86400.                       ! hms in seconds
+!                  it = floor(t1/tb_res)+1
+!                  if (idoy .lt. start_ydoy-nt_bwd_bc) then ; idoy=start_ydoy-nt_bwd_bc ; it=1 ; endif
+                  if (f_flags(iv,iR,iE) .eq. 12) then
+                     do i=1,3
+                        pos(i) = b_ptl(iv,iR,iE,i+1)
+                        vel(i) = b_ptl(iv,iR,iE,i+4)
+                     enddo
+
+                     call GSE2SPH(pos,finlon,finlat)
+!                     iflon=floor(finlon/bc_res)+1                !   0 < lon < 360
+!                    ** It is due to the longitude is defined from -180 to 180 in python, not 0 to 360.
+!                    ** If it is defined from 0 to 360, then use the above one.
+                     iflon=floor(finlon/bc_res)+(180/bc_res)+1              
+                     iflat=floor(finlat/bc_res)+(90/bc_res)+1     ! -90 < lat < 90
+                     if (iflat .eq. 180/bc_res+1) then
+                        iflon = iflon + 180/bc_res
+                        iflat = 180/bc_res
+                     endif
+                     if (iflon .ge. 360/bc_res+1) then
+                        quotient = int(iflon/(360/bc_res))
+                        iflon = iflon - (360/bc_res)*quotient
+                     endif
+
+!                     n_BC    = nH_BC(iflon,iflat,it,idoy)
+!                     temp_BC = TH_BC(iflon,iflat,it,idoy)
+                     n_BC    = 1.2d5
+                     temp_BC = 1.d3
+
+!                     vel = (vel - vel_BC)
+                     cexo2 = fac*temp_BC
+                     vel2 = sum(vel*vel)
+                     number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5
+                     each_n = number_density * dV2(iE,iv) 
+
+                     do i=1,3
+                        pos(i) = f_ptl(iv,iR,iE,i+1)
+                        vel(i) = f_ptl(iv,iR,iE,i+4)
+                     enddo                    
+                     call GSE2SPH(pos,finlon,finlat)
+!                     iflon=floor(finlon/bc_res)+1                !   0 < lon < 360
+!                    ** It is due to the longitude is defined from -180 to 180 in python, not 0 to 360.
+!                    ** If it is defined from 0 to 360, then use the above one.
+                     iflon=floor(finlon/bc_res)+(180/bc_res)+1              
+                     iflat=floor(finlat/bc_res)+(90/bc_res)+1     ! -90 < lat < 90
+                     if (iflat .eq. 180/bc_res+1) then
+                        iflon = iflon + 180/bc_res
+                        iflat = 180/bc_res
+                     endif
+                     if (iflon .ge. 360/bc_res+1) then
+                        quotient = int(iflon/(360/bc_res))
+                        iflon = iflon - (360/bc_res)*quotient
+                     endif
+
+                     ! vr = (v.r)/|r|
+                     vr = (pos(1)*vel(1)+pos(2)*vel(2)+pos(3)*vel(3))/sqrt(pos(1)*pos(1)+pos(2)*pos(2)+pos(3)*pos(3))
+                     number_density_2D(iflon,iflat) = number_density_2D(iflon,iflat) + each_n*vr
+
+                  endif
+               enddo
+            enddo
+            esc_flux = sum(each_n(:,iR,:))
+         enddo
+
+         return
+      End
+
+
 
       Subroutine MSIS_averaged_over_exobase(MSIS_nH,MSIS_TH)
 
