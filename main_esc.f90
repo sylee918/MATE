@@ -56,7 +56,8 @@
 !            ihour = it*(time_resolution/3600.d0)
 !            iminute = it*(time_resolution/60.d0)-ihour*60
 !            print*, 'Current time:', iday, ihour, iminute
-            current_time = start_ydoy
+            current_time = start_ydoy*1.d0
+            print*, "Current_time = ", current_time
 
             do ilat=nLat,nLat_NS
                lat = latitudeNS_range(ilat)
