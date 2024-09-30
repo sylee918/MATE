@@ -100,6 +100,7 @@
       Subroutine Trace_particle(ptl,flags, radial_boundary, tmax, Lya, current_time)
 
 !         use omp_lib
+         use Module_for_NVelocityDirection
          include "Setting.inc"
          external rk4, calculate_final_timestep
 

@@ -51,6 +51,7 @@
 
       Subroutine Init_Particles(ptl, radial_distance_range, energy_range, lon,lat)
 
+            use Module_for_NVelocityDirection
             include "Setting.inc"
             external gen_points
 

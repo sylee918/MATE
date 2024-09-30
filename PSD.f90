@@ -1,5 +1,6 @@
       Subroutine Initialize(input_dir, init, fin, flags, tag, thread_num)
 
+         use Module_for_NVelocityDirection
          include "Setting.inc"
          external Init_Parameter, read_ind_binary, read_fin_binary
 
@@ -27,6 +28,7 @@
       Subroutine Calculate_Density(fin, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
          ! "cdensity" in python code
 !         use omp_lib
+         use Module_for_NVelocityDirection
          use, intrinsic :: ieee_arithmetic
          include "Setting.inc"
          external calculate_Velocity_Volume_Element
