@@ -131,7 +131,7 @@
 
 
 !      Subroutine Calculate_Density_Hodge(fin, flags, nH_BC,TH_BC, number_density_at_single_LON_LAT, rank)
-      Subroutine Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux, rank)
+      Subroutine Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, number_density_2D, rank)
 
          use Module_for_NVelocityDirection
          use, intrinsic :: ieee_arithmetic
@@ -141,14 +141,15 @@
 
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: b_ptl, f_ptl
          integer, dimension(N_vel_directions,nRadial,nEnergy) :: f_flags
+         real*8, dimension(nbx,nby) :: number_density_2D
          real*8, dimension(nEnergy,N_vel_directions) :: dV2
          real*8 each_n, esc_flux, cexo2
          real*8 pos(3), vel(3), vel2
          real*8 temp_BC, n_BC, vel_BC(3), fac, number_density
          integer iR,iE,iv, i
          real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
-         real*8 finlon, finlat
-         real*8 current_time, t0, t1, Iph
+         real*8 finlon, finlat, vr
+         real*8 current_time, t0, t1 
          integer iflon, iflat, it, rank, quotient
          character*30 fn2D, fn3D
          integer idoy, iday
@@ -226,7 +227,6 @@
                   endif
                enddo
             enddo
-            esc_flux = sum(each_n(:,iR,:))
          enddo
 
          return

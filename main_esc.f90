@@ -18,9 +18,8 @@
       real*8 lon,lat
       integer ilon, ilat, nLon0
 
-      real*8 number_density_1D(nRadial), esc_flux
-!      real*8, dimension(nLon,nLat_NS,ntperday) :: number_density_3D, number_density_3D_MPI
-      real*8, dimension(nLon,nLat_NS) :: number_density_2D, number_density_2D_MPI
+      real*8 number_density_1D(nRadial)
+      real*8, dimension(nbx,nby) :: esc_flux, esc_flux_MPI
       real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
       character*30 tag
       integer rank, nprocs, ierr, il, N_REDUCE
@@ -48,6 +47,7 @@
       allocate(b_ptl(N_vel_directions,nRadial,nEnergy,7)) ; allocate(b_flags(N_vel_directions,nRadial,nEnergy))
       allocate(f_ptl(N_vel_directions,nRadial,nEnergy,7)) ; allocate(f_flags(N_vel_directions,nRadial,nEnergy))
 
+      esc_flux=0.d0; esc_flux_MPI=0.d0
 !      do iday=start_ydoy, end_ydoy
 !         number_density_2D_MPI=0.d0; number_density_2D=0.d0
 !         do it=1,ntperday
@@ -68,20 +68,13 @@
                      call Init_Particles(b_ptl, radial_distance_range, energy_range, lon,lat)
                      f_ptl = b_ptl
                      call Trace_particle(b_ptl, b_flags, radial_boundary, tmax, Lya, current_time)
-
-!                     call Calculate_Density(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
-!                     number_density_2D_MPI(:,ilon,ilat) = number_density_1D
-
                      call Forward_Tracing_particle(f_ptl,f_flags, b_flags, radial_boundary, tmax, Lya, current_time)
-                     call Calculate_Escaping_Flux_constBC(fin, flags, esc_flux, rank)
-                     number_density_2D_MPI(ilon,ilat) = esc_flux
-
+                     call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_MPI, rank)
 
                      if (lat .gt. 0) then    ! N/S symmetry
                         b_ptl(:,:,:,4) = -b_ptl(:,:,:,4)
                         b_ptl(:,:,:,7) = -b_ptl(:,:,:,7)
-                        call Calculate_Escaping_Flux_constBC(fin, flags, esc_flux, rank)
-                        number_density_2D_MPI(ilon,nLat_NS+1-ilat) = esc_flux
+                        call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_MPI, rank)
                      endif
 
                   endif
@@ -91,19 +84,19 @@
 
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
          N_REDUCE = nRadial * nLon * nLat_NS * ntperday
-         call MPI_REDUCE(number_density_2D_MPI, number_density_2D, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
+         call MPI_REDUCE(esc_flux_MPI, esc_flux, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
          
          if (rank .eq. 0) then
 !            do it=1,ntperday
                do ilon=2,nLong
-                  number_density_2D(ilon,1)       = number_density_2D(1,1)         ! South pole
-                  number_density_2D(ilon,nLat_NS) = number_density_2D(1,nLat_NS)   ! North pole
+                  esc_flux(ilon,1)       = esc_flux(1,1)         ! South pole
+                  esc_flux(ilon,nLat_NS) = esc_flux(1,nLat_NS)   ! North pole
                enddo
 !            enddo ! it
 
             write(dayst, '(I7.7)') iday
             tag = '_' // trim(tag0) // '_' // trim(dayst)
-            call write_density_2D(number_density_2D, tag)
+            call write_density_2D(esc_flux, tag)
          endif
 
 !      enddo ! iday
