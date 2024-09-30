@@ -39,7 +39,7 @@
             ! Generate "tag_phys".
             ! Example: tag = "GRCPX" or "GRC"
             include "Setting.inc"
-            character(len=1), dimension(n_physics) :: phy_name
+            character(len=1), dimension(n_physics) :: phy_name=''
 
             if (i_EarthGravity .eq. 1)           phy_name(1)='G'
             if (i_SolarRadiationPressure .eq. 1) phy_name(2)='R'
