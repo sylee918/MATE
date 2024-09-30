@@ -36,8 +36,8 @@
 
       call Init_Parameter(radial_distance_range, energy_range, longitude_range, latitude_range, latitudeNS_range, radial_boundary, tmax)
       ! load BC
-      year = int(start_ydoy/1000);  write(yearst, '(I4.4)') year
       Lya = 3.d0 ; bph=0.d0
+      year = int(start_ydoy/1000);  write(yearst, '(I4.4)') year
 !      call Get_exobaseBC(nH_BC, TH_BC, rank)
 !      call read_Lya_Bph(Lya, bph);  if (i_Photoionization .eq. 0) bph = 0.d0
       ! call modules
@@ -56,6 +56,7 @@
 !            ihour = it*(time_resolution/3600.d0)
 !            iminute = it*(time_resolution/60.d0)-ihour*60
 !            print*, 'Current time:', iday, ihour, iminute
+            current_time = start_ydoy
 
             do ilat=nLat,nLat_NS
                lat = latitudeNS_range(ilat)
