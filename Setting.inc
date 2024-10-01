@@ -4,7 +4,7 @@
 !!**** Recommended to change the parameters for your run ***!!
 
    !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data"
-      character*10, parameter :: Runname_in_10char              = "test"
+      character*10, parameter :: Runname_in_10char              = "NV6"
    
    !! TIME SETTING !!
       integer, parameter ::      Start_Time_in_YYYYDOY          = 2008164
@@ -18,7 +18,7 @@
       real*8, parameter  ::      dR                             = 0.5
 
    !! Number of Particle Direction !!
-      integer, parameter ::      dV_theta                         = 10                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
+      integer, parameter ::      dV_theta                         = 6                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
       integer, parameter ::      nTheta                           = 180/dV_theta + 1          ! # of theta grids
 
    !! (FIX ME!!) Energy Grid !!

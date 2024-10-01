@@ -97,9 +97,7 @@
 !               enddo
 !            enddo ! it
 
-            write(dayst, '(I7.7)') iday
-            tag = '_' // trim(tag0)
-            call Write_ESC_FLUX_2D(esc_flux, tag)
+            call Write_ESC_FLUX_2D(esc_flux)
          endif
 
 !      enddo ! iday
