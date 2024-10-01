@@ -75,8 +75,8 @@
                      call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_MPI, rank)
 
                      if (lat .gt. 0) then    ! N/S symmetry
-                        b_ptl(:,:,:,4) = -b_ptl(:,:,:,4)
-                        b_ptl(:,:,:,7) = -b_ptl(:,:,:,7)
+                        b_ptl(:,:,:,4) = -b_ptl(:,:,:,4); b_ptl(:,:,:,7) = -b_ptl(:,:,:,7)
+                        f_ptl(:,:,:,4) = -f_ptl(:,:,:,4); f_ptl(:,:,:,7) = -f_ptl(:,:,:,7)
                         call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_MPI, rank)
                      endif
 
