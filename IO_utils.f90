@@ -350,6 +350,9 @@
          allocate(real_density_2D(nbx,nby))
          real_density_2D = real(density_2D)
 
+      print*, tag_phys
+      print*, tag0
+
          filename = trim(outdir) // 'ESC_FLUX_2D' // '_' // trim(tag_phys) // '_' // trim(tag0) // '.data' 
          inquire(iolength=nlen) real_density_2D
          open(file=filename,unit=42,form='unformatted',access='direct',recl=nlen,status='replace')
