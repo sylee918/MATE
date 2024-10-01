@@ -59,7 +59,7 @@
       integer, parameter :: nRadial = (RadialRange_max-RadialRange_min)/dR + 1  
 
       integer, parameter :: geores = GEO_Resolution_in_Degree
-      integer, parameter :: nLat = 180/geores +1
+      integer, parameter :: nLat = 90/geores +1
       integer, parameter :: nLat_NS = nLat*2-1              ! # of latitude grid for both hemisphere
       integer, parameter :: nLong = 360/geores
       integer, parameter :: nLon = nLong                    ! To avoid confusion...^^;
