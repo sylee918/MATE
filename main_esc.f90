@@ -86,7 +86,8 @@
 !         enddo ! ihour
 
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-         N_REDUCE = nRadial * nLon * nLat_NS * ntperday
+!         N_REDUCE = nRadial * nLon * nLat_NS * ntperday
+         N_REDUCE = nbx * nby
          call MPI_REDUCE(esc_flux_MPI, esc_flux, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
          
          if (rank .eq. 0) then
