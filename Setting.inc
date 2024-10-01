@@ -27,7 +27,7 @@
    !! DIRECTORIES SETTING !!
       character*70, parameter :: Lya_dir                          = "indices_for_MSIS_1963-2023_2.txt"
       character*70, parameter :: BC_dir                           = "./exobaseBC/"
-      character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0826/GRC/"
+      character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/ESC/"
 
    !! Including Physics !!
       integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
