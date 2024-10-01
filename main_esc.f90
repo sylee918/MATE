@@ -41,8 +41,8 @@
 !      call Get_exobaseBC(nH_BC, TH_BC, rank)
 !      call read_Lya_Bph(Lya, bph);  if (i_Photoionization .eq. 0) bph = 0.d0
       ! call modules
-      call Physics_tag(); call gen_points_for_NV(); print*, "N_vel_directions = ", N_vel_directions
-      call Make_Parameters_OutFile()
+      call Physics_tag(); call gen_points_for_NV()
+      call Make_Parameters_OutFile()  ! It's not moduel, just making .in file
       ! End Initialization
 
       allocate(b_ptl(N_vel_directions,nRadial,nEnergy,7)) ; allocate(b_flags(N_vel_directions,nRadial,nEnergy))
