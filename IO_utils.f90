@@ -347,13 +347,9 @@
          integer nlen
          character*100 filename
 
+         call Physics_tag()
          allocate(real_density_2D(nbx,nby))
          real_density_2D = real(density_2D)
-
-         call Physics_tag()
-         
-      print*, tag_phys
-      print*, tag0
 
          filename = trim(outdir) // 'ESC_FLUX_2D_' // trim(tag_phys) // '_' // trim(tag0) // '.data' 
          inquire(iolength=nlen) real_density_2D
