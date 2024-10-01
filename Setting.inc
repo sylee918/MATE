@@ -3,9 +3,9 @@
 !!********************<< User Setting >>********************!!
 !!**** Recommended to change the parameters for your run ***!!
 
-   !! TAG for an Unique Runname !!
-      character*10, parameter :: TAG_within_10_characters       = "test"                      ! ex: output_filename = "MATE_nH_GRC_{tag}_2008174.data"
-
+   !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data"
+      character*10, parameter :: Runname_in_10char              = "test"
+   
    !! TIME SETTING !!
       integer, parameter ::      Start_Time_in_YYYYDOY          = 2008164
       integer, parameter ::      End_Time_in_YYYYDOY            = 2008164
@@ -54,7 +54,7 @@
 
       integer, parameter :: start_ydoy = Start_Time_in_YYYYDOY
       integer, parameter :: end_ydoy   = End_Time_in_YYYYDOY
-      character*10, parameter :: tag0 = TAG_within_10_characters
+      character*10, parameter :: tag0 = Runname_in_10char
 
       integer, parameter :: nRadial = (RadialRange_max-RadialRange_min)/dR + 1  
 
