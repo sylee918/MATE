@@ -9,6 +9,7 @@
       real*8, parameter :: mp = 1.67262158d-27              ! Proton mass [kg]
       real*8, parameter :: me = 9.10938188d-31              ! Electron mass [kg]
       real*8, parameter :: Re = 6.371009d6                  ! Earth radius [m]
+      real*8, parameter :: Re2 = Re**2                      ! Square of Earth radius [m^2]
       real*8, parameter :: mEarth = 5.9722e24               ! Earth mass [kg]
       real*8, parameter :: constG = 6.6743e-11              ! Gravitational constant
       real*8, parameter :: GM = constG * mEarth             ! For convenience

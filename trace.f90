@@ -2,35 +2,39 @@
 
          include "Setting.inc"
 
-         real*8 temp(6), dt
-         real*8, dimension(3) :: pos, vel
-         real*8, dimension(6) :: deriv, deriv_G, deriv_R, deriv_C, k_out
-         real*8 rho, f0
+         real*8, target :: temp(6)
+         real*8, pointer :: pos(:), vel(:)
+         real*8 dt, coeff_G, coeff_R, coeff_C, norm_pos, norm_pos2, norm_pos3
+         real*8, dimension(6) :: deriv, k_out
+         real*8 rho2, f0
 
-         pos = temp(1:3)
-         vel = temp(4:6)
+         pos => temp(1:3)
+         vel => temp(4:6)
 
-         deriv = 0.d0
-         deriv(1:3) = vel 
+         deriv(1:3) = vel
 
-         deriv_G = 0.d0
-         deriv_R = 0.d0
-         deriv_C = 0.d0
+         norm_pos2 = pos(1)**2 + pos(2)**2 + pos(3)**2
+         norm_pos = sqrt(norm_pos2)
+         norm_pos3 = norm_pos * norm_pos2
+         coeff_G = -GM / norm_pos3
+         deriv(4:6) = coeff_G * pos * i_EarthGravity
 
-         deriv_G(4:6) = -GM * pos / (pos(1)**2 + pos(2)**2 + pos(3)**2)**1.5   
-
-         ! Add Radialtion Pressure
-            ! No radiation by Earth's shadow
-         rho = sqrt(pos(2)**2 + pos(3)**2)
-         if (pos(1) .gt. 0 .or. rho .gt. Re) then
-            deriv_R(4) = - arad*f0
+         ! Add Radialtion Pressure considering Earth's shadow
+         coeff_R = arad * f0 * i_SolarRadiationPressure
+         if (pos(1) .gt. 0) then
+            deriv(4) = deriv(4) - coeff_R
+         else
+            rho2 = pos(2)**2 + pos(3)**2
+            if (rho2 .gt. Re2) then
+               deriv(4) = deriv(4) - coeff_R
+            endif
          endif
 
          ! Add Coriolis Force
-         deriv_C(4) = 2*Wrot*vel(2) 
-         deriv_C(5) = -2*Wrot*vel(1)
+         coeff_C = 2*Wrot* i_CoriolisForce_GSE
+         deriv(4) = deriv(4) + coeff_C * vel(2) 
+         deriv(5) = deriv(5) - coeff_C * vel(1)
 
-         deriv = deriv_G*i_EarthGravity + deriv_R*i_SolarRadiationPressure + deriv_C*i_CoriolisForce_GSE
          k_out = dt * deriv
 
          return
