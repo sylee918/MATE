@@ -32,8 +32,8 @@
    !! Including Physics !!
       integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
       integer, parameter ::      i_SolarRadiationPressure         = 1                          ! If you set these values as N, then the force is N-times stronger as a coefficient.
-      integer, parameter ::      i_CoriolisForce_GSE              = 1
-      integer, parameter ::      i_Photoionization                = 1
+      integer, parameter ::      i_CoriolisForce_GSE              = 0
+      integer, parameter ::      i_Photoionization                = 0
       integer, parameter ::      i_ChargeExchange                 = 0                          ! Not developed yet
 
    !! Exobase Boundary Condition (BC) Setting !!
