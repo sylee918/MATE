@@ -350,6 +350,8 @@
          allocate(real_density_2D(nbx,nby))
          real_density_2D = real(density_2D)
 
+         call Physics_tag()
+         
       print*, tag_phys
       print*, tag0
 
@@ -430,7 +432,7 @@
 
 
       Subroutine Make_Parameters_OutFile()
-      
+
          use Module_for_NVelocityDirection
          use Module_Physics_tag
          include "Setting.inc"
