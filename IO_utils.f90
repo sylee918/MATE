@@ -237,20 +237,19 @@
       End
 
 
-      Subroutine Write_ESC_FLUX_2D(density_2D,tag)
+      Subroutine Write_ESC_FLUX_2D(density_2D)
 
          use Module_Physics_tag
          include "Setting.inc"
          real*8 density_2D(nbx,nby)
          real, dimension(:,:), allocatable :: real_density_2D
          integer nlen
-         character*30 tag
          character*100 filename
 
          allocate(real_density_2D(nbx,nby))
          real_density_2D = real(density_2D)
 
-         filename = trim(outdir) // 'ESC_FLUX_2D' // '_' // trim(tag_phys) // '_' // trim(tag) // '.data' 
+         filename = trim(outdir) // 'ESC_FLUX_2D' // '_' // trim(tag_phys) // '_' // trim(tag0) // '.data' 
          inquire(iolength=nlen) real_density_2D
          open(file=filename,unit=42,form='unformatted',access='direct',recl=nlen,status='replace')
          write(42,rec=1) real_density_2D
