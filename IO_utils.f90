@@ -353,7 +353,7 @@
       print*, tag_phys
       print*, tag0
 
-         filename = trim(outdir) // 'ESC_FLUX_2D' // '_' // trim(tag_phys) // '_' // trim(tag0) // '.data' 
+         filename = trim(outdir) // 'ESC_FLUX_2D_' // trim(tag_phys) // '_' // trim(tag0) // '.data' 
          inquire(iolength=nlen) real_density_2D
          open(file=filename,unit=42,form='unformatted',access='direct',recl=nlen,status='replace')
          write(42,rec=1) real_density_2D
