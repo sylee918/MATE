@@ -432,7 +432,7 @@
          include "Setting.inc"
          character*100 filename
 
-         filename = 'MATE_Parameters_' // trim(TAG_within_10_characters) // '.in'
+         filename = 'MATE_Parameters_' // trim(Runname_in_10char) // '.in'
          open(file=filename,unit=123,status='replace')
          write(123,*) N_vel_directions, nRadial, nEnergy
          write(123,*) nRadial, nLon, nLat_NS, ntperday
