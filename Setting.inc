@@ -43,7 +43,7 @@
       integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 2008164                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
    !! Particle Tracing Range !!
-      real*8, parameter :: inner_boundary                         = Re + 500.d0                ! Exobase location
+      real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location
       real*8, parameter :: outer_boundary                         = 100*Re
       real*8, parameter :: Max_Travel_Time_in_Days                = 60                         ! DEFAULT = 60
 
