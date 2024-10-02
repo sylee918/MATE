@@ -4,7 +4,7 @@
 
 !         real*8, target :: temp(6)
 !         real*8, pointer :: pos(:), vel(:)
-         real*8, temp(6), pos(3), vel(3)
+         real*8 temp(6), pos(3), vel(3)
          real*8 dt, coeff_G, coeff_R, coeff_C, norm_pos, norm_pos2, norm_pos3
          real*8, dimension(6) :: deriv, k_out
          real*8 rho2, f0
