@@ -29,6 +29,7 @@
       real*8, dimension(start_ydoy_index:end_ydoy_index) :: Lya, bph
       real*8 current_time
       character*10 yearst, dayst
+      real*8, dimension(nEnergy) :: esc_flux_1D, esc_flux_1D_MPI
 
       call MPI_INIT(ierr)
       call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
@@ -48,7 +49,8 @@
       allocate(b_ptl(N_vel_directions,nRadial,nEnergy,7)) ; allocate(b_flags(N_vel_directions,nRadial,nEnergy))
       allocate(f_ptl(N_vel_directions,nRadial,nEnergy,7)) ; allocate(f_flags(N_vel_directions,nRadial,nEnergy))
 
-      esc_flux=0.d0; esc_flux_MPI=0.d0
+!      esc_flux=0.d0; esc_flux_MPI=0.d0
+      esc_flux_1D=0.d0; esc_flux_1D_MPI=0.d0
 !      do iday=start_ydoy, end_ydoy
 !         number_density_2D_MPI=0.d0; number_density_2D=0.d0
 !         do it=1,ntperday
@@ -72,12 +74,12 @@
                      f_ptl = b_ptl
                      call Trace_particle(b_ptl, b_flags, radial_boundary, tmax, Lya, current_time)
                      call Forward_Tracing_particle(f_ptl,f_flags, b_flags, radial_boundary, tmax, Lya, current_time)
-                     call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_MPI, energy_range, rank)
+                     call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_1D_MPI, energy_range, rank)
 
                      if (lat .gt. 0) then    ! N/S symmetry
                         b_ptl(:,:,:,4) = -b_ptl(:,:,:,4); b_ptl(:,:,:,7) = -b_ptl(:,:,:,7)
                         f_ptl(:,:,:,4) = -f_ptl(:,:,:,4); f_ptl(:,:,:,7) = -f_ptl(:,:,:,7)
-                        call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_MPI, energy_range, rank)
+                        call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_1D_MPI, energy_range, rank)
                      endif
 
                   endif
@@ -90,7 +92,7 @@
 !         N_REDUCE = nbx * nby
 !         call MPI_REDUCE(esc_flux_MPI, esc_flux, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
          N_REDUCE = nEnergy
-         call MPI_REDUCE(esc_flux_MPI, esc_flux, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
+         call MPI_REDUCE(esc_flux_1D_MPI, esc_flux_1D, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
 
          if (rank .eq. 0) then
 !            do it=1,ntperday
@@ -100,7 +102,8 @@
 !               enddo
 !            enddo ! it
 
-            call Write_ESC_FLUX_2D(esc_flux)
+!            call Write_ESC_FLUX_2D(esc_flux)
+            call Write_ESC_FLUX_1D(esc_flux_1D)
          endif
 
 !      enddo ! iday
