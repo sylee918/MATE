@@ -154,7 +154,7 @@
          character*30 fn2D, fn3D
          integer idoy, iday, iE1
          real*8, dimension(nEnergy) :: PSD2, energy_range
-         real*8 Enr, w1, w2, PSD1, deltaE
+         real*8 Enr, w1, w2, deltaE
 
          vel_BC = 0.d0;
          call calculate_Velocity_Volume_Element(dV2)
