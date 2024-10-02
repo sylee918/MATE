@@ -131,7 +131,7 @@
 
 
 !      Subroutine Calculate_Density_Hodge(fin, flags, nH_BC,TH_BC, number_density_at_single_LON_LAT, rank)
-      Subroutine Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, number_density_2D, energy_range, rank)
+      Subroutine Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, PSD2, energy_range, rank)
 
          use Module_for_NVelocityDirection
          use, intrinsic :: ieee_arithmetic
