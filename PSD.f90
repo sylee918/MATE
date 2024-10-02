@@ -145,7 +145,7 @@
          real*8, dimension(nEnergy,N_vel_directions) :: dV2
          real*8 each_n, esc_flux, cexo2
          real*8 pos(3), vel(3), vel2
-         real*8 temp_BC, n_BC, vel_BC(3), fac, number_density
+         real*8 temp_BC, n_BC, vel_BC(3), fac, PSD1
          integer iR,iE,iv, i
          real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
          real*8 finlon, finlat, vr
@@ -198,8 +198,8 @@
 !                     vel = (vel - vel_BC)
                      cexo2 = fac*temp_BC
                      vel2 = sum(vel*vel)
-                     number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5
-                     each_n = number_density * dV2(iE,iv) 
+                     PSD1 = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5
+!                     each_n = PSD1 * dV2(iE,iv) 
 
                      do i=1,3
                         pos(i) = f_ptl(iv,iR,iE,i+1)
@@ -222,7 +222,10 @@
 
                      ! vr = (v.r)/|r|
                      vr = (pos(1)*vel(1)+pos(2)*vel(2)+pos(3)*vel(3))/sqrt(pos(1)*pos(1)+pos(2)*pos(2)+pos(3)*pos(3))
-                     number_density_2D(iflon,iflat) = number_density_2D(iflon,iflat) + each_n*vr
+                  enr = 0.5*mH*vr*vr/e ! in eV
+                  jE = integer value of enr
+                  PSD2(iflon,iflat,jE) = PSD2(iflon,iflat,jE) + PSD1
+!                     number_density_2D(iflon,iflat) = number_density_2D(iflon,iflat) + PSD1*vr
 
                   endif
                enddo
