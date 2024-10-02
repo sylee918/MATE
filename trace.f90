@@ -9,8 +9,11 @@
          real*8, dimension(6) :: deriv, k_out
          real*8 rho2, f0
 
-         pos => temp(1:3)
-         vel => temp(4:6)
+!         pos => temp(1:3)
+!         vel => temp(4:6)
+
+         pos = temp(1:3)
+         vel = temp(4:6)
 
          deriv(1:3) = vel
 
