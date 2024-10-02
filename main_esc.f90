@@ -72,12 +72,12 @@
                      f_ptl = b_ptl
                      call Trace_particle(b_ptl, b_flags, radial_boundary, tmax, Lya, current_time)
                      call Forward_Tracing_particle(f_ptl,f_flags, b_flags, radial_boundary, tmax, Lya, current_time)
-                     call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_MPI, rank)
+                     call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_MPI, energy_range, rank)
 
                      if (lat .gt. 0) then    ! N/S symmetry
                         b_ptl(:,:,:,4) = -b_ptl(:,:,:,4); b_ptl(:,:,:,7) = -b_ptl(:,:,:,7)
                         f_ptl(:,:,:,4) = -f_ptl(:,:,:,4); f_ptl(:,:,:,7) = -f_ptl(:,:,:,7)
-                        call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_MPI, rank)
+                        call Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, esc_flux_MPI, energy_range, rank)
                      endif
 
                   endif
@@ -86,10 +86,12 @@
 !         enddo ! ihour
 
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-!         N_REDUCE = nRadial * nLon * nLat_NS * ntperday
-         N_REDUCE = nbx * nby
+!!         N_REDUCE = nRadial * nLon * nLat_NS * ntperday
+!         N_REDUCE = nbx * nby
+!         call MPI_REDUCE(esc_flux_MPI, esc_flux, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
+         N_REDUCE = nEnergy
          call MPI_REDUCE(esc_flux_MPI, esc_flux, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
-         
+
          if (rank .eq. 0) then
 !            do it=1,ntperday
 !               do ilon=2,nLong

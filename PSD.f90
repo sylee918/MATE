@@ -131,7 +131,7 @@
 
 
 !      Subroutine Calculate_Density_Hodge(fin, flags, nH_BC,TH_BC, number_density_at_single_LON_LAT, rank)
-      Subroutine Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, number_density_2D, rank)
+      Subroutine Calculate_Escaping_Flux_constBC(b_ptl, f_ptl, f_flags, number_density_2D, energy_range, rank)
 
          use Module_for_NVelocityDirection
          use, intrinsic :: ieee_arithmetic
@@ -152,7 +152,9 @@
          real*8 current_time, t0, t1 
          integer iflon, iflat, it, rank, quotient
          character*30 fn2D, fn3D
-         integer idoy, iday
+         integer idoy, iday, iE1
+         real*8, dimension(nEnergy) :: PSD2, energy_range
+         real*8 Enr, w1, w2, PSD1, deltaE
 
          vel_BC = 0.d0;
          call calculate_Velocity_Volume_Element(dV2)
@@ -222,9 +224,26 @@
 
                      ! vr = (v.r)/|r|
                      vr = (pos(1)*vel(1)+pos(2)*vel(2)+pos(3)*vel(3))/sqrt(pos(1)*pos(1)+pos(2)*pos(2)+pos(3)*pos(3))
-                  enr = 0.5*mH*vr*vr/e ! in eV
-                  jE = integer value of enr
-                  PSD2(iflon,iflat,jE) = PSD2(iflon,iflat,jE) + PSD1
+!                  jE = integer value of enr
+!                  PSD2(jE) = PSD2(jE) + PSD1
+
+
+
+                  Enr = 0.5*mH*vr*vr/e ! in eV
+                  do iE1 = 1, nEnergy - 1
+                     if (Enr >= energy_range(iE1) .and. Enr <= energy_range(iE1 + 1)) then
+                        deltaE = energy_range(iE1 + 1) - energy_range(iE1)
+                        w1 = (energy_range(iE1 + 1) - Enr) / deltaE
+                        w2 = (Enr - energy_range(iE1)) / deltaE
+                        ! Assign the interpolated density to the grid points
+                        PSD2(iE1) = PSD2(iE1) + PSD1 * w1
+                        PSD2(iE1 + 1) = PSD2(iE1 + 1) + PSD1 * w2
+                        exit
+                     end if
+                  enddo
+
+
+!                  PSD2(iflon,iflat,jE) = PSD2(iflon,iflat,jE) + PSD1
 !                     number_density_2D(iflon,iflat) = number_density_2D(iflon,iflat) + PSD1*vr
 
                   endif

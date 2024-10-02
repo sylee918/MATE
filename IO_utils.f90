@@ -363,6 +363,31 @@
       End
 
 
+      Subroutine Write_ESC_FLUX_1D(density_1D)
+
+         use Module_Physics_tag
+         include "Setting.inc"
+         real*8 density_1D(nEnergy)
+         real, dimension(:), allocatable :: real_density_1D
+         integer nlen
+         character*100 filename
+
+         call Physics_tag()
+         allocate(real_density_1D(nEnergy))
+         real_density_1D = real(density_1D)
+
+         filename = trim(outdir) // 'ESC_FLUX_1D_' // trim(tag_phys) // '_' // trim(tag0) // '.data' 
+         inquire(iolength=nlen) real_density_1D
+         open(file=filename,unit=42,form='unformatted',access='direct',recl=nlen,status='replace')
+         write(42,rec=1) real_density_1D
+         close(42)
+
+         deallocate(real_density_1D)
+
+         return
+      End
+
+
       Subroutine read_exobaseBC(filename, nH_temp,TH_temp, thread_num)
 
          include "Setting.inc"
