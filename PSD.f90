@@ -143,7 +143,8 @@
          integer, dimension(N_vel_directions,nRadial,nEnergy) :: f_flags
          real*8, dimension(nbx,nby) :: number_density_2D
          real*8, dimension(nEnergy,N_vel_directions) :: dV2
-         real*8 each_n, esc_flux, cexo2
+         real*8, dimension(:,:,:), allocatable :: each_n
+         real*8 esc_flux, cexo2
          real*8 pos(3), vel(3), vel2
          real*8 temp_BC, n_BC, vel_BC(3), fac, PSD1
          integer iR,iE,iv, i
@@ -158,11 +159,11 @@
 
          vel_BC = 0.d0;
          call calculate_Velocity_Volume_Element(dV2)
+!         call calculate_Velocity_Volume_Element_For_Flux(dV2)
 
+         allocate(each_n(N_vel_directions,nRadial,nEnergy))
          each_n = 0.d0
-
          fac = 2.d0*kb/mH
-
          do iR=1,nRadial      ! Outermost iR-loop
             do iE=1,nEnergy
                do iv=1,N_vel_directions
@@ -249,6 +250,7 @@
                   endif
                enddo
             enddo
+            number_density_1D(iR) = sum(each_n(:,iR,:))
          enddo
 
          return

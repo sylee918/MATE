@@ -211,6 +211,62 @@
       End
 
 
+      Subroutine Radial_Component_Of_Velocity_Volume_Element_For_Flux(v3dv)
+         ! 'v3dv' = v^3 dv (v=vr for initial condition)
+         ! 'vollist' in python code.
+         include "Setting.inc"
+         external Init_Parameter
+
+         real*8, dimension(nEnergy) :: energy_to_speed, v3dv
+         real*8 v_spacing(nEnergy+1), half_dv
+         real*8 radial_distance_range(nRadial), energy_range(nEnergy), longitude_range(nLong), latitude_range(nLat), latitudeNS_range(nLat_NS)
+         real*8 radial_boundary(2), tmax
+         integer iE
+
+         call Init_Parameter(radial_distance_range, energy_range, longitude_range, latitude_range, latitudeNS_range, radial_boundary, tmax)
+         energy_to_speed = sqrt(energy_range*e*2.d0/mH)
+
+         v_spacing(1)=energy_to_speed(1)/2
+         do iE=2, nEnergy
+            if (iE .lt. nEnergy) then
+               half_dv = 0.5d0*(energy_to_speed(iE+1)-energy_to_speed(iE))
+            endif
+            !use old half_dv of iE=nEnergy for energy_to_speed(iE+1)
+            v_spacing(iE) = energy_to_speed(iE)-half_dv
+         enddo
+         v_spacing(nEnergy+1) = energy_to_speed(nEnergy)+half_dv
+
+         do iE=1, nEnergy
+            v3dv(iE) = (v_spacing(iE+1)**4 - v_spacing(iE)**4)/4.d0
+         enddo
+
+         return
+      End
+
+
+      Subroutine calculate_Velocity_Volume_Element_For_Flux(dV2)
+
+         use Module_for_NVelocityDirection
+         include "Setting.inc"
+         external Solid_Angle_For_Velocity_Volume_Element, Radial_Component_For_Velocity_Volume_Element
+
+         real*8 solid_angle(N_vel_directions)
+         real*8, dimension(nEnergy) :: v3dv
+         real*8 dV2(nEnergy,N_vel_directions)
+         integer iE, iv
+
+         call Solid_Angle_For_Velocity_Volume_Element(solid_angle)
+         call Radial_Component_Of_Velocity_Volume_Element_For_Flux(v3dv)
+
+         do iv=1,N_vel_directions
+            do iE=1,nEnergy
+               dV2(iE,iv) = v3dv(iE)*solid_angle(iv)
+            enddo
+         enddo
+
+         return
+      End
+
       Subroutine calculate_Configuration_Volume_Element(radial_distance_range, lat, dV1)
          ! For RadPres...
          include "Setting.inc"
