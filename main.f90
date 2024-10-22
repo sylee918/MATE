@@ -70,12 +70,14 @@
                      call Init_Particles(ptl, radial_distance_range, energy_range, lon,lat)
                      call Trace_particle(ptl, flags, radial_boundary, tmax, Lya, current_time)
                      call Calculate_Density(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
+!                     call Calculate_Flux(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
                      number_density_4D_MPI(:,ilon,ilat,it) = number_density_1D
 
                      if (lat .gt. 0) then    ! N/S symmetry
                         ptl(:,:,:,4) = -ptl(:,:,:,4)
                         ptl(:,:,:,7) = -ptl(:,:,:,7)
                         call Calculate_Density(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
+!                        call Calculate_Flux(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
                         number_density_4D_MPI(:,ilon,nLat_NS+1-ilat,it) = number_density_1D
                      endif
 
