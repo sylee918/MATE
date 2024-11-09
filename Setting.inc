@@ -25,7 +25,7 @@
       integer, parameter :: nEnergy                               = 61                        ! # of energy grid
 
    !! DIRECTORIES SETTING !!
-      character*70, parameter :: Lya_dir                          = "indices_for_MSIS_1963-2023_2.txt"
+      character*70, parameter :: Lya_dir                          = "OMNI_extended.txt"         ! 1964 - 2024 (Oct)
       character*70, parameter :: BC_dir                           = "./exobaseBC/"
       character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/ESC/"
 
