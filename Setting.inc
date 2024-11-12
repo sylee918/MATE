@@ -13,7 +13,7 @@
 
    !! 3-D SPATIAL RESOLUTIONS !!
       integer, parameter ::      GEO_Resolution_in_Degree       = 15
-      real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
+      real*8, parameter  ::      RadialRange_min                = 1.5                         ! unit Re
       real*8, parameter  ::      RadialRange_max                = 15.0
       real*8, parameter  ::      dR                             = 0.5
 
@@ -32,8 +32,8 @@
    !! Including Physics !!
       integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
       integer, parameter ::      i_SolarRadiationPressure         = 1                          ! If you set these values as N, then the force is N-times stronger as a coefficient.
-      integer, parameter ::      i_CoriolisForce_GSE              = 0
-      integer, parameter ::      i_Photoionization                = 0
+      integer, parameter ::      i_CoriolisForce_GSE              = 1
+      integer, parameter ::      i_Photoionization                = 1
       integer, parameter ::      i_ChargeExchange                 = 0                          ! Not developed yet
 
    !! Exobase Boundary Condition (BC) Setting !!
