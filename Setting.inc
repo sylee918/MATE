@@ -7,8 +7,8 @@
       character*10, parameter :: Runname_in_10char              = "NV6"
    
    !! TIME SETTING !!
-      integer, parameter ::      Start_Time_in_YYYYDOY          = 2008164
-      integer, parameter ::      End_Time_in_YYYYDOY            = 2008164
+      integer, parameter ::      Start_Time_in_YYYYDOY          = 2024129
+      integer, parameter ::      End_Time_in_YYYYDOY            = 2024136
       integer, parameter ::      Output_Time_Interval_in_Minute = 60
 
    !! 3-D SPATIAL RESOLUTIONS !!
@@ -37,10 +37,10 @@
       integer, parameter ::      i_ChargeExchange                 = 0                          ! Not developed yet
 
    !! Exobase Boundary Condition (BC) Setting !!
-      character*10, parameter :: ExobaseBC_Model_Name             = "CONST"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
+      character*10, parameter :: ExobaseBC_Model_Name             = "MSIS"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
       integer, parameter ::      BC_GEO_Resolution_in_Degree      = 5
       integer, parameter ::      BC_Time_Resolution_in_Minute     = 5
-      integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 2008164                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+      integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 2024126                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
    !! Particle Tracing Range !!
       real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location
