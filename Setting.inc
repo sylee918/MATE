@@ -4,7 +4,7 @@
 !!**** Recommended to change the parameters for your run ***!!
 
    !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data"
-      character*10, parameter :: Runname_in_10char              = "NV6"
+      character*20, parameter :: Runname              = "MSIS_May10_1"
    
    !! TIME SETTING !!
       integer, parameter ::      Start_Time_in_YYYYDOY          = 2024129
@@ -54,7 +54,7 @@
 
       integer, parameter :: start_ydoy = Start_Time_in_YYYYDOY
       integer, parameter :: end_ydoy   = End_Time_in_YYYYDOY
-      character*10, parameter :: tag0 = Runname_in_10char
+      character*20, parameter :: tag0 = Runname
 
       integer, parameter :: nRadial = (RadialRange_max-RadialRange_min)/dR + 1  
 
