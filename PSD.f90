@@ -1,11 +1,10 @@
       Subroutine Initialize(input_dir, init, fin, flags, tag, thread_num)
 
-         use Module_for_NVelocityDirection
-         include "Setting.inc"
+         USE SETTING
          external Init_Parameter, read_ind_binary, read_fin_binary
 
-         real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: init, fin
-         integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
+         real*8, dimension(nvel,nRadial,nEnergy,7) :: init, fin
+         integer, dimension(nvel,nRadial,nEnergy) :: flags
 
          real*8 radial_distance_range(nRadial), energy_range(nEnergy)
          real*8 longitude_range(nLong), latitude_range(nLat), latitudeNS_range(nLat_NS)
@@ -25,18 +24,17 @@
       End
 
 
-      Subroutine Calculate_Density(fin, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
+      Subroutine Calculate_Density(fin, flags, current_time, number_density_1D, bph, rank)
          ! "cdensity" in python code
 !         use omp_lib
-         use Module_for_NVelocityDirection
+         USE SETTING
+         USE VOLUME_ELEMENT
+         USE EXOBASE_BC
          use, intrinsic :: ieee_arithmetic
-         include "Setting.inc"
-         external calculate_Velocity_Volume_Element
          external GSE2SPH
 
-         real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: fin
-         integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
-         real*8, dimension(nEnergy,N_vel_directions) :: dV2
+         real*8, dimension(nvel,nRadial,nEnergy,7) :: fin
+         integer, dimension(nvel,nRadial,nEnergy) :: flags
          real*8, dimension(start_ydoy_index:end_ydoy_index) :: bph
          real*8, dimension(:,:,:), allocatable :: each_n
          real*8 pos(3), vel(3), vel2
@@ -50,10 +48,12 @@
          character*30 fn2D, fn3D
          integer idoy, iday
 
+
          vel_BC = 0.d0;
          call calculate_Velocity_Volume_Element(dV2)
+         call Get_exobaseBC
 
-         allocate(each_n(N_vel_directions,nRadial,nEnergy))
+         allocate(each_n(nvel,nRadial,nEnergy))
          each_n = 0.d0
          number_density_1D = 0.d0
 
@@ -61,7 +61,7 @@
 
          do iR=1,nRadial      ! Outermost iR-loop
             do iE=1,nEnergy
-               do iv=1,N_vel_directions
+               do iv=1,nvel
                   t0 = current_time + fin(iv,iR,iE,1)/86400.    ! unit day
                   idoy = int(t0)                               ! yyyy+doy
                   t1 = (t0 - idoy)*86400.                       ! hms in seconds
@@ -133,15 +133,14 @@
       Subroutine Calculate_Flux(fin, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
          ! "cdensity" in python code
 !         use omp_lib
-         use Module_for_NVelocityDirection
+         USE SETTING
          use, intrinsic :: ieee_arithmetic
-         include "Setting.inc"
          external calculate_Velocity_Volume_Element
          external GSE2SPH
 
-         real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: fin
-         integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
-         real*8, dimension(nEnergy,N_vel_directions) :: dV2
+         real*8, dimension(nvel,nRadial,nEnergy,7) :: fin
+         integer, dimension(nvel,nRadial,nEnergy) :: flags
+         real*8, dimension(nEnergy,nvel) :: dV2
          real*8, dimension(start_ydoy_index:end_ydoy_index) :: bph
          real*8, dimension(:,:,:), allocatable :: each_n
          real*8 pos(3), vel(3), vel2
@@ -158,7 +157,7 @@
          vel_BC = 0.d0;
          call calculate_Velocity_Volume_Element(dV2)
 
-         allocate(each_n(N_vel_directions,nRadial,nEnergy))
+         allocate(each_n(nvel,nRadial,nEnergy))
          each_n = 0.d0
          number_density_1D = 0.d0
 
@@ -166,7 +165,7 @@
 
          do iR=1,nRadial      ! Outermost iR-loop
             do iE=1,nEnergy
-               do iv=1,N_vel_directions
+               do iv=1,nvel
                   t0 = current_time + fin(iv,iR,iE,1)/86400.    ! unit day
                   idoy = int(t0)                               ! yyyy+doy
                   t1 = (t0 - idoy)*86400.                       ! hms in seconds
@@ -232,16 +231,16 @@
 !      Subroutine Calculate_Density_Hodge(fin, flags, nH_BC,TH_BC, number_density_at_single_LON_LAT, rank)
       Subroutine Calculate_Escaping_Flux_constBC_Related_to_Forward_Tracing(b_ptl, f_ptl, f_flags, PSD2, energy_range, rank)
 
-         use Module_for_NVelocityDirection
+         USE SETTING
          use, intrinsic :: ieee_arithmetic
-         include "Setting.inc"
+
          external calculate_Velocity_Volume_Element
          external GSE2SPH
 
-         real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: b_ptl, f_ptl
-         integer, dimension(N_vel_directions,nRadial,nEnergy) :: f_flags
+         real*8, dimension(nvel,nRadial,nEnergy,7) :: b_ptl, f_ptl
+         integer, dimension(nvel,nRadial,nEnergy) :: f_flags
          real*8, dimension(nbx,nby) :: number_density_2D
-         real*8, dimension(nEnergy,N_vel_directions) :: dV2
+         real*8, dimension(nEnergy,nvel) :: dV2
          real*8, dimension(:,:,:), allocatable :: each_n
          real*8 esc_flux, cexo2
          real*8 pos(3), vel(3), vel2
@@ -260,12 +259,12 @@
          call calculate_Velocity_Volume_Element(dV2)
 !         call calculate_Velocity_Volume_Element_For_Flux(dV2)
 
-         allocate(each_n(N_vel_directions,nRadial,nEnergy))
+         allocate(each_n(nvel,nRadial,nEnergy))
          each_n = 0.d0
          fac = 2.d0*kb/mH
          do iR=1,nRadial      ! Outermost iR-loop
             do iE=1,nEnergy
-               do iv=1,N_vel_directions
+               do iv=1,nvel
 !                  t0 = current_time + fin(iv,iR,iE,1)/86400.    ! unit day
 !                  idoy = int(t0)                               ! yyyy+doy
 !                  t1 = (t0 - idoy)*86400.                       ! hms in seconds
@@ -359,7 +358,7 @@
 
       Subroutine MSIS_averaged_over_exobase(MSIS_nH,MSIS_TH)
 
-         include "Setting.inc"
+         USE SETTING
 !         real*8, dimension(nRadial) :: MSIS_nH, MSIS_TH
          real*8, dimension(41) :: MSIS_nH, MSIS_TH
 
@@ -378,7 +377,7 @@
       Subroutine GSE2SPH(pos,finlon,finlat)
       !  Just transform GSE to GEO without considering Earth's rotation. FIX IT when considering the temporal effect of Earth's rotation.
 
-         include "Setting.inc"
+         USE SETTING
          real*8 pos(3)
          real*8 finlon,finlat
 

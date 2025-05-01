@@ -1,9 +1,10 @@
       Subroutine outptl(ptl,filename)
 
-         use Module_for_NVelocityDirection
-         include "Setting.inc"
+         use SET_VELOCITY_DIRECTION
+         USE SETTING
+         IMPLICIT NONE
 
-         real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: ptl
+         real*8, dimension(nvel,nRadial,nEnergy,7) :: ptl
          real one(7)
          integer iR,iE,iv
          character*12 filename
@@ -11,7 +12,7 @@
          open(file=filename,unit=21)
          do iE=1,nEnergy
             do iR=1,nRadial
-               do iv=1,N_vel_directions
+               do iv=1,nvel
                   one = real(ptl(iv,iR,iE,:))
                   write(21,*) one
                enddo
@@ -25,17 +26,18 @@
 
       Subroutine outind(flags,filename)
 
-         use Module_for_NVelocityDirection
-         include "Setting.inc"
+         use SET_VELOCITY_DIRECTION
+         USE SETTING
+         IMPLICIT NONE
 
-         integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
+         integer, dimension(nvel,nRadial,nEnergy) :: flags
          integer iR,iE,iv
          character*12 filename
 
          open(file=filename,unit=22)
          do iE=1,nEnergy
             do iR=1,nRadial
-               do iv=1,N_vel_directions
+               do iv=1,nvel
                   write(22,*) flags(iv,iR,iE)
                enddo
             enddo
@@ -48,16 +50,18 @@
 
       Subroutine out_init_binary(init,input_dir,tag)
 
-         use Module_for_NVelocityDirection
-         include "Setting.inc"
-         real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: init
+         use SET_VELOCITY_DIRECTION
+         USE SETTING
+         IMPLICIT NONE
+
+         real*8, dimension(nvel,nRadial,nEnergy,7) :: init
          real, dimension(:,:,:,:), allocatable :: real_init
          integer nlen
          character*70 input_dir
          character*30 tag
          character*100 filename
 
-         allocate(real_init(N_vel_directions,nRadial,nEnergy,7))
+         allocate(real_init(nvel,nRadial,nEnergy,7))
          real_init = real(init)
 
          inquire(iolength=nlen) real_init 
@@ -76,16 +80,18 @@
 
       Subroutine out_fin_binary(fin,input_dir,tag)
 
-         use Module_for_NVelocityDirection
-         include "Setting.inc"
-         real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: fin
+         use SET_VELOCITY_DIRECTION
+         USE SETTING
+         IMPLICIT NONE
+
+         real*8, dimension(nvel,nRadial,nEnergy,7) :: fin
          real, dimension(:,:,:,:), allocatable :: real_fin
          integer nlen
          character*70 input_dir
          character*30 tag
          character*100 filename
 
-         allocate(real_fin(N_vel_directions,nRadial,nEnergy,7))
+         allocate(real_fin(nvel,nRadial,nEnergy,7))
          real_fin = real(fin)
 
          inquire(iolength=nlen) real_fin 
@@ -101,9 +107,11 @@
 
       Subroutine out_ind_binary(flags,input_dir,tag)
 
-         use Module_for_NVelocityDirection
-         include "Setting.inc"
-         integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
+         use SET_VELOCITY_DIRECTION
+         USE SETTING
+         IMPLICIT NONE
+
+         integer, dimension(nvel,nRadial,nEnergy) :: flags
          integer nlen
          character*70 input_dir
          character*30 tag
@@ -122,8 +130,8 @@
 
      Subroutine outRuntime(Runtime_dist,filename)
 
-         include "Setting.inc"
-
+         USE SETTING
+         IMPLICIT NONE
          real, dimension(nRadial,nEnergy) :: Runtime_dist
          integer iR,iE
          character*16 filename
@@ -143,9 +151,11 @@
       
       Subroutine read_ind_binary(flags,input_dir,tag,thread_num)
 
-         use Module_for_NVelocityDirection
-         include "Setting.inc"
-         integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags
+         use SET_VELOCITY_DIRECTION
+         USE SETTING
+         IMPLICIT NONE
+
+         integer, dimension(nvel,nRadial,nEnergy) :: flags
          integer nlen, iexist, thread_num, IO_unit
          character*70 input_dir
          character*30 tag
@@ -176,16 +186,17 @@
 
       Subroutine read_fin_binary(fin,input_dir,tag,thread_num)
 
-         use Module_for_NVelocityDirection
-         include "Setting.inc"
-         real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: fin
+         use SET_VELOCITY_DIRECTION
+         USE SETTING
+         IMPLICIT NONE
+         real*8, dimension(nvel,nRadial,nEnergy,7) :: fin
          real, dimension(:,:,:,:), allocatable :: real_fin
          integer nlen, thread_num, IO_unit, iexist
          character*70 input_dir
          character*30 tag
          character*100 filename
 
-         allocate(real_fin(N_vel_directions,nRadial,nEnergy,7))
+         allocate(real_fin(nvel,nRadial,nEnergy,7))
 
 !         thread_num = omp_get_thread_num()
          IO_unit=thread_num+512
@@ -215,7 +226,9 @@
 
       Subroutine write_density_1D(density_1D,tag)
 
-         include "Setting.inc"
+         USE SETTING
+         IMPLICIT NONE
+
          real*8 density_1D(nRadial)
          real, dimension(:), allocatable :: real_density_1D
          integer nlen
@@ -239,7 +252,9 @@
 
       Subroutine write_density_3D(density_3D,tag)
 
-         include "Setting.inc"
+         USE SETTING
+         IMPLICIT NONE
+         
          real*8 density_3D(nRadial,nLong,nLat_NS)
          real, dimension(:,:,:), allocatable :: real_density_3D
          integer nlen
@@ -263,7 +278,9 @@
 
       Subroutine Write_2D_Real(fn2D, arr2D, nx,ny)
 
-         include "Setting.inc"
+         USE SETTING
+         IMPLICIT NONE
+
          integer nx, ny, nlen
          real*8, dimension(nx,ny) :: arr2D
          real, dimension(:,:), allocatable :: real_arr2D
@@ -287,7 +304,9 @@
 
       Subroutine Write_3D_Real(fn3D, arr3D, nx,ny,nz)
 
-         include "Setting.inc"
+         USE SETTING
+         IMPLICIT NONE
+
          integer nx, ny, nz, nlen
          real*8, dimension(nx,ny,nz) :: arr3D
          real, dimension(:,:,:), allocatable :: real_arr3D
@@ -313,8 +332,9 @@
 
       Subroutine write_density_4D(density_4D,iday)
 
-         use Module_Physics_tag
-         include "Setting.inc"
+         USE PHYSICS_TAG
+         USE SETTING
+         IMPLICIT NONE
          
          real*8 density_4D(nRadial,nLong,nLat_NS,ntperday)
          real, dimension(:,:,:,:), allocatable :: real_density_4D
@@ -340,8 +360,9 @@
 
       Subroutine Write_ESC_FLUX_2D(density_2D)
 
-         use Module_Physics_tag
-         include "Setting.inc"
+         USE PHYSICS_TAG
+         USE SETTING
+         IMPLICIT NONE
          real*8 density_2D(nbx,nby)
          real, dimension(:,:), allocatable :: real_density_2D
          integer nlen
@@ -365,8 +386,10 @@
 
       Subroutine Write_ESC_FLUX_1D(density_1D)
 
-         use Module_Physics_tag
-         include "Setting.inc"
+         USE PHYSICS_TAG
+         USE SETTING
+         IMPLICIT NONE
+
          real*8 density_1D(nEnergy)
          real, dimension(:), allocatable :: real_density_1D
          integer nlen
@@ -388,42 +411,11 @@
       End
 
 
-      Subroutine read_exobaseBC(filename, nH_temp,TH_temp, thread_num)
-
-         include "Setting.inc"
-         real*8, dimension(nbx,nby,nbtperday) :: nH_temp, TH_temp
-         real, dimension(:,:,:), allocatable :: nH_real, TH_real
-         integer nlen, thread_num, IO_unit, iexist
-         character*100 filename
-
-         allocate(nH_real(nbx,nby,nbtperday),TH_real(nbx,nby,nbtperday))
-         IO_unit=thread_num+600
-
-         print*, "Read exobase BC file: ", filename
-         inquire(file=filename, exist=iexist)
-         if (iexist .eq. 0) then
-            print*, "File is not exist: ", filename
-         else
-            inquire(iolength=nlen) nH_real
-            nlen=nlen*2
-
-            open(file=filename,unit=IO_unit,form='unformatted', &
-               access='direct',action='read',recl=nlen,status='old')
-            read(IO_unit,rec=1) nH_real, TH_real
-            close(IO_unit)
-         endif
-
-         nH_temp = nH_real*1.d0
-         TH_temp = TH_real*1.d0
-         deallocate(nH_real,TH_real)
-
-         return
-      End
-
-
       Subroutine read_Lya_Bph(Lya, bph)
 
-         include "Setting.inc"
+         USE SETTING
+         IMPLICIT NONE
+
          real*8, dimension(start_ydoy_index:end_ydoy_index) :: Lya, bph
          character(len=80) :: line
          integer :: year, doy, i, yyyydoy
@@ -454,18 +446,20 @@
 
       Subroutine Make_Parameters_OutFile()
 
-         use Module_for_NVelocityDirection
-         use Module_Physics_tag
-         include "Setting.inc"
+         use SET_VELOCITY_DIRECTION
+         use PHYSICS_TAG
+         USE SETTING
+         IMPLICIT NONE
+
          character*100 filename
 
          filename = 'MATE_Parameters_' // trim(Runname_in_10char) // '.in'
          open(file=filename,unit=123,status='replace')
-         write(123,*) N_vel_directions, nRadial, nEnergy
+         write(123,*) nvel, nRadial, nEnergy
          write(123,*) nRadial, nLon, nLat_NS, ntperday
 
          write(123,*) "Above paramters are ..."
-         write(123,*) "    [N_vel_directions, nRadial, nEnergy]"
+         write(123,*) "    [nvel, nRadial, nEnergy]"
          write(123,*) "    [nRadial, nLon, nLat_NS, ntperday]"
          write(123,*) "Start_Time_in_YYYYDOY = ", Start_Time_in_YYYYDOY
          write(123,*) "End_Time_in_YYYYDOY   = ", End_Time_in_YYYYDOY

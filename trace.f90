@@ -1,6 +1,6 @@
       Subroutine rk1(temp, dt, k_out, f0)
 
-         include "Setting.inc"
+         USE SETTING
 
 !         real*8, target :: temp(6)
 !         real*8, pointer :: pos(:), vel(:)
@@ -47,7 +47,7 @@
 
       Subroutine rk4(one,dt,f0)
 
-         include "Setting.inc"
+         USE SETTING
          external rk1
 
          real*8 one(7), temp(6), dt, f0
@@ -77,7 +77,7 @@
 
       Subroutine calculate_final_timestep(old,new,radial_boundary,dt,f0)      ! Do interpolation for dt_final
 
-         include "Setting.inc"
+         USE SETTING
          external rk4
 
          real*8, dimension(7) :: old, new
@@ -105,15 +105,16 @@
       End
 
 
-      Subroutine Trace_particle(ptl,flags, radial_boundary, tmax, Lya, current_time)
+      Subroutine Trace_particle(ptl,flags, Lya, current_time)
 
-!         use omp_lib
-         use Module_for_NVelocityDirection
-         include "Setting.inc"
+         USE SET_VELOCITY_DIRECTION
+         USE GRID_PARAMETERS
+
+         USE SETTING
          external rk4, calculate_final_timestep
 
-         real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: ptl
-         integer :: flags(N_vel_directions,nRadial,nEnergy)
+         real*8, dimension(nvel,nRadial,nEnergy,7) :: ptl
+         integer :: flags(nvel,nRadial,nEnergy)
          real*8, dimension(7) :: one, old
          integer :: flag     ! 0: orbiting Earth t<tmax;   1: into exobase;  2: out of outer boundary;  3: orbiting but t>tmax
          real*8 radial_boundary(2), radial_distance, radial_distance_old
@@ -127,7 +128,7 @@
 
          do iE=1,nEnergy
           do iR=1,nRadial
-           do iv=1,N_vel_directions
+           do iv=1,nvel
 
             flag=0; 
             do i=1,7;   one(i) = ptl(iv,iR,iE,i);   enddo
@@ -215,11 +216,11 @@
 
 !         use omp_lib
          use Module_for_NVelocityDirection
-         include "Setting.inc"
+         USE SETTING
          external rk4, calculate_final_timestep
 
-         real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: ptl
-         integer, dimension(N_vel_directions,nRadial,nEnergy) :: flags, init_flags
+         real*8, dimension(nvel,nRadial,nEnergy,7) :: ptl
+         integer, dimension(nvel,nRadial,nEnergy) :: flags, init_flags
          real*8, dimension(7) :: one, old
          integer :: flag     ! 0: orbiting Earth t<tmax;   1: into exobase;  2: out of outer boundary;  3: orbiting but t>tmax
          real*8 radial_boundary(2), radial_distance, radial_distance_old
@@ -233,7 +234,7 @@
 
          do iE=1,nEnergy
           do iR=1,nRadial
-           do iv=1,N_vel_directions
+           do iv=1,nvel
                if(init_flags(iv,iR,iE) .eq. 1) then
 
                flag=10; 
