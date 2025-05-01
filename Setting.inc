@@ -3,18 +3,13 @@
 !!********************<< User Setting >>********************!!
 !!**** Recommended to change the parameters for your run ***!!
 
-<<<<<<< HEAD
-   !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data"
-      character*20, parameter :: Runname              = "MSIS_May10_1"
-=======
    !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
       character*20, parameter :: Runname_in_10char              = "IBEX_JS"
->>>>>>> 3a796e870702aa388e657ad0f7fe30695b9976e0
    
    !! TIME SETTING !!
       integer, parameter ::      Start_Time_in_YYYYDOY          = 2010079
       integer, parameter ::      End_Time_in_YYYYDOY            = 2010079
-      integer, parameter ::      Output_Time_Interval_in_Minute = 60
+      integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
    !! 3-D SPATIAL RESOLUTIONS !!
       integer, parameter ::      GEO_Resolution_in_Degree       = 90
@@ -59,11 +54,7 @@
 
       integer, parameter :: start_ydoy = Start_Time_in_YYYYDOY
       integer, parameter :: end_ydoy   = End_Time_in_YYYYDOY
-<<<<<<< HEAD
-      character*20, parameter :: tag0 = Runname
-=======
       character*20, parameter :: tag0 = Runname_in_10char
->>>>>>> 3a796e870702aa388e657ad0f7fe30695b9976e0
 
       integer, parameter :: nRadial = (RadialRange_max-RadialRange_min)/dR + 1  
 
