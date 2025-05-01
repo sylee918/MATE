@@ -42,7 +42,7 @@
       call read_Lya_Bph(Lya, bph);  if (i_Photoionization .eq. 0) bph = 0.d0
       ! call modules
       call Physics_tag(); call gen_points_for_NV()
-      call Make_Parameters_OutFile()  ! It's not moduel, just making .in file
+      if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not moduel, just making .in file
       ! End Initialization
 
       allocate(ptl(N_vel_directions,nRadial,nEnergy,7))
