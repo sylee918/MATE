@@ -2,28 +2,30 @@
       ! "cdensity" in python code
 !         use omp_lib
       USE SETTING
-      USE MPI_MATE, only: rank
-      USE VOLUME_ELEMENT
-      USE EXOBASE_BC
+      USE EXOBASE_BC, only: nH_BC, TH_BC
       USE SOLAR_LYMAN_ALPHA, only: bph
+      USE MPI_MATE, only: nR_loc
+      USE VOLUME_ELEMENT
       use, intrinsic :: ieee_arithmetic
       external GSE2SPH
 
-      real*8, dimension(nvel,nR_loc,nEnergy,7) :: fin
-      integer, dimension(nvel,nR_loc,nEnergy) :: flags
+      real*8, dimension(nvel,nR_loc,nEnergy,7), intent(in) :: fin
+      integer, dimension(nvel,nR_loc,nEnergy), intent(in) :: flags
+      real*8, intent(in) :: current_time
+      real*8, intent(out) :: number_density_1D(nR_loc)
+
       real*8, dimension(:,:,:), allocatable :: each_n
       real*8 pos(3), vel(3), vel2
       real*8 temp_BC, n_BC, vel_BC(3), fac, number_density
-      real*8 number_density_1D(nR_loc), cexo2
       integer iR,iE,iv, i
-      real*8 finlon, finlat
-      real*8 current_time, t0, t1, Iph
+      real*8 finlon, finlat, cexo2
+      real*8 t0, t1, Iph
       integer iflon, iflat, it, quotient
-      character*30 fn2D, fn3D
       integer idoy, iday
 
 
       vel_BC = 0.d0;
+      allocate(dV2(nEnergy,nvel), solid_angle(nvel))
       call calculate_Velocity_Volume_Element(dV2)
 
       allocate(each_n(nvel,nR_loc,nEnergy))
@@ -97,32 +99,32 @@
       enddo
 
       deallocate(each_n)
-
+      deallocate(dV2,solid_angle)
       return
    End
 
 
-   Subroutine Calculate_Flux(fin, flags, current_time, number_density_1D, bph)
+   Subroutine Calculate_Flux(fin, flags, current_time, number_density_1D)
       ! "cdensity" in python code
 !         use omp_lib
       USE SETTING
+      USE VOLUME_ELEMENT
+      USE MPI_MATE, only: rank, nR_loc
+      USE EXOBASE_BC
+      USE SOLAR_LYMAN_ALPHA, only: bph
       use, intrinsic :: ieee_arithmetic
-      external calculate_Velocity_Volume_Element
       external GSE2SPH
 
       real*8, dimension(nvel,nR_loc,nEnergy,7) :: fin
       integer, dimension(nvel,nR_loc,nEnergy) :: flags
-      real*8, dimension(nEnergy,nvel) :: dV2
-      real*8, dimension(start_ydoy_index:end_ydoy_index) :: bph
       real*8, dimension(:,:,:), allocatable :: each_n
       real*8 pos(3), vel(3), vel2
       real*8 temp_BC, n_BC, vel_BC(3), fac, number_density
       real*8 number_density_1D(nR_loc), cexo2
       integer iR,iE,iv, i
-      real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
       real*8 finlon, finlat
       real*8 current_time, t0, t1, Iph, vr
-      integer iflon, iflat, it, rank, quotient
+      integer iflon, iflat, it, quotient
       character*30 fn2D, fn3D
       integer idoy, iday
 

@@ -1,9 +1,8 @@
 Module MPI_MATE
-   integer nprocs, ierr
+   integer :: nprocs, ierr
    integer :: rank
       real*8 :: rad, lon, lat   ! RANK dependent variables
       integer :: nR_loc, ilon, ilat, il
-      integer :: nR_loc_MPI(nprocs)
 contains
 
    Subroutine Initialize_MPI
@@ -23,7 +22,6 @@ contains
       if (rank .lt. mod(nRadial, nprocs)) then
          nR_loc = nR_loc + 1
       endif
-      nR_loc_MPI(rank+1) = nR_loc
 
    end Subroutine
 
@@ -235,11 +233,10 @@ Module PHYSICS_TAG
    IMPLICIT NONE
 
    character*10 tag_phys
-   public :: Physics_tag
 
 contains
    
-   Subroutine Physics_tag
+   Subroutine Physical_tag
       ! Example: tag = "GRCPX" or "GRC"
       integer i
       character(len=1), dimension(n_physics) :: phy_name=''
@@ -279,7 +276,7 @@ contains
       call Init_Parameter
       call Get_exobaseBC
       call read_Lya_Bph  ;  if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
-      call Physics_tag
+      call Physical_tag
       
    end Subroutine
 

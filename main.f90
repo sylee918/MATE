@@ -1,15 +1,13 @@
-      Program main
+   Program main
 
       USE SETTING
       USE INTEGRATED_INITIALIZATION
       USE MPI_MATE
+      IMPLICIT NONE
 
       include "mpif.h"
-
       external Trace_particle, Calculate_Density
-      external read_Lya_Bph, write_density_4D, Make_Parameters_OutFile
-
-      IMPLICIT NONE
+      external write_density_4D, Make_Parameters_OutFile
 
       real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: number_density_4D, number_density_4D_MPI
       real*8, allocatable, dimension(:,:,:,:) :: ptl
@@ -23,13 +21,10 @@
       call Initialize_MPI
       call Initialize_Setting
 
-      ! load BC
+      if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not module, just making .in file
 
-      if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not moduel, just making .in file
-      ! End Initialization
-
-      allocate(ptl(nvel,nR_loc,nEnergy,7))
-      allocate(flags(nvel,nR_loc,nEnergy))
+      allocate(ptl(nvel,nR_loc,nEnergy,7), flags(nvel,nR_loc,nEnergy))
+      allocate(number_density_1D(nR_loc))
 
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
@@ -54,8 +49,8 @@
                      number_density_4D_MPI(:,ilon,ilat,it) = number_density_1D
 
                      if (lat .gt. 0) then    ! N/S symmetry
-                        ptl(:,:,4) = -ptl(:,:,4)
-                        ptl(:,:,7) = -ptl(:,:,7)
+                        ptl(:,:,:,4) = -ptl(:,:,:,4)
+                        ptl(:,:,:,7) = -ptl(:,:,:,7)
                         call Calculate_Density(ptl, flags, current_time, number_density_1D)
                         number_density_4D_MPI(:,ilon,nLat_NS+1-ilat,it) = number_density_1D
                      endif
@@ -82,8 +77,8 @@
 
       enddo ! iday
 
-      deallocate(ptl,flags)
+      deallocate(ptl,flags,number_density_1D)
 
       call MPI_FINALIZE(ierr)
 
-      End Program
+   End Program

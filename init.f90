@@ -8,7 +8,7 @@
       integer iR, iE
       real*8, dimension(nvel,nR_loc,nEnergy,7) :: ptl
       real*8, dimension(nvel,3) :: vel_dir
-      real*8 energy_to_speed, lon,lat, cos_lat,sin_lat, cos_lon,sin_lon
+      real*8 energy_to_speed, cos_lat,sin_lat, cos_lon,sin_lon
 
       ptl=0.d0
 

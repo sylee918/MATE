@@ -5,19 +5,16 @@ MODULE VOLUME_ELEMENT
    USE GRID_PARAMETERS
    IMPLICIT NONE
 
-   PRIVATE
-      real*8 solid_angle(nvel)
-      real*8, dimension(nEnergy) :: energy_to_speed, v2dv
+   real*8, allocatable, dimension(:,:) :: dV2
+   real*8, allocatable, dimension(:) :: solid_angle
 
-   PUBLIC :: calculate_Velocity_Volume_Element
-      real*8 dV2(nEnergy,nvel)
 
    contains
 
-      Subroutine Solid_Angle_For_Velocity_Volume_Element
+      Subroutine Solid_Angle_For_Velocity_Volume_Element(solid_angle)
       ! 'solid_angle' = sin(theta).d(theta).d(phi)
       ! 'solanglist' in python code
-
+      real*8, dimension(nvel) :: solid_angle
       integer row(0:nTheta)
       real*8 dphi, lat0, latup, latdown
       integer thetasec, direc
@@ -54,11 +51,11 @@ MODULE VOLUME_ELEMENT
    End
 
 
-   Subroutine Radial_Component_For_Velocity_Volume_Element
+   Subroutine Radial_Component_For_Velocity_Volume_Element(v2dv)
       ! 'v2dv' = v^2 dv (v=vr for initial condition)
       ! 'vollist' in python code.
 
-      real*8 v_spacing(nEnergy+1), half_dv
+      real*8 v_spacing(nEnergy+1), half_dv, energy_to_speed(nEnergy), v2dv(nEnergy)
       integer iE
 
       energy_to_speed = sqrt(energy_range*e*2.d0/mH)
@@ -81,12 +78,15 @@ MODULE VOLUME_ELEMENT
    End
 
 
-   Subroutine calculate_Velocity_Volume_Element
+   Subroutine calculate_Velocity_Volume_Element(dV2)
 
       integer iE, iv
+      real*8, dimension(nEnergy,nvel) :: dV2
+      real*8, dimension(nvel) :: solid_angle
+      real*8, dimension(nEnergy) :: v2dv
 
-      call Solid_Angle_For_Velocity_Volume_Element
-      call Radial_Component_For_Velocity_Volume_Element
+      call Solid_Angle_For_Velocity_Volume_Element(solid_angle)
+      call Radial_Component_For_Velocity_Volume_Element(v2dv)
 
       do iv=1,nvel
          do iE=1,nEnergy
@@ -170,10 +170,10 @@ MODULE VOLUME_ELEMENT
    End
 
 
-   Subroutine Volume_Element(lat, dV)
+   Subroutine Volume_Element2(lat, dV)
       ! dV = dx^3 * dv^3
 
-      real*8 dV1(nRadial), dV2(nEnergy,nvel)
+      real*8 dV1(nRadial)
       real*8, dimension(nvel,nRadial,nEnergy) :: dV
       real*8 lat
       integer iE,iR,iv

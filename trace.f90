@@ -1,7 +1,7 @@
    Subroutine rk1(temp, dt, k_out, f0)
 
       USE SETTING, only: i_EarthGravity, i_SolarRadiationPressure, i_CoriolisForce_GSE
-      USE CONSTANTS, only: GM, arad, Wrot
+      USE CONSTANTS, only: GM, arad, Wrot, Re2
       IMPLICIT NONE
 
       real*8, intent(in) :: temp(6), dt, f0
@@ -9,7 +9,7 @@
 
       real*8 pos(3), vel(3)
 !      real*8, pointer :: pos(3), vel(3)
-      real*8 dt, coeff_G, coeff_R, coeff_C, norm_pos, norm_pos2, norm_pos3
+      real*8 coeff_G, coeff_R, coeff_C, norm_pos, norm_pos2, norm_pos3
       real*8, dimension(6) :: deriv
       real*8 rho2
 
@@ -83,7 +83,7 @@
    Subroutine calculate_final_timestep(old,new,dt,f0)      ! Do interpolation for dt_final
 
       USE SETTING
-      USE GRID_PARAMETERS, only: radial_distance_range
+      USE GRID_PARAMETERS, only: radial_distance_range, radial_boundary
       external rk4
 
       real*8, dimension(7) :: old, new
@@ -116,19 +116,19 @@
       USE SETTING
       USE GRID_PARAMETERS, only: radial_boundary
       USE SOLAR_LYMAN_ALPHA, only: Lya
-      external rk4, calculate_final_timestep
       IMPLICIT NONE
+      external rk4, calculate_final_timestep
 
       real*8, dimension(nvel,nRadial,nEnergy,7) :: ptl
       integer :: flags(nvel,nRadial,nEnergy)
       real*8, dimension(7) :: one, old
       integer :: flag     ! 0: orbiting Earth t<tmax;   1: into exobase;  2: out of outer boundary;  3: orbiting but t>tmax
-      real*8 radial_distance, radial_distance_old
+      real*8 :: radial_distance, radial_distance_old
       integer :: iR, iE, iv, i
-      real*8 tmax,dt, vt,vt_old,dv, ds
+      real*8 :: dt, vt,vt_old,dv, ds
       real*8, parameter :: max_ds = 1.d6
-      real*8 x0, f0, current_time, trace_time
-      integer ydoy, ii
+      real*8 :: x0, f0, current_time, trace_time
+      integer :: ydoy, ii
 
       do iE=1,nEnergy
        do iR=1,nRadial
