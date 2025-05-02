@@ -5,13 +5,12 @@ Module MPI_MATE
       integer :: nR_loc, ilon, ilat, il
 contains
 
-   Subroutine Initialize_MPI
-      call MPI_INIT(ierr)
-      call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
-      call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierr)
-
-      call Calculate_Local_nRadial
-   end Subroutine
+!   Subroutine Initialize_MPI
+!      call MPI_INIT(ierr)
+!      call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
+!      call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierr)
+!      call Calculate_Local_nRadial
+!   end Subroutine
 
    Subroutine Calculate_Local_nRadial
 
