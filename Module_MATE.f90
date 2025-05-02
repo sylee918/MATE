@@ -14,11 +14,15 @@ contains
 
    Subroutine Calculate_Local_nRadial
 
-      use SETTING, only: nRadial
+      use SETTING, only: nRadial, nLat_NS, nLong
       IMPLICIT NONE
 
-      nR_loc = nRadial / nprocs
-      if (rank .lt. mod(nRadial, nprocs)) then
+      integer :: n1, n2
+
+      n1 = (nLat_NS-1)/2*nLong+1
+      n2 = nRadial*n1
+      nR_loc = n2 / nprocs
+      if (rank .lt. mod(n2, nprocs)) then
          nR_loc = nR_loc + 1
       endif
 

@@ -21,7 +21,8 @@
       call MPI_INIT(ierr)
       call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
       call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierr)
-      call Calculate_Local_nRadial
+!      call Calculate_Local_nRadial
+      nR_loc = nRadial
 
       call Initialize_Setting
 
@@ -43,7 +44,7 @@
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
-                  il = ilon-1 + (ilat-nLat)*nLong
+                  il = (ilon-1 + (ilat-nLat)*nLong)
                   if (rank .eq. il) then
                      print*, '  LON & LAT = ', int(lon*180/pi), int(lat*180/pi), '[deg]'
 
