@@ -42,7 +42,7 @@
 
          ! eg. 2012360 - 2012366
          do iday=start_ydoy-nt_bwd_bc, (start_ydoy/1000)*1000+maxdoy
-            nH_temp = 0.d0 ; TH_temp=0.d0
+!            nH_temp = 0.d0 ; TH_temp=0.d0
             write(ydoy_str,'(I7.7)') iday
             write(yearst, '(I4.4)') start_ydoy/1000
             filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(ExobaseBC_Model_Name) // "_" // trim(ydoy_str) //  ".bc"

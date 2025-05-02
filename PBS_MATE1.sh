@@ -19,6 +19,7 @@ mpirun -np 5 ./MATE.x
 
 ## Ncpu = (360/res)*(180/res)/2+1
 
+##PBS -l select=1:ncpus=5:mpiprocs=5:model=bro
 ##PBS -l select=5:ncpus=24:mpiprocs=24:model=bro+1:ncpus=25:mpiprocs=25:model=bro
 ##PBS -l select=47:ncpus=27:mpiprocs=27:model=bro+1:ncpus=28:mpiprocs=28:model=bro
 ##PBS -l select=11:ncpus=12:mpiprocs=12:model=bro+1:ncpus=13:mpiprocs=13:model=bro
