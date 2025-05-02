@@ -37,7 +37,7 @@
             current_time = iday*1.d0 + it*(time_resolution/86400.d0)
             ihour = it*(time_resolution/3600.d0)
             iminute = it*(time_resolution/60.d0)-ihour*60
-            print*, 'Current time:', iday, ihour, iminute
+            if (rank .eq. 0) print*, 'Current time:', iday, ihour, iminute
 
             do ilat=nLat,nLat_NS
                lat = latitudeNS_range(ilat)
@@ -61,6 +61,7 @@
                            ptl(:,:,7) = -ptl(:,:,7)
                            call Calculate_Density(ptl, flags, current_time, number_density_0D)
                            number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
+                           print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
                         endif
                      endif
                   enddo ! irad

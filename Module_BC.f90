@@ -1,6 +1,7 @@
    Module EXOBASE_BC
 
       USE SETTING
+      USE MPI_MATE, only: rank
       IMPLICIT NONE
 
       real*8, dimension(nbx,nby,nbtperday) :: nH_temp, TH_temp
@@ -88,7 +89,8 @@
          allocate(nH_real(nbx,nby,nbtperday),TH_real(nbx,nby,nbtperday))
          IO_unit=600
 
-         print*, "Read exobase BC file: ", filename_BC
+         if (rank .eq. 0) print*, "Read exobase BC file: ", filename_BC
+
          inquire(file=filename_BC, exist=iexist)
          if (iexist .eq. 0) then
             print*, "File is not exist: ", filename_BC
