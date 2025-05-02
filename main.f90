@@ -49,7 +49,7 @@
                      rad = radial_distance_range(irad)
                      i2 = (i1-1)*nRadial + irad
                      if (rank .eq. i2) then
-                        print*, '  LON & LAT = ', int(lon*180/pi), int(lat*180/pi), '[deg]'
+                        print '(a, f5.2, i3, i3)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
                         call Init_Particles(ptl)
                         call Trace_particle(ptl, flags, current_time)
