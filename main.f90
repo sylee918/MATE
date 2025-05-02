@@ -43,7 +43,7 @@
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
-                  il = ilon-1 + (ilat-nLat)*nLong
+                  il = (ilon-1 + (ilat-nLat)*nLong)
                   if (rank .eq. il) then
                      print*, '  LON & LAT = ', int(lon*180/pi), int(lat*180/pi), '[deg]'
 

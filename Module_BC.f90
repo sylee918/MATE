@@ -5,6 +5,7 @@
 
       real*8, dimension(nbx,nby,nbtperday) :: nH_temp, TH_temp
       real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
+      character*100 filename_BC
 
       contains
 
@@ -12,7 +13,6 @@
 
          integer iday, maxdoy
          character*7 ydoy_str, yearst
-         character*100 filename_BC
 
          if (start_ydoy/1000 .eq. end_ydoy/1000) then
             write(yearst, '(I4.4)') start_ydoy/1000
@@ -85,20 +85,19 @@
          real*8, dimension(nbx,nby,nbtperday) :: nH_temp, TH_temp
          real, dimension(:,:,:), allocatable :: nH_real, TH_real
          integer nlen, thread_num, IO_unit, iexist
-         character*100 filename
 
          allocate(nH_real(nbx,nby,nbtperday),TH_real(nbx,nby,nbtperday))
          IO_unit=600
 
-         print*, "Read exobase BC file: ", filename
-         inquire(file=filename, exist=iexist)
+         print*, "Read exobase BC file: ", filename_BC
+         inquire(file=filename_BC, exist=iexist)
          if (iexist .eq. 0) then
-            print*, "File is not exist: ", filename
+            print*, "File is not exist: ", filename_BC
          else
             inquire(iolength=nlen) nH_real
             nlen=nlen*2
 
-            open(file=filename,unit=IO_unit,form='unformatted', &
+            open(file=filename_BC,unit=IO_unit,form='unformatted', &
                access='direct',action='read',recl=nlen,status='old')
             read(IO_unit,rec=1) nH_real, TH_real
             close(IO_unit)
