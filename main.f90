@@ -55,6 +55,7 @@
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
+lon=pi/2
                   i1 = (ilon-1 + (ilat-nLat)*nLong)      ! starts from 0
                   do irad=1,nRadial
                      rad = radial_distance_range(irad)
@@ -82,9 +83,9 @@
          enddo ! ihour
 
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-         N_REDUCE = nR_loc * nLon * nLat_NS * ntperday
+         N_REDUCE = nRadial * nLon * nLat_NS * ntperday
+
          call MPI_REDUCE(number_density_4D_MPI, number_density_4D, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
-         
          if (rank .eq. 0) then
             do it=1,ntperday
                do ilon=2,nLong
