@@ -260,28 +260,3 @@ contains
    End
 
 END MODULE PHYSICS_TAG
-
-
-
-Module INTEGRATED_INITIALIZATION
-
-   USE SET_VELOCITY_DIRECTION
-   USE GRID_PARAMETERS
-   USE EXOBASE_BC
-   USE SOLAR_LYMAN_ALPHA
-   USE PHYSICS_TAG
-
-contains
-
-   Subroutine Initialize_Setting
-      USE SETTING, only: i_Photoionization
-
-      call gen_points_for_NV
-      call Init_Parameter
-      call Get_exobaseBC
-      call read_Lya_Bph  ;  if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
-      call Physical_tag
-      
-   end Subroutine
-
-END MODULE INTEGRATED_INITIALIZATION
