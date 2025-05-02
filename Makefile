@@ -15,17 +15,27 @@ all: MATE.x
 
 esc: MATE_esc.x
 
-MATE.x: Module_MATE.o main.o init.o trace.o PSD.o IO_utils.o
-	$(FC) -o MATE.x Module_MATE.o main.o init.o trace.o PSD.o IO_utils.o
+MATE.x: Module_Setting.o Module_MATE.o Module_Lyman.o Module_BC.o main.o init.o trace.o PSD.o IO_utils.o
+	$(FC) -o MATE.x Module_Setting.o Module_MATE.o Module_Lyman.o Module_BC.o main.o init.o trace.o PSD.o IO_utils.o
 
-MATE_esc.x: Module_MATE.o main_esc.o init.o trace.o PSD.o IO_utils.o
-	$(FC) -o MATE_esc.x Module_MATE.o main_esc.o init.o trace.o PSD.o IO_utils.o
+#MATE_esc.x: Module_MATE.o Module_Setting.o Module_Lyman.o Module_BC.o main_esc.o init.o trace.o PSD.o IO_utils.o
+#	$(FC) -o MATE_esc.x Module_MATE.o Module_Setting.o Module_Lyman.o Module_BC.o main_esc.o init.o trace.o PSD.o IO_utils.o
+
+
+Module_Setting.o: Module_Setting.f90
+	$(FC) -c $(flags) Module_Setting.f90
 
 Module_MATE.o: Module_MATE.f90
 	$(FC) -c $(flags) Module_MATE.f90
 
-main_esc.o: main_esc.f90
-	$(FC) -c $(flags) main_esc.f90
+Module_Lyman.o: Module_Lyman.f90
+	$(FC) -c $(flags) Module_Lyman.f90
+
+Module_BC.o: Module_BC.f90
+	$(FC) -c $(flags) Module_BC.f90
+
+#main_esc.o: main_esc.f90
+#	$(FC) -c $(flags) main_esc.f90
 
 main.o: main.f90
 	$(FC) -c $(flags) main.f90
