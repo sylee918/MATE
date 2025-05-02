@@ -15,8 +15,8 @@ all: MATE.x
 
 esc: MATE_esc.x
 
-MATE.x: Module_Setting.o Module_BC.o Module_Lyman.o Module_MATE.o Module_Vol.o main.o init.o trace.o PSD.o IO_utils.o
-	$(FC) -o MATE.x Module_Setting.o Module_BC.o Module_Lyman.o Module_MATE.o Module_Vol.o main.o init.o trace.o PSD.o IO_utils.o
+MATE.x: Module_Setting.o Module_MATE.o Module_BC.o Module_Lyman.o Module_Vol.o main.o init.o trace.o PSD.o IO_utils.o
+	$(FC) -o MATE.x Module_Setting.o Module_MATE.o Module_BC.o Module_Lyman.o Module_Vol.o main.o init.o trace.o PSD.o IO_utils.o
 
 #MATE_esc.x: Module_MATE.o Module_Setting.o Module_Lyman.o Module_BC.o main_esc.o init.o trace.o PSD.o IO_utils.o
 #	$(FC) -o MATE_esc.x Module_MATE.o Module_Setting.o Module_Lyman.o Module_BC.o main_esc.o init.o trace.o PSD.o IO_utils.o

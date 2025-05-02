@@ -1,8 +1,12 @@
    Program main
 
       USE SETTING
-      USE INTEGRATED_INITIALIZATION
       USE MPI_MATE
+      USE SET_VELOCITY_DIRECTION
+      USE GRID_PARAMETERS
+      USE EXOBASE_BC
+      USE SOLAR_LYMAN_ALPHA
+      USE PHYSICS_TAG
       IMPLICIT NONE
 
       include "mpif.h"
@@ -25,7 +29,14 @@
 !      nR_loc = nRadial
       nR_loc = 1
 
-      call Initialize_Setting
+
+      call gen_points_for_NV
+      call Init_Parameter
+      call Get_exobaseBC
+      call read_Lya_Bph  ;  if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
+      call Physical_tag
+
+!      call Initialize_Setting
 
       if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not module, just making .in file
 
