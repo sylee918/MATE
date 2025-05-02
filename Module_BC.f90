@@ -3,14 +3,10 @@
       USE SETTING
       IMPLICIT NONE
 
-      PRIVATE
       real*8, dimension(nbx,nby,nbtperday) :: nH_temp, TH_temp
-
-      PUBLIC :: Get_exobaseBC
       real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
 
       contains
-
 
       Subroutine Get_exobaseBC
 
@@ -115,4 +111,4 @@
          return
       End
 
-   END MODULE LOAD_BC
+   END MODULE EXOBASE_BC

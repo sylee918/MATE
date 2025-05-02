@@ -31,7 +31,7 @@
 
       USE PHYSICS_TAG
       USE SETTING
-      USE MPI_MATE, only: nprocs, nR_loc
+      USE MPI_MATE, only: nprocs
       IMPLICIT NONE
 
       character*100 filename
@@ -50,7 +50,6 @@
       write(123,*) "Exobase BC:             ", ExobaseBC_Model_Name
       write(123,*) "Physics:                ", tag_phys
       write(123,*) "MPI:                    ", nprocs
-      write(123,*) "nR_loc:                 ", nR_loc
 
       close(123)
 
