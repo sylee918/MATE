@@ -70,6 +70,7 @@ contains
       do ilon=1,nLong   ;  longitude_range(ilon)  = (ilon-1)*pi/180.d0*geores              ;  enddo
       do ilat=1,nLat    ;  latitude_range(ilat)   = (ilat-1)*pi/180.d0*geores              ;  enddo
       do ilat=1,nLat_NS ;  latitudeNS_range(ilat) = ((ilat-1.d0)*geores-90.d0) *pi/180.d0  ;  enddo
+      if (nLat_NS .eq. 1) latitudeNS_range(1) = 0.d0
 
       radial_boundary(1) = inner_boundary
       radial_boundary(2) = outer_boundary

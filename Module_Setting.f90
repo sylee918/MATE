@@ -39,7 +39,7 @@ MODULE SETTING
 !! 3-D SPATIAL RESOLUTIONS !!
    integer, parameter ::      GEO_Resolution_in_Degree       = 360
    real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
-   real*8, parameter  ::      RadialRange_max                = 60.0
+   real*8, parameter  ::      RadialRange_max                = 3.0
    real*8, parameter  ::      dR                             = 1.0
 
 !! Number of Particle Direction !!
@@ -51,8 +51,10 @@ MODULE SETTING
 
 !! DIRECTORIES SETTING !!
    character*70, parameter :: Lya_dir                          = "OMNI_extended.txt"         ! 1964 - 2024 (Oct)
-   character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
-   character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0524/GRC/"
+!   character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
+!   character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0524/GRC/"
+   character*70, parameter :: BC_dir                           = "/home/sylee/exospherecode/MSIS/Fortran/BC/"
+   character*70, parameter :: outdir                           = ""
 
 !! Including Physics !!
    integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on

@@ -687,3 +687,100 @@
    End
 
 
+
+   Subroutine Calculate_Flux(fin, flags, current_time, number_density_1D)
+      ! "cdensity" in python code
+!         use omp_lib
+      USE SETTING
+      USE VOLUME_ELEMENT
+      USE MPI_MATE, only: rank, nR_loc
+      USE EXOBASE_BC
+      USE SOLAR_LYMAN_ALPHA, only: bph
+      use, intrinsic :: ieee_arithmetic
+      external GSE2SPH
+
+      real*8, dimension(nvel,nR_loc,nEnergy,7) :: fin
+      integer, dimension(nvel,nR_loc,nEnergy) :: flags
+      real*8, dimension(:,:,:), allocatable :: each_n
+      real*8 pos(3), vel(3), vel2
+      real*8 temp_BC, n_BC, vel_BC(3), fac, number_density
+      real*8 number_density_1D(nR_loc), cexo2
+      integer iR,iE,iv, i
+      real*8 finlon, finlat
+      real*8 current_time, t0, t1, Iph, vr
+      integer iflon, iflat, it, quotient
+      character*30 fn2D, fn3D
+      integer idoy, iday
+
+      vel_BC = 0.d0;
+      call calculate_Velocity_Volume_Element(dV2)
+
+      allocate(each_n(nvel,nR_loc,nEnergy))
+      each_n = 0.d0
+      number_density_1D = 0.d0
+
+      fac = 2.d0*kb/mH
+
+      do iR=1,nR_loc      ! Outermost iR-loop
+         do iE=1,nEnergy
+            do iv=1,nvel
+               t0 = current_time + fin(iv,iR,iE,1)/86400.    ! unit day
+               idoy = int(t0)                               ! yyyy+doy
+               t1 = (t0 - idoy)*86400.                       ! hms in seconds
+               it = floor(t1/tb_res)+1
+               if (idoy .lt. start_ydoy-nt_bwd_bc) then ; idoy=start_ydoy-nt_bwd_bc ; it=1 ; endif
+               if (flags(iv,iR,iE) .eq. 1) then
+                  do i=1,3
+                     pos(i) = fin(iv,iR,iE,i+1)
+                     vel(i) = fin(iv,iR,iE,i+4)
+                  enddo
+
+                  call GSE2SPH(pos,finlon,finlat)
+!                     iflon=floor(finlon/bc_res)+1                !   0 < lon < 360
+!                    ** It is due to the longitude is defined from -180 to 180 in python, not 0 to 360.
+!                    ** If it is defined from 0 to 360, then use the above one.
+                  iflon=floor(finlon/bc_res)+(180/bc_res)+1              
+                  iflat=floor(finlat/bc_res)+(90/bc_res)+1     ! -90 < lat < 90
+                  if (iflat .eq. 180/bc_res+1) then
+                     iflon = iflon + 180/bc_res
+                     iflat = 180/bc_res
+                  endif
+                  if (iflon .ge. 360/bc_res+1) then
+                     quotient = int(iflon/(360/bc_res))
+                     iflon = iflon - (360/bc_res)*quotient
+                  endif
+
+                  n_BC    = nH_BC(iflon,iflat,it,idoy)
+                  temp_BC = TH_BC(iflon,iflat,it,idoy)
+
+                  !! ** FIX ME (above): Trilinear interpolation is desired for more accurate calculation.
+                  !!                    Current code is just the 0th-order interpolation.
+
+                  if (idoy .eq. int(current_time)) then
+                     Iph = bph(idoy) * abs(fin(iv,iR,iE,1))
+                  else
+                     Iph = bph(idoy) * (86400.-t1)
+                     do iday=idoy+1,int(current_time)-1
+                        Iph = Iph + bph(iday)*86400.
+                     enddo
+                     Iph = Iph + bph(iday) * (current_time-int(current_time))*86400.
+                  endif
+
+!                     vel = (vel - vel_BC)
+                  cexo2 = fac*temp_BC
+                  vel2 = sum(vel*vel)
+                  number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph)
+                  vr = (pos(1)*vel(1)+pos(2)*vel(2)+pos(3)*vel(3))/sqrt(pos(1)*pos(1)+pos(2)*pos(2)+pos(3)*pos(3))
+                  each_n(iv,iR,iE) = vr*number_density * dV2(iE,iv) !* dV1(iR)
+
+               endif
+            enddo
+         enddo
+         number_density_1D(iR) = sum(each_n(:,iR,:))
+      enddo
+      deallocate(each_n)
+
+!         print*, number_density_1D
+
+      return
+   End
