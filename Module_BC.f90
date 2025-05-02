@@ -18,7 +18,7 @@
             write(yearst, '(I4.4)') start_ydoy/1000
 
             do iday=start_ydoy-nt_bwd_bc,end_ydoy
-               nH_temp = 0.d0 ; TH_temp=0.d0
+!               nH_temp = 0.d0 ; TH_temp=0.d0
                write(ydoy_str,'(I7.7)') iday
                write(yearst, '(I4.4)') start_ydoy/1000
                filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(ExobaseBC_Model_Name) // "_" // trim(ydoy_str) //  ".bc"
@@ -42,7 +42,7 @@
 
          ! eg. 2012360 - 2012366
          do iday=start_ydoy-nt_bwd_bc, (start_ydoy/1000)*1000+maxdoy
-            nH_temp = 0.d0 ; TH_temp=0.d0
+!            nH_temp = 0.d0 ; TH_temp=0.d0
             write(ydoy_str,'(I7.7)') iday
             write(yearst, '(I4.4)') start_ydoy/1000
             filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(ExobaseBC_Model_Name) // "_" // trim(ydoy_str) //  ".bc"
@@ -58,7 +58,7 @@
 
          ! eg. 2013001 - 2013012
          do iday=(end_ydoy/1000)*1000+1, end_ydoy
-            nH_temp = 0.d0 ; TH_temp=0.d0
+!            nH_temp = 0.d0 ; TH_temp=0.d0
             write(ydoy_str,'(I7.7)') iday
             write(yearst, '(I4.4)') end_ydoy/1000
             filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(ExobaseBC_Model_Name) // "_" // trim(ydoy_str) //  ".bc"
@@ -82,7 +82,6 @@
 
          IMPLICIT NONE
 
-         real*8, dimension(nbx,nby,nbtperday) :: nH_temp, TH_temp
          real, dimension(:,:,:), allocatable :: nH_real, TH_real
          integer nlen, thread_num, IO_unit, iexist
 
