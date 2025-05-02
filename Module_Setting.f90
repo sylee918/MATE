@@ -82,6 +82,7 @@
       integer, parameter :: ntperday = 86400/time_resolution              ! Number of time grid per day
       integer, parameter :: nt = ntperday*ndays                           ! Total number of time grid for nH
       integer, parameter :: ntmax = Max_Travel_Time_in_Days
+      real*8,  parameter :: tmax = ntmax * 86400.d0          ! 60 days
       integer, parameter :: n_physics = 5                               ! # of physics (Gravity, ..., ChargeExchange)
 
       integer, parameter :: previous_year = end_year - 1                ! For daily-varying indices (e.g. Lya, F10.7),

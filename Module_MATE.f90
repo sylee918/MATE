@@ -1,20 +1,22 @@
    Module INTEGRATED_INITIALIZATION
-   
-      use MPI_MATE
-      use SET_VELOCITY_DIRECTION
-      use GRID_PARAMETERS
-      use PHYSICS_TAG
+
+      USE SET_VELOCITY_DIRECTION
+      USE GRID_PARAMETERS
+      USE EXOBASE_BC
+      USE SOLAR_LYMAN_ALPHA
+      USE PHYSICS_TAG
 
    contains
 
       Subroutine Initialize_Setting
-
-         call Initialize_MPI      ! Should be called first.
+         USE SETTING, only: i_Photoionization
 
          call gen_points_for_NV
          call Init_Parameter
+         call Get_exobaseBC
+         call read_Lya_Bph  ;  if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
          call Physics_tag
-
+         
       end Subroutine
    
    END MODULE INTEGRATED_INITIALIZATION
@@ -22,16 +24,32 @@
 
 
    Module MPI_MATE
-      integer rank, nprocs, ierr, il, N_REDUCE
-
-      contains
+      integer nprocs, ierr
+      integer :: rank
+         real*8 :: rad, lon, lat   ! RANK dependent variables
+         integer :: nR_loc, ilon, ilat, il
+         integer :: nR_loc_MPI(nprocs)
+   contains
 
       Subroutine Initialize_MPI
-
          call MPI_INIT(ierr)
          call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
          call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierr)
-         
+
+         call Calculate_Local_nRadial
+      end Subroutine
+
+      Subroutine Calculate_Local_nRadial
+
+         use SETTING, only: nRadial
+         IMPLICIT NONE
+
+         nR_loc = nRadial / nprocs
+         if (rank .lt. mod(nRadial, nprocs)) then
+            nR_loc = nR_loc + 1
+         endif
+         nR_loc_MPI(rank+1) = nR_loc
+
       end Subroutine
 
    END MODULE MPI_MATE
@@ -45,7 +63,7 @@
 
       real*8 radial_distance_range(nRadial), energy_range(nEnergy)
       real*8 longitude_range(nLong), latitude_range(nLat), latitudeNS_range(nLat_NS)
-      real*8 radial_boundary(2), tmax
+      real*8 radial_boundary(2)
 
    contains
 
@@ -54,9 +72,7 @@
          integer iR, iE, ilon, ilat
          integer index_Emin
 
-         do iR=1,nRadial
-            radial_distance_range(iR) = RadialRange_min + (iR-1)*dR
-         enddo
+         do iR=1,nRadial   ;  radial_distance_range(iR) = RadialRange_min + (iR-1)*dR         ;  enddo
          radial_distance_range = radial_distance_range * Re
 
          if (nEnergy .eq. 121) then  ! for 0.0025 - 10 eV
@@ -81,8 +97,6 @@
 
          radial_boundary(1) = inner_boundary
          radial_boundary(2) = outer_boundary
-
-         tmax = ntmax * 86400.d0          ! 60 days
 
          return
       End

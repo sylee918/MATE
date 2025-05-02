@@ -1,38 +1,34 @@
+   Subroutine Init_Particles(ptl)
 
+      USE SETTING
+      USE GRID_PARAMETERS,        only: radial_distance_range, energy_range
+      USE SET_VELOCITY_DIRECTION, only: gen_points
+      USE MPI_MATE,               only: nR_loc, lon, lat
 
-      Subroutine Init_Particles(ptl, lon,lat)
+      integer iR, iE
+      real*8, dimension(nvel,nR_loc,nEnergy,7) :: ptl
+      real*8, dimension(nvel,3) :: vel_dir
+      real*8 energy_to_speed, lon,lat, cos_lat,sin_lat, cos_lon,sin_lon
 
-            use SET_VELOCITY_DIRECTION
-            use GRID_PARAMETERS
-            
-            USE SETTING
-            external gen_points
+      ptl=0.d0
 
-            integer iR, iE
-            real*8, dimension(nvel,nRadial,nEnergy,7) :: ptl
-            real*8, dimension(nvel,3) :: vel_dir
-            real*8 radial_distance_range(nRadial), energy_range(nEnergy)
-            real*8 energy_to_speed, lon,lat, cos_lat,sin_lat, cos_lon,sin_lon
+      call gen_points(vel_dir)
+      sin_lat = sin(lat)  ;  cos_lat = cos(lat)
+      sin_lon = sin(lon)  ;  cos_lon = cos(lon)
 
-            ptl=0.d0
+      do iE=1, nEnergy
+         energy_to_speed = sqrt(energy_range(iE)*e*2.d0/mH)
+         do iR=1, nR_loc
+            ptl(:,iR,iE,2) = radial_distance_range(iR)*cos_lat*cos_lon        ! X
+            ptl(:,iR,iE,3) = radial_distance_range(iR)*cos_lat*sin_lon        ! Y
+            ptl(:,iR,iE,4) = radial_distance_range(iR)*sin_lat                ! Z
+            ptl(:,iR,iE,5) = vel_dir(:,1) * energy_to_speed       ! Vx
+            ptl(:,iR,iE,6) = vel_dir(:,2) * energy_to_speed       ! Vy
+            ptl(:,iR,iE,7) = vel_dir(:,3) * energy_to_speed       ! Vz
+         enddo
+      enddo
 
-            call gen_points(vel_dir)
-            sin_lat = sin(lat) ;    cos_lat = cos(lat)
-            sin_lon = sin(lon) ;    cos_lon = cos(lon)
-
-            do iE=1, nEnergy
-                  energy_to_speed = sqrt(energy_range(iE)*e*2.d0/mH)
-                  do iR=1, nRadial
-                        ptl(:,iR,iE,2) = radial_distance_range(iR)*cos_lat*cos_lon        ! X
-                        ptl(:,iR,iE,3) = radial_distance_range(iR)*cos_lat*sin_lon        ! Y
-                        ptl(:,iR,iE,4) = radial_distance_range(iR)*sin_lat                ! Z
-                        ptl(:,iR,iE,5) = vel_dir(:,1) * energy_to_speed       ! Vx
-                        ptl(:,iR,iE,6) = vel_dir(:,2) * energy_to_speed       ! Vy
-                        ptl(:,iR,iE,7) = vel_dir(:,3) * energy_to_speed       ! Vz
-                  enddo
-            enddo
-
-            return
-      End
+      return
+   End
 
 

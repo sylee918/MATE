@@ -2,6 +2,7 @@
 
       USE SETTING
       USE INTEGRATED_INITIALIZATION
+      USE MPI_MATE
 
       include "mpif.h"
 
@@ -10,37 +11,29 @@
 
       IMPLICIT NONE
 
+      real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: number_density_4D, number_density_4D_MPI
       real*8, allocatable, dimension(:,:,:,:) :: ptl
       integer, allocatable, dimension(:,:,:) :: flags
+      real*8, allocatable, dimension(:) :: number_density_1D
 
-      real*8 lon,lat
-      integer ilon, ilat, nLon0
-
-      real*8 number_density_1D
-      real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: number_density_4D, number_density_4D_MPI
-
-      integer doy, iday, ihour, iminute, it, year, hour
-      real*8, dimension(start_ydoy_index:end_ydoy_index) :: Lya, bph
+      integer doy, iday, ihour, iminute, it, year, hour, nLon0
       real*8 current_time
-      character*10 yearst, dayst
       integer:: N_REDUCE
 
-      call Initialize_Setting()
+      call Initialize_MPI
+      call Initialize_Setting
 
       ! load BC
-      call read_Lya_Bph(Lya, bph);  
-      if (i_Photoionization .eq. 1) then; call read_Lya_Bph(Lya, bph);  else; bph = 0.d0; endif
+
       if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not moduel, just making .in file
       ! End Initialization
 
-      allocate(ptl(nvel,nRadial,nEnergy,7))
-      allocate(flags(nvel,nRadial,nEnergy))
+      allocate(ptl(nvel,nR_loc,nEnergy,7))
+      allocate(flags(nvel,nR_loc,nEnergy))
 
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
-         do it=1,ntperday
-!         do ihour=0,23
-!            it=ihour+1
+         do it=1,ntperday  ! hour loop
             current_time = iday*1.d0 + it*(time_resolution/86400.d0)
             ihour = it*(time_resolution/3600.d0)
             iminute = it*(time_resolution/60.d0)-ihour*60
@@ -55,15 +48,15 @@
                   if (rank .eq. il) then
                      print*, '  LON & LAT = ', int(lon*180/pi), int(lat*180/pi), '[deg]'
 
-                     call Init_Particles(ptl, lon,lat)
-                     call Trace_particle(ptl, flags, Lya, current_time)
-                     call Calculate_Density(ptl, flags, current_time, number_density_1D, bph, rank)
+                     call Init_Particles(ptl)
+                     call Trace_particle(ptl, flags, current_time)
+                     call Calculate_Density(ptl, flags, current_time, number_density_1D)
                      number_density_4D_MPI(:,ilon,ilat,it) = number_density_1D
 
                      if (lat .gt. 0) then    ! N/S symmetry
                         ptl(:,:,4) = -ptl(:,:,4)
                         ptl(:,:,7) = -ptl(:,:,7)
-                        call Calculate_Density(ptl, flags, current_time, number_density_1D, bph, rank)
+                        call Calculate_Density(ptl, flags, current_time, number_density_1D)
                         number_density_4D_MPI(:,ilon,nLat_NS+1-ilat,it) = number_density_1D
                      endif
 
@@ -73,7 +66,7 @@
          enddo ! ihour
 
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-         N_REDUCE = nRadial * nLon * nLat_NS * ntperday
+         N_REDUCE = nR_loc * nLon * nLat_NS * ntperday
          call MPI_REDUCE(number_density_4D_MPI, number_density_4D, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
          
          if (rank .eq. 0) then
@@ -84,7 +77,6 @@
                enddo
             enddo ! it
 
-            write(dayst, '(I7.7)') iday
             call write_density_4D(number_density_4D, iday)
          endif
 
