@@ -2,7 +2,7 @@ Module MPI_MATE
    integer :: nprocs, ierr
    integer :: rank
       real*8 :: rad, lon, lat   ! RANK dependent variables
-      integer :: nR_loc, ilon, ilat, il
+      integer :: nR_loc, ilon, ilat, irad, i1, i2
 contains
 
 !   Subroutine Initialize_MPI
