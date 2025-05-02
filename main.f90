@@ -55,10 +55,10 @@
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
-                  i1 = (ilon-1 + (ilat-nLat)*nLong)
+                  i1 = (ilon-1 + (ilat-nLat)*nLong)      ! starts from 0
                   do irad=1,nRadial
                      rad = radial_distance_range(irad)
-                     i2 = (i1-1)*nRadial + irad
+                     i2 = i1*nRadial + irad-1
                      if (rank .eq. i2) then
                         print '(a, f5.2, i3, i3)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
@@ -66,6 +66,7 @@
                         call Trace_particle(ptl, flags, current_time)
                         call Calculate_Density(ptl, flags, current_time, number_density_0D)
                         number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
+                        print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
 
                         if (lat .gt. 0) then    ! N/S symmetry
                            ptl(:,:,4) = -ptl(:,:,4)
