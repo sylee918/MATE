@@ -7,8 +7,8 @@
       character*20, parameter :: Runname_in_10char              = "IBEX_JS"
    
    !! TIME SETTING !!
-      integer, parameter ::      Start_Time_in_YYYYDOY          = 2010079
-      integer, parameter ::      End_Time_in_YYYYDOY            = 2010079
+      integer, parameter ::      Start_Time_in_YYYYDOY          = 2015079
+      integer, parameter ::      End_Time_in_YYYYDOY            = 2015079
       integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
    !! 3-D SPATIAL RESOLUTIONS !!
