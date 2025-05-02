@@ -18,7 +18,11 @@
       real*8 current_time
       integer:: N_REDUCE
 
-      call Initialize_MPI
+      call MPI_INIT(ierr)
+      call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
+      call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierr)
+      call Calculate_Local_nRadial
+
       call Initialize_Setting
 
       if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not module, just making .in file

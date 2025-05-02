@@ -1,5 +1,4 @@
 MODULE CONSTANTS
-
 !  Physical Constants
       real*8, parameter :: pi = 3.141592653589793
       real*8, parameter :: c = 2.99792458d8                 ! Speed of light [m/s]
@@ -19,6 +18,7 @@ MODULE CONSTANTS
       real*8, parameter :: Wrot = 1.9910d-7                 ! Earth's angular speed [rad/s]
 
 END MODULE CONSTANTS
+
 
 
 MODULE SETTING
