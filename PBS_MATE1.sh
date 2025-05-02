@@ -1,18 +1,19 @@
 #PBS -S /bin/csh
 #PBS -N slee122
-#PBS -l select=1:ncpus=5:mpiprocs=5:model=bro
-#PBS -l walltime=8:00:00
+#PBS -l select=2:ncpus=20:mpiprocs=20:model=bro+1:ncpus=19:mpiprocs=19:model=bro
+#PBS -l walltime=2:00:00
 #PBS -j oe
 #PBS -W group_list=s3015
 #PBS -m e
-#PBS -q normal
+#PBS -q devel
 
 module load comp-intel mpi-hpe
 module load pkgsrc
 
 cd $PBS_O_WORKDIR
 
-mpirun -np 5 ./MATE.x
+# np should be the total number of grid points.
+mpirun -np 59 ./MATE.x
 #mpirun -np 1297 ./MATE.x
 #mpirun -np 48 ./MATE.x
 

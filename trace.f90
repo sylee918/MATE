@@ -83,7 +83,7 @@
    Subroutine calculate_final_timestep(old,new,dt,f0)      ! Do interpolation for dt_final
 
       USE SETTING
-      USE GRID_PARAMETERS, only: radial_distance_range, radial_boundary
+      USE GRID_PARAMETERS, only: radial_boundary
       external rk4
 
       real*8, dimension(7) :: old, new
@@ -119,23 +119,22 @@
       IMPLICIT NONE
       external rk4, calculate_final_timestep
 
-      real*8, dimension(nvel,nRadial,nEnergy,7) :: ptl
-      integer :: flags(nvel,nRadial,nEnergy)
+      real*8, dimension(nvel,nEnergy,7) :: ptl
+      integer :: flags(nvel,nEnergy)
       real*8, dimension(7) :: one, old
       integer :: flag     ! 0: orbiting Earth t<tmax;   1: into exobase;  2: out of outer boundary;  3: orbiting but t>tmax
       real*8 :: radial_distance, radial_distance_old
-      integer :: iR, iE, iv, i
+      integer :: iE, iv, i
       real*8 :: dt, vt,vt_old,dv, ds
       real*8, parameter :: max_ds = 1.d6
       real*8 :: x0, f0, current_time, trace_time
       integer :: ydoy, ii
 
       do iE=1,nEnergy
-       do iR=1,nRadial
-        do iv=1,nvel
+         do iv=1,nvel
 
          flag=0; 
-         do i=1,7;   one(i) = ptl(iv,iR,iE,i);   enddo
+         do i=1,7;   one(i) = ptl(iv,iE,i);   enddo
 
          radial_distance_old = sqrt(one(2)**2+one(3)**2+one(4)**2)
          vt = sqrt(one(5)**2 + one(6)**2 + one(7)**2)
@@ -198,11 +197,10 @@
 
          enddo ! end while
 
-         do i=1,7;   ptl(iv,iR,iE,i) = one(i);   enddo
-         flags(iv,iR,iE) = flag
+         do i=1,7;   ptl(iv,iE,i) = one(i);   enddo
+         flags(iv,iE) = flag
 
         enddo ! iv
-       enddo ! iR
       enddo ! iE
 
       return
