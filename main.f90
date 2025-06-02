@@ -55,7 +55,7 @@
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
-lon=pi/2
+!  lon=pi/2!+(0.5d0*pi/180) ! 0.5-degree shift (test)
                   i1 = (ilon-1 + (ilat-nLat)*nLong)      ! starts from 0
                   do irad=1,nRadial
                      rad = radial_distance_range(irad)
@@ -67,14 +67,14 @@ lon=pi/2
                         call Trace_particle(ptl, flags, current_time)
                         call Calculate_Density(ptl, flags, current_time, number_density_0D)
                         number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
-                        print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
+!                        print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
 
                         if (lat .gt. 0) then    ! N/S symmetry
                            ptl(:,:,4) = -ptl(:,:,4)
                            ptl(:,:,7) = -ptl(:,:,7)
                            call Calculate_Density(ptl, flags, current_time, number_density_0D)
                            number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
-                           print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
+!                           print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
                         endif
                      endif
                   enddo ! irad
@@ -84,10 +84,6 @@ lon=pi/2
 
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
          N_REDUCE = nRadial * nLon * nLat_NS * ntperday
-<<<<<<< HEAD
-
-=======
->>>>>>> 01df8e3043b5a7f967e1524ce72f441ff920f98f
          call MPI_REDUCE(number_density_4D_MPI, number_density_4D, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
          if (rank .eq. 0) then
             do it=1,ntperday
