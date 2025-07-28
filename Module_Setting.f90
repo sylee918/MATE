@@ -37,10 +37,10 @@ MODULE SETTING
    integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
 !! 3-D SPATIAL RESOLUTIONS !!
-   integer, parameter ::      GEO_Resolution_in_Degree       = 15
+   integer, parameter ::      GEO_Resolution_in_Degree       = 90
    real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
    real*8, parameter  ::      RadialRange_max                = 10.0
-   real*8, parameter  ::      dR                             = 0.5
+   real*8, parameter  ::      dR                             = 2.0
 
 !! Number of Particle Direction !!
    integer, parameter ::      dV_theta                         = 2                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
