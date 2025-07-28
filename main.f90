@@ -25,9 +25,9 @@
       call MPI_INIT(ierr)
       call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
       call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierr)
-!      call Calculate_Local_nRadial
+      call Calculate_Local_nRadial
 !      nR_loc = nRadial
-      nR_loc = 1
+!      nR_loc = 1
 
       if (nprocs .ne. nRadial * nLon * (nLat-1) + 1) then
          print*, "nprocs", nprocs, "nRadial", nRadial, "nLon", nLon, "nLat", nLat
@@ -60,7 +60,8 @@
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
                   i1 = (ilon-1 + (ilat-nLat)*nLong)      ! starts from 0
-                  do irad=1,nRadial
+!                  do irad=1,nRadial
+                  do irad=1,nR_loc
                      rad = radial_distance_range(irad)
                      i2 = i1*nRadial + irad-1
                      if (rank .eq. i2) then
@@ -101,7 +102,7 @@
 
       enddo ! iday
 
-      print*, "maxnH", rank, maxval(number_density_4D)
+      print*, "maxnH", rank, maxval(number_density_4D), maxval(number_density_4D_MPI)
 
       deallocate(ptl,flags)
 
