@@ -31,6 +31,7 @@
 
       if (nprocs .ne. nRadial * nLon * (nLat-1) + 1) then
          print*, "nprocs", nprocs, "nRadial", nRadial, "nLon", nLon, "nLat", nLat
+         print*, "Warning: Using new parallelization scheme"
 !         stop
       endif
 
@@ -60,11 +61,10 @@
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
                   i1 = (ilon-1 + (ilat-nLat)*nLong)      ! starts from 0
-!                  do irad=1,nRadial
-                  do irad=1,nR_loc
+                  do irad=1,nRadial
                      rad = radial_distance_range(irad)
-                     i2 = i1*nRadial + irad-1
-                     if (rank .eq. i2) then
+                     grid_point_idx = i1*nRadial + irad-1
+                     if (grid_point_idx >= start_grid .and. grid_point_idx <= end_grid) then
                         print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
                         call Init_Particles(ptl)

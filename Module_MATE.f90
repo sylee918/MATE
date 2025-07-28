@@ -3,6 +3,8 @@ Module MPI_MATE
    integer :: rank
       real*8 :: rad, lon, lat   ! RANK dependent variables
       integer :: nR_loc, ilon, ilat, irad, i1, i2
+      integer :: start_grid, end_grid  ! 추가된 변수
+      integer :: grid_point_idx
 contains
 
 !   Subroutine Initialize_MPI
@@ -14,19 +16,57 @@ contains
 
    Subroutine Calculate_Local_nRadial
 
-      use SETTING, only: nRadial, nLat, nLat_NS, nLon
+      use SETTING, only: nRadial, nLat, nLat_NS, nLon, nLong
       IMPLICIT NONE
 
-      integer :: n1, n2, total_grid
+      integer :: total_grid_points, grid_per_proc, remainder
+      integer :: i, irad, ilat, ilon, nLon0
 
-      total_grid = nRadial * (nLon * (nLat-1) + 1)
+      ! 전체 그리드 포인트 수 계산
+      total_grid_points = 0
+      do ilat=nLat,nLat_NS
+         if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then
+            nLon0 = 1
+         else
+            nLon0 = nLong
+         endif
+         do ilon=1,nLon0
+            do irad=1,nRadial
+               total_grid_points = total_grid_points + 1
+            enddo
+         enddo
+      enddo
 
-      n1 = (nLat_NS-1)/2*nLon+1
-      n2 = nRadial*n1
-      nR_loc = n2 / nprocs
-      if (rank .lt. mod(n2, nprocs)) then
-         nR_loc = nR_loc + 1
-      endif
+      ! 각 프로세스가 담당할 그리드 포인트 수
+      grid_per_proc = total_grid_points / nprocs
+      remainder = mod(total_grid_points, nprocs)
+
+      ! 현재 프로세스의 시작/끝 그리드 인덱스
+      start_grid = rank * grid_per_proc + min(rank, remainder)
+      end_grid = start_grid + grid_per_proc - 1
+      if (rank < remainder) end_grid = end_grid + 1
+
+      ! 현재 프로세스가 담당할 반경 그리드 수 계산
+      nR_loc = 0
+      grid_point_idx = 0
+      
+      do ilat=nLat,nLat_NS
+         if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then
+            nLon0 = 1
+         else
+            nLon0 = nLong
+         endif
+         
+         do ilon=1,nLon0
+            do irad=1,nRadial
+               grid_point_idx = grid_point_idx + 1
+               
+               if (grid_point_idx >= start_grid .and. grid_point_idx <= end_grid) then
+                  if (irad > nR_loc) nR_loc = irad
+               endif
+            enddo
+         enddo
+      enddo
 
    end Subroutine
 
