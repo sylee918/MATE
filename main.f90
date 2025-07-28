@@ -59,6 +59,7 @@
             print*, 'Current time:', iday, ihour, iminute
 
             do ilat=nLat,nLat_NS
+!            do ilat=nLat,nLat
                lat = latitudeNS_range(ilat)
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
                do ilon=1,nLon0

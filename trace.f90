@@ -11,6 +11,8 @@
 
 !         pos => temp(1:3)
 !         vel => temp(4:6)
+         ! FIX ME: f0 is 4 for the 1st paper
+         f0=4.0
 
          pos = temp(1:3)
          vel = temp(4:6)
@@ -35,7 +37,7 @@
          endif
 
          ! Add Coriolis Force
-         coeff_C = 2*Wrot* i_CoriolisForce_GSE
+         coeff_C = 2*Wrot* i_CoriolisForce_GSE *100
          deriv(4) = deriv(4) + coeff_C * vel(2) 
          deriv(5) = deriv(5) - coeff_C * vel(1)
 

@@ -4,21 +4,21 @@
 !!**** Recommended to change the parameters for your run ***!!
 
    !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-      character*20, parameter :: Runname_in_10char              = "IBEX_JS"
+      character*20, parameter :: Runname_in_10char              = "Cor_x100"
    
    !! TIME SETTING !!
-      integer, parameter ::      Start_Time_in_YYYYDOY          = 2010079
-      integer, parameter ::      End_Time_in_YYYYDOY            = 2010079
+      integer, parameter ::      Start_Time_in_YYYYDOY          = 1234010
+      integer, parameter ::      End_Time_in_YYYYDOY            = 1234010
       integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
    !! 3-D SPATIAL RESOLUTIONS !!
-      integer, parameter ::      GEO_Resolution_in_Degree       = 90
+      integer, parameter ::      GEO_Resolution_in_Degree       = 5
       real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
-      real*8, parameter  ::      RadialRange_max                = 60.0
+      real*8, parameter  ::      RadialRange_max                = 20.0
       real*8, parameter  ::      dR                             = 1.0
 
    !! Number of Particle Direction !!
-      integer, parameter ::      dV_theta                         = 1                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
+      integer, parameter ::      dV_theta                         = 2                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
       integer, parameter ::      nTheta                           = 180/dV_theta + 1          ! # of theta grids
 
    !! (FIX ME!!) Energy Grid !!
@@ -37,10 +37,10 @@
       integer, parameter ::      i_ChargeExchange                 = 0                          ! Not developed yet
 
    !! Exobase Boundary Condition (BC) Setting !!
-      character*10, parameter :: ExobaseBC_Model_Name             = "MSIS-YA"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
+      character*10, parameter :: ExobaseBC_Model_Name             = "CONST"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
       integer, parameter ::      BC_GEO_Resolution_in_Degree      = 5
       integer, parameter ::      BC_Time_Resolution_in_Minute     = 5
-      integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 2010079                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+      integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1234010                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
    !! Particle Tracing Range !!
       real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location

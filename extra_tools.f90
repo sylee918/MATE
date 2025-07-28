@@ -346,6 +346,14 @@
          character*7 ydoy_str, yearst
          character*100 filename_BC
 
+
+         if (ExobaseBC_Model_Name .eq. "CONST") then
+            nH_BC = 1.2e5
+            TH_BC = 1e3
+            return
+         endif
+
+
          if (start_ydoy/1000 .eq. end_ydoy/1000) then
          write(yearst, '(I4.4)') start_ydoy/1000
 
