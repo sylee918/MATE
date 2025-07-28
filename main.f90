@@ -55,11 +55,6 @@
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
-<<<<<<< Updated upstream
-!  lon=pi/2!+(0.5d0*pi/180) ! 0.5-degree shift (test)
-=======
-!   lon=pi/2.
->>>>>>> Stashed changes
                   i1 = (ilon-1 + (ilat-nLat)*nLong)      ! starts from 0
                   do irad=1,nRadial
                      rad = radial_distance_range(irad)

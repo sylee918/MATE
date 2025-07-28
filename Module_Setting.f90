@@ -39,7 +39,7 @@ MODULE SETTING
 !! 3-D SPATIAL RESOLUTIONS !!
    integer, parameter ::      GEO_Resolution_in_Degree       = 5
    real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
-   real*8, parameter  ::      RadialRange_max                = 20.0
+   real*8, parameter  ::      RadialRange_max                = 10.0
    real*8, parameter  ::      dR                             = 0.5
 
 !! Number of Particle Direction !!
