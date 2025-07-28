@@ -14,14 +14,14 @@ contains
 
    Subroutine Calculate_Local_nRadial
 
-      use SETTING, only: nRadial, nLat_NS, nLong
+      use SETTING, only: nRadial, nLat, nLat_NS, nLon
       IMPLICIT NONE
 
       integer :: n1, n2, total_grid
 
       total_grid = nRadial * (nLon * (nLat-1) + 1)
 
-      n1 = (nLat_NS-1)/2*nLong+1
+      n1 = (nLat_NS-1)/2*nLon+1
       n2 = nRadial*n1
       nR_loc = n2 / nprocs
       if (rank .lt. mod(n2, nprocs)) then
