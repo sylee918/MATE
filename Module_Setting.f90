@@ -29,15 +29,15 @@ MODULE SETTING
 !!**** Recommended to change the parameters for your run ***!!
 
 !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-   character*20, parameter :: Runname_in_10char              = "P1rev2"
+   character*20, parameter :: Runname_in_10char              = "CXtest1"
 
 !! TIME SETTING !!
-   integer, parameter ::      Start_Time_in_YYYYDOY          = 2015079
-   integer, parameter ::      End_Time_in_YYYYDOY            = 2015079
+   integer, parameter ::      Start_Time_in_YYYYDOY          = 2008164
+   integer, parameter ::      End_Time_in_YYYYDOY            = 2008165
    integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
 !! 3-D SPATIAL RESOLUTIONS !!
-   integer, parameter ::      GEO_Resolution_in_Degree       = 5
+   integer, parameter ::      GEO_Resolution_in_Degree       = 15
    real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
    real*8, parameter  ::      RadialRange_max                = 10.0
    real*8, parameter  ::      dR                             = 0.5
@@ -65,7 +65,7 @@ MODULE SETTING
    character*10, parameter :: ExobaseBC_Model_Name             = "CONST"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
    integer, parameter ::      BC_GEO_Resolution_in_Degree      = 5
    integer, parameter ::      BC_Time_Resolution_in_Minute     = 5
-   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 2015079                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 2008164                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
 !! Particle Tracing Range !!
    real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location
