@@ -31,7 +31,7 @@
 
       if (nprocs .ne. nRadial * nLon * (nLat-1) + 1) then
          print*, "nprocs", nprocs, "nRadial", nRadial, "nLon", nLon, "nLat", nLat
-         stop
+!         stop
       endif
 
       call gen_points_for_NV
