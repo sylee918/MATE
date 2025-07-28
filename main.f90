@@ -39,8 +39,8 @@
       call Init_Parameter
       call Get_exobaseBC
       call read_Lya_Bph  
-         if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
          if (ExobaseBC_Model_Name .eq. "CONST") then; Lya = 4.d0; endif
+         if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
       call Physical_tag
 
 !      call Initialize_Setting

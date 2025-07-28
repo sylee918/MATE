@@ -6,6 +6,7 @@
       USE SOLAR_LYMAN_ALPHA, only: bph
       USE MPI_MATE, only: nR_loc
       USE VOLUME_ELEMENT
+      USE ChargeExchange
       use, intrinsic :: ieee_arithmetic
       external GSE2SPH
 
@@ -75,15 +76,19 @@
                !! ** FIX ME (above): Trilinear interpolation is desired for more accurate calculation.
                !!                    Current code is just the 0th-order interpolation.
 
-               if (idoy .eq. int(current_time)) then
-                  Iph = bph(idoy) * abs(fin(iv,iE,1))
-               else
-                  Iph = bph(idoy) * (86400.-t1)
-                  do iday=idoy+1,int(current_time)-1
-                     Iph = Iph + bph(iday)*86400.
-                  enddo
-                  Iph = Iph + bph(iday) * (current_time-int(current_time))*86400.
+               if (i_Photoionization .eq. 1) then
+                  if (idoy .eq. int(current_time)) then
+                     Iph = bph(idoy) * abs(fin(iv,iE,1))
+                  else
+                     Iph = bph(idoy) * (86400.-t1)
+                     do iday=idoy+1,int(current_time)-1
+                        Iph = Iph + bph(iday)*86400.
+                     enddo
+                     Iph = Iph + bph(iday) * (current_time-int(current_time))*86400.
+                  endif
                endif
+
+               call Calculate_ChargeExchange(iE,iv, current_time, ICX)
 
 !                     vel = (vel - vel_BC)
                cexo2 = fac*temp_BC
