@@ -5,7 +5,7 @@
       USE SET_VELOCITY_DIRECTION, only: gen_points
       USE MPI_MATE,               only: lon, lat, rad
 
-      integer iE, rad2
+      integer iE
       real*8, dimension(nvel,nEnergy,7) :: ptl
       real*8, dimension(nvel,3) :: vel_dir
       real*8 energy_to_speed, cos_lat,sin_lat, cos_lon,sin_lon
