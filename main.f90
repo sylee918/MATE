@@ -29,6 +29,10 @@
 !      nR_loc = nRadial
       nR_loc = 1
 
+      if (nprocs .ne. nRadial * nLon * (nLat-1) + 1) then
+         print*, "nprocs", nprocs, "nRadial", nRadial, "nLon", nLon, "nLat", nLat
+         stop
+      endif
 
       call gen_points_for_NV
       call Init_Parameter
@@ -60,20 +64,20 @@
                      rad = radial_distance_range(irad)
                      i2 = i1*nRadial + irad-1
                      if (rank .eq. i2) then
-                        print '(a, f5.2, i3, i3)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
+                        print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
                         call Init_Particles(ptl)
                         call Trace_particle(ptl, flags, current_time)
                         call Calculate_Density(ptl, flags, current_time, number_density_0D)
                         number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
-!                        print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
+                        !print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
 
                         if (lat .gt. 0) then    ! N/S symmetry
                            ptl(:,:,4) = -ptl(:,:,4)
                            ptl(:,:,7) = -ptl(:,:,7)
                            call Calculate_Density(ptl, flags, current_time, number_density_0D)
                            number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
-!                           print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
+                           !print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
                         endif
                      endif
                   enddo ! irad
@@ -97,7 +101,7 @@
 
       enddo ! iday
 
-      print*, "maxnH", maxval(number_density_4D)
+      print*, "maxnH", rank, maxval(number_density_4D)
 
       deallocate(ptl,flags)
 

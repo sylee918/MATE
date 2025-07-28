@@ -17,7 +17,9 @@ contains
       use SETTING, only: nRadial, nLat_NS, nLong
       IMPLICIT NONE
 
-      integer :: n1, n2
+      integer :: n1, n2, total_grid
+
+      total_grid = nRadial * (nLon * (nLat-1) + 1)
 
       n1 = (nLat_NS-1)/2*nLong+1
       n2 = nRadial*n1
