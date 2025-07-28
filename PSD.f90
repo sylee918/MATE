@@ -20,7 +20,7 @@
       real*8 temp_BC, n_BC, vel_BC(3), fac, number_density
       integer iE,iv, i
       real*8 finlon, finlat, cexo2
-      real*8 t0, t1, Iph
+      real*8 t0, t1, Iph, ICX
       integer iflon, iflat, it, quotient
       integer idoy, iday
 
@@ -93,7 +93,7 @@
 !                     vel = (vel - vel_BC)
                cexo2 = fac*temp_BC
                vel2 = sum(vel*vel)
-               number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph)
+               number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph) * exp(-ICX)
                each_n(iv,iE) = number_density * dV2(iE,iv)
 
             endif

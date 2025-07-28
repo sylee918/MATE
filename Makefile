@@ -15,8 +15,8 @@ all: MATE.x
 
 esc: MATE_esc.x
 
-MATE.x: Module_Setting.o Module_MATE.o Module_BC.o Module_Lyman.o Module_Vol.o main.o init.o trace.o PSD.o IO_utils.o
-	$(FC) -o MATE.x Module_Setting.o Module_MATE.o Module_BC.o Module_Lyman.o Module_Vol.o main.o init.o trace.o PSD.o IO_utils.o
+MATE.x: Module_Setting.o Module_MATE.o Module_BC.o Module_Lyman.o Module_Vol.o Module_ChargeExchange.o main.o init.o trace.o PSD.o IO_utils.o
+	$(FC) -o MATE.x Module_Setting.o Module_MATE.o Module_BC.o Module_Lyman.o Module_Vol.o Module_ChargeExchange.o main.o init.o trace.o PSD.o IO_utils.o
 
 #MATE_esc.x: Module_MATE.o Module_Setting.o Module_Lyman.o Module_BC.o main_esc.o init.o trace.o PSD.o IO_utils.o
 #	$(FC) -o MATE_esc.x Module_MATE.o Module_Setting.o Module_Lyman.o Module_BC.o main_esc.o init.o trace.o PSD.o IO_utils.o
@@ -36,6 +36,9 @@ Module_MATE.o: Module_MATE.f90
 
 Module_Vol.o: Module_Vol.f90
 	$(FC) -c $(flags) Module_Vol.f90
+
+Module_ChargeExchange.o: Module_ChargeExchange.f90
+	$(FC) -c $(flags) Module_ChargeExchange.f90
 
 #main_esc.o: main_esc.f90
 #	$(FC) -c $(flags) main_esc.f90

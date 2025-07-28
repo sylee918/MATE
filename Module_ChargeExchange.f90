@@ -3,9 +3,10 @@ Module ChargeExchange
    USE SETTING
    IMPLICIT NONE
 
-   integer :: nx=201, ny=201, nz=201
-   real*8, dimension(nx,ny,nz) :: nps, Tps
-   real*8, dimension(nx) :: xps, yps, zps
+   integer, parameter :: nx=201, ny=201, nz=201, nh=101, nMLT=24, nphi=24, nrho=201
+   real*8, dimension(nh,nMLT,nz) :: nps, Tps
+   real*8 :: rho(nh), MLT(nMLT), zps(nz)
+   real*8, dimension(nh) :: rho_ps
 
 
    contains
@@ -18,16 +19,33 @@ Module ChargeExchange
       integer :: iE, iv
       real*8 :: current_time, ICX
       real*8, dimension(7) :: ptl0
+      real*8 :: beta_CX1, vsig_1eV
 
       call Retrieve_initptl(iE,iv, ptl0)
       ptl0(1) = current_time
+
+      call Trace_Again(ptl0, current_time, beta_CX1)
+
+      vsig_1eV = sqrt(2.d0*e/mH)*100.d0 *5.d-15
+      ICX = beta_CX1 * vsig_1eV
+
+
 
    End Subroutine Calculate_ChargeExchange
 
 
    Subroutine Retrieve_initptl(iE,iv, ptl0)
 
+      USE SETTING
+      USE SET_VELOCITY_DIRECTION, only: gen_points
+      USE MPI_MATE, only: rad, lon, lat
+      USE GRID_PARAMETERS, only: radial_distance_range, energy_range
+      IMPLICIT NONE
+
+      integer :: iE, iv
+      real*8, dimension(7) :: ptl0
       real*8, dimension(nvel,3) :: vel_dir
+      real*8 :: sin_lat, cos_lat, sin_lon, cos_lon, energy_to_speed
 
 
       call gen_points(vel_dir)
@@ -46,25 +64,272 @@ Module ChargeExchange
    End Subroutine Retrieve_initptl
 
 
-   Subroutine Read_Plasmasphere(nps, Tps)
+   Subroutine Read_Plasmasphere()
 
-      integer :: i, j, k
+      USE SETTING
+      IMPLICIT NONE
 
-      do i=1,nx
-         xps(i) = -10.d0 + (i-1)*0.1
+      real*8, allocatable :: nps_real(:,:,:)
+      character(len=200) :: filename_BC
+      integer :: i, j, k, iexist, nlen, IO_unit
+
+      do i=1,nz
+         zps(i) = -10.d0 + (i-1)*0.1
       enddo
-      yps = xps ; zps = xps
 
-      do k=1,nz
-         do j=1,ny
-            do i=1,nx
-               nps(i,j,k) = 100.d0
-            enddo
-         enddo
+      do i=1,nh
+         rho(i) = (i-1)*0.1
+         rho_ps(i) = (i-1)*0.1  ! rho_ps 배열 초기화
       enddo
+
+      do i=1,nMLT
+         MLT(i) = (i-1)*15.d0
+      enddo
+
+      allocate(nps_real(nh,nMLT,nz))
+
+      filename_BC = "GCPM_example_cylindrical_kp0.dat"
+      inquire(file=filename_BC, exist=iexist)
+      if (iexist .eq. 0) then
+         print*, "File is not exist: ", filename_BC
+      else
+         inquire(iolength=nlen) nps_real
+         open(file=filename_BC,unit=IO_unit,form='unformatted', &
+            access='direct',action='read',recl=nlen,status='old')
+         read(IO_unit,rec=1) nps_real
+         close(IO_unit)
+      endif
+
+      nps = nps_real*1.d0
+      deallocate(nps_real)
+
+      Tps = 0.d0 !! FIX ME!!
 
 
    End Subroutine Read_Plasmasphere
 
+
+   Subroutine interpolate_plasmasphere(one, nps1)
+
+      USE SETTING
+      USE GRID_PARAMETERS
+      IMPLICIT NONE
+      
+      real*8, dimension(7) :: one
+      real*8 :: nps1
+      
+      real*8 :: x, y, z, rho, phi, z_coord
+      real*8 :: rho_min, rho_max, phi_min, phi_max, z_min, z_max
+      real*8 :: phi_grid, phi_grid_next
+      integer :: i_rho, i_phi, i_z
+      integer :: i_rho1, i_rho2, i_phi1, i_phi2, i_z1, i_z2
+      real*8 :: w_rho1, w_rho2, w_phi1, w_phi2, w_z1, w_z2
+      real*8 :: nps_interp
+      real*8 :: d_rho, d_phi, d_z
+      
+      ! 입자의 x, y, z 좌표 추출
+      x = one(2)
+      y = one(3) 
+      z = one(4)
+      
+      ! Cylindrical coordinates로 변환
+      rho = sqrt(x**2 + y**2)  ! Radial distance from z-axis
+      phi = atan2(y, x)        ! Azimuthal angle
+      z_coord = z              ! Height
+      
+      ! phi를 0-2π 범위로 정규화
+      if (phi < 0.d0) phi = phi + 2.d0*pi
+      
+      ! Grid boundaries 확인
+      rho_min = minval(rho_ps)
+      rho_max = maxval(rho_ps)
+      phi_min = 0.d0
+      phi_max = 2.d0*pi
+      z_min = minval(zps)
+      z_max = maxval(zps)
+      
+      ! Boundary check - 만약 입자가 plasmasphere grid 밖에 있으면 0 반환
+      if (rho < rho_min .or. rho > rho_max .or. &
+          z_coord < z_min .or. z_coord > z_max) then
+         nps1 = 0.d0
+         return
+      endif
+      
+      ! rho grid index 찾기
+      i_rho1 = 1
+      i_rho2 = nrho
+      do i_rho = 1, nrho-1
+         if (rho >= rho_ps(i_rho) .and. rho <= rho_ps(i_rho+1)) then
+            i_rho1 = i_rho
+            i_rho2 = i_rho + 1
+            exit
+         endif
+      enddo
+      
+      ! phi grid index 찾기 (MLT를 phi로 변환)
+      i_phi1 = 1
+      i_phi2 = nphi
+      do i_phi = 1, nphi-1
+         phi_grid = 2.d0*pi * (i_phi-1) / (nphi-1)  ! Grid phi values
+         phi_grid_next = 2.d0*pi * i_phi / (nphi-1)
+         if (phi >= phi_grid .and. phi <= phi_grid_next) then
+            i_phi1 = i_phi
+            i_phi2 = i_phi + 1
+            exit
+         endif
+      enddo
+      
+      ! z grid index 찾기
+      i_z1 = 1
+      i_z2 = nz
+      do i_z = 1, nz-1
+         if (z_coord >= zps(i_z) .and. z_coord <= zps(i_z+1)) then
+            i_z1 = i_z
+            i_z2 = i_z + 1
+            exit
+         endif
+      enddo
+      
+      ! Interpolation weights 계산
+      if (i_rho2 > i_rho1) then
+         d_rho = rho_ps(i_rho2) - rho_ps(i_rho1)
+         w_rho1 = (rho_ps(i_rho2) - rho) / d_rho
+         w_rho2 = (rho - rho_ps(i_rho1)) / d_rho
+      else
+         w_rho1 = 1.d0
+         w_rho2 = 0.d0
+      endif
+      
+      if (i_phi2 > i_phi1) then
+         d_phi = 2.d0*pi / (nphi-1)
+         phi_grid = 2.d0*pi * (i_phi1-1) / (nphi-1)
+         w_phi1 = (phi_grid + d_phi - phi) / d_phi
+         w_phi2 = (phi - phi_grid) / d_phi
+      else
+         w_phi1 = 1.d0
+         w_phi2 = 0.d0
+      endif
+      
+      if (i_z2 > i_z1) then
+         d_z = zps(i_z2) - zps(i_z1)
+         w_z1 = (zps(i_z2) - z_coord) / d_z
+         w_z2 = (z_coord - zps(i_z1)) / d_z
+      else
+         w_z1 = 1.d0
+         w_z2 = 0.d0
+      endif
+      
+      ! 3D Trilinear interpolation 수행
+      nps_interp = 0.d0
+      
+      ! 8개 corner points에 대한 interpolation
+      nps_interp = nps_interp + &
+                   w_rho1 * w_phi1 * w_z1 * nps(i_rho1, i_phi1, i_z1) + &
+                   w_rho2 * w_phi1 * w_z1 * nps(i_rho2, i_phi1, i_z1) + &
+                   w_rho1 * w_phi2 * w_z1 * nps(i_rho1, i_phi2, i_z1) + &
+                   w_rho2 * w_phi2 * w_z1 * nps(i_rho2, i_phi2, i_z1) + &
+                   w_rho1 * w_phi1 * w_z2 * nps(i_rho1, i_phi1, i_z2) + &
+                   w_rho2 * w_phi1 * w_z2 * nps(i_rho2, i_phi1, i_z2) + &
+                   w_rho1 * w_phi2 * w_z2 * nps(i_rho1, i_phi2, i_z2) + &
+                   w_rho2 * w_phi2 * w_z2 * nps(i_rho2, i_phi2, i_z2)
+      
+      nps1 = nps_interp
+      
+   End Subroutine interpolate_plasmasphere
+
+
+
+   Subroutine Trace_Again(ptl0, current_time, beta_CX1)
+
+      USE SETTING
+      USE GRID_PARAMETERS, only: radial_boundary
+      USE SOLAR_LYMAN_ALPHA, only: Lya
+      IMPLICIT NONE
+      external rk4, calculate_final_timestep
+
+      real*8, dimension(7) :: ptl0
+      real*8, dimension(7) :: one, old
+      integer :: flag     ! 0: orbiting Earth t<tmax;   1: into exobase;  2: out of outer boundary;  3: orbiting but t>tmax
+      real*8 :: radial_distance, radial_distance_old
+      integer :: i
+      real*8 :: dt, vt,vt_old,dv, ds
+      real*8, parameter :: max_ds = 1.d6
+      real*8 :: x0, f0, current_time, trace_time
+      integer :: ydoy, ii
+      real*8 :: beta_CX1, nps1
+
+         beta_CX1 = 0.d0
+         one = ptl0
+
+         radial_distance_old = sqrt(one(2)**2+one(3)**2+one(4)**2)
+         vt = sqrt(one(5)**2 + one(6)**2 + one(7)**2)
+         trace_time = current_time - 1e-5
+
+         do while (abs(one(1)) < tmax)
+
+            radial_distance_old = sqrt(one(2)**2+one(3)**2+one(4)**2)
+            vt_old = sqrt(one(5)**2 + one(6)**2 + one(7)**2)
+
+            dt = -1.d0*max_ds / vt_old     ! -1e6 or 4e6 is a "factor" in python code. The maximum distance jump at single time step.
+            if (mod(trace_time-1,1000.0) .gt. 500) then               ! eg. trace_time=2010000.98, then it should be 2009365.98, 
+               ii=1000-mod(int(trace_time-1),1000)                  ! eg. trace_time-1 = 2009999.98, ii=1000-999=1
+               if (mod(int((trace_time-1)/1000),4) .eq. 0) then
+                  trace_time = int((trace_time-1)/1000)*1000 + (367-ii) + mod(trace_time,1.0)      ! For leap years (400-year period is not applied)
+               else
+                  trace_time = int((trace_time-1)/1000)*1000 + (366-ii) + mod(trace_time,1.0)      ! eg. trace_time = 2009000+365+0.98 = 2009365.98
+               endif
+            endif
+
+            ydoy = int(trace_time)
+            f0 = Lya(ydoy)
+            if (int(trace_time + dt/86400) .ne. int(trace_time)) then
+               dt = (int(trace_time)-trace_time)*86400 - 1e-5    ! trace_time always hits the time (00:00:00) for daily-varying Lya.
+               if (abs(dt) .lt. 1e-6) then
+                  print*, "ERROR: dt is too small"
+                  stop
+               endif
+            endif
+
+            old = one
+101 continue
+            call rk4(one,dt,f0)
+            trace_time = current_time + one(1)/86400  ! one(2) < 0
+            ! FIX ME (if time cross year)
+
+            radial_distance = sqrt(one(2)**2+one(3)**2+one(4)**2)
+            vt = sqrt(one(5)**2 + one(6)**2 + one(7)**2)
+            ds = sqrt((old(2)-one(2))**2+(old(3)-one(3))**2+(old(4)-one(4))**2)
+            dv = vt-vt_old
+
+            ! If the solution is diverging ...
+            if (abs(ds/radial_distance_old) .gt. 1e-1 .or. abs(ds)/max_ds .gt. 1.2 .or. dv/vt_old .gt. 10) then
+                  dt=dt/2
+                  one=old
+                  goto 101
+            endif
+
+            call interpolate_plasmasphere(one, nps1)
+            beta_CX1 = beta_CX1 + nps1*dt
+
+            radial_distance = sqrt(one(2)**2+one(3)**2+one(4)**2)
+            if (radial_distance .lt. radial_boundary(1)) then
+               flag = 1
+               call calculate_final_timestep(old,one,dt,f0)
+            else if (radial_distance .gt. radial_boundary(2)) then
+               flag = 2
+               print*, "ERROR: Rerun makes particle to escape!!"
+               stop
+            endif
+
+            if (flag > 0) then
+               exit
+            endif
+
+         enddo ! end while
+
+      ptl0 = one
+
+      return
+   End
 
 End Module ChargeExchange
