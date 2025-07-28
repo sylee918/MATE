@@ -97,6 +97,8 @@
 
       enddo ! iday
 
+      print*, "maxnH", maxval(number_density_4D)
+
       deallocate(ptl,flags)
 
       call MPI_FINALIZE(ierr)
