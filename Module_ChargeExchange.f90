@@ -106,9 +106,6 @@ if (rank .eq. 4 .and. iE .eq. 32 .and. iv .eq. 170) print*, "Init_Particles_0", 
       nps = nps_real*1.d0
       deallocate(nps_real)
 
-      print*, "nps", minval(nps), maxval(nps), nps(1,1,1)
-      print*, nh,nMLT,nz
-
       Tps = 0.d0 !! FIX ME!!
 
 

@@ -43,9 +43,6 @@
       call Read_Plasmasphere
       call Physical_tag
 
-      print*, maxval(nps)
-      stop
-
 !      call Initialize_Setting
 
       if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not module, just making .in file
