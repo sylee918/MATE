@@ -24,6 +24,8 @@ Module ChargeExchange
       call Retrieve_initptl(iE,iv, ptl0)
       ptl0(1) = current_time
 
+if (rank .eq. 4 .and. iE .eq. 32 .and. iv .eq. 170) print*, "Init_Particles_0", ptl0
+
       call Trace_Again(iE,iv, ptl0, current_time, beta_CX1)
 
       vsig_1eV = sqrt(2.d0*e/mH)*100.d0 *5.d-15
