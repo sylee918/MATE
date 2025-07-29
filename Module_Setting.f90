@@ -32,8 +32,8 @@ MODULE SETTING
    character*20, parameter :: Runname_in_10char              = "CXtest1"
 
 !! TIME SETTING !!
-   integer, parameter ::      Start_Time_in_YYYYDOY          = 1000002
-   integer, parameter ::      End_Time_in_YYYYDOY            = 1000002
+   integer, parameter ::      Start_Time_in_YYYYDOY          = 1000003
+   integer, parameter ::      End_Time_in_YYYYDOY            = 1000003
    integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
 !! 3-D SPATIAL RESOLUTIONS !!
@@ -65,7 +65,7 @@ MODULE SETTING
    character*10, parameter :: ExobaseBC_Model_Name             = "CONST"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
    integer, parameter ::      BC_GEO_Resolution_in_Degree      = 5
    integer, parameter ::      BC_Time_Resolution_in_Minute     = 5
-   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1000002                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1000003                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
 !! Particle Tracing Range !!
    real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location

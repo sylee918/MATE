@@ -72,8 +72,8 @@ if (rank .eq. 4 .and. iE .eq. 32 .and. iv .eq. 170) print*, "Init_Particles_0", 
       USE SETTING
       IMPLICIT NONE
 
-      real*8, allocatable :: nps_real(:,:,:)
-      character(len=200) :: filename_BC
+      real, allocatable :: nps_real(:,:,:)
+      character(len=200) :: filename
       integer :: i, j, k, iexist, nlen, IO_unit
 
       do i=1,nz
@@ -91,13 +91,13 @@ if (rank .eq. 4 .and. iE .eq. 32 .and. iv .eq. 170) print*, "Init_Particles_0", 
 
       allocate(nps_real(nh,nMLT,nz))
 
-      filename_BC = "GCPM_example_cylindrical_kp0.dat"
-      inquire(file=filename_BC, exist=iexist)
+      filename = "GCPM_example_cylindrical_kp0.dat"
+      inquire(file=filename, exist=iexist)
       if (iexist .eq. 0) then
-         print*, "File is not exist: ", filename_BC
+         print*, "File is not exist: ", filename
       else
          inquire(iolength=nlen) nps_real
-         open(file=filename_BC,unit=IO_unit,form='unformatted', &
+         open(file=filename,unit=IO_unit,form='unformatted', &
             access='direct',action='read',recl=nlen,status='old')
          read(IO_unit,rec=1) nps_real
          close(IO_unit)
@@ -105,6 +105,9 @@ if (rank .eq. 4 .and. iE .eq. 32 .and. iv .eq. 170) print*, "Init_Particles_0", 
 
       nps = nps_real*1.d0
       deallocate(nps_real)
+
+      print*, "nps", minval(nps), maxval(nps), nps(1,1,1)
+      print*, nh,nMLT,nz
 
       Tps = 0.d0 !! FIX ME!!
 

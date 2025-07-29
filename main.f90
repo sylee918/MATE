@@ -30,7 +30,7 @@
 !      nR_loc = nRadial
 !      nR_loc = 1
 
-      if (nprocs .ne. nRadial * (nLon * (nLat-1) + 1)) then
+      if (nprocs .ne. nRadial * (nLon * (nLat-1) + 1) .and. rank .eq. 0) then
          print*, "nprocs", nprocs, "nRadial", nRadial, "nLon", nLon, "nLat", nLat
       endif
 
@@ -42,6 +42,9 @@
          if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
       call Read_Plasmasphere
       call Physical_tag
+
+      print*, maxval(nps)
+      stop
 
 !      call Initialize_Setting
 
