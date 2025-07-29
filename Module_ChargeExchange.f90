@@ -14,6 +14,7 @@ Module ChargeExchange
    Subroutine Calculate_ChargeExchange(iE,iv,current_time, ICX)
 
       USE SETTING
+      USE MPI_MATE, only: rank
       IMPLICIT NONE
 
       integer :: iE, iv
