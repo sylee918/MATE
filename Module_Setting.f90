@@ -37,7 +37,7 @@ MODULE SETTING
    integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
 !! 3-D SPATIAL RESOLUTIONS !!
-   integer, parameter ::      GEO_Resolution_in_Degree       = 90
+   integer, parameter ::      GEO_Resolution_in_Degree       = 15
    real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
    real*8, parameter  ::      RadialRange_max                = 10.0
    real*8, parameter  ::      dR                             = 0.5
