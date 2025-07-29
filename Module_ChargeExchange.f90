@@ -24,7 +24,7 @@ Module ChargeExchange
       call Retrieve_initptl(iE,iv, ptl0)
       ptl0(1) = current_time
 
-      call Trace_Again(ptl0, current_time, beta_CX1)
+      call Trace_Again(iE,iv, ptl0, current_time, beta_CX1)
 
       vsig_1eV = sqrt(2.d0*e/mH)*100.d0 *5.d-15
       ICX = beta_CX1 * vsig_1eV
@@ -239,14 +239,16 @@ Module ChargeExchange
 
 
 
-   Subroutine Trace_Again(ptl0, current_time, beta_CX1)
+   Subroutine Trace_Again(iE,iv, ptl0, current_time, beta_CX1)
 
       USE SETTING
+      USE MPI_MATE, only: rank
       USE GRID_PARAMETERS, only: radial_boundary
       USE SOLAR_LYMAN_ALPHA, only: Lya
       IMPLICIT NONE
       external rk4, calculate_final_timestep
 
+      integer :: iE, iv
       real*8, dimension(7) :: ptl0
       real*8, dimension(7) :: one, old
       integer :: flag     ! 0: orbiting Earth t<tmax;   1: into exobase;  2: out of outer boundary;  3: orbiting but t>tmax
