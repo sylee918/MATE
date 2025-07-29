@@ -6,6 +6,7 @@
       USE GRID_PARAMETERS
       USE EXOBASE_BC
       USE SOLAR_LYMAN_ALPHA
+      USE MODULE_CHARGE_EXCHANGE
       USE PHYSICS_TAG
       IMPLICIT NONE
 
@@ -39,6 +40,7 @@
       call read_Lya_Bph  
          if (ExobaseBC_Model_Name .eq. "CONST") then; Lya = 4.d0; endif
          if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
+      call Read_Plasmasphere
       call Physical_tag
 
 !      call Initialize_Setting
