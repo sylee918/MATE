@@ -49,9 +49,6 @@
                enddo
 
                call GSE2SPH(pos,finlon,finlat)
-!                     iflon=floor(finlon/bc_res)+1                !   0 < lon < 360
-!                    ** It is due to the longitude is defined from -180 to 180 in python, not 0 to 360.
-!                    ** If it is defined from 0 to 360, then use the above one.
                iflon=floor(finlon/bc_res)+(180/bc_res)+1              
                iflat=floor(finlat/bc_res)+(90/bc_res)+1     ! -90 < lat < 90
                if (iflat .eq. 180/bc_res+1) then
@@ -62,13 +59,6 @@
                   quotient = int(iflon/(360/bc_res))
                   iflon = iflon - (360/bc_res)*quotient
                endif
-
-               !! FIX ME (05.28.2024) : Temporarily fixed the 180 degree
-               !difference of MSIS longitude
-!                     iflon = ilon + 180/bc_res
-!                     if (iflon .gt. 360/bc_res) then
-!                        iflon = iflon - 360/bc_res
-!                     endif
 
                n_BC    = nH_BC(iflon,iflat,it,idoy)
                temp_BC = TH_BC(iflon,iflat,it,idoy)
@@ -90,7 +80,7 @@
 
                call Calculate_ChargeExchange(iE,iv, current_time, ICX)
 
-!                     vel = (vel - vel_BC)
+               !vel = (vel - vel_BC)
                cexo2 = fac*temp_BC
                vel2 = sum(vel*vel)
                number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph) * exp(-ICX)

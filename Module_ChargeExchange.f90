@@ -23,7 +23,7 @@ Module ChargeExchange
       real*8 :: beta_CX1, vsig_1eV
 
       call Retrieve_initptl(iE,iv, ptl0)
-      ptl0(1) = current_time
+      ptl0(1) = 0.d0
 
 if (rank .eq. 4 .and. iE .eq. 32 .and. iv .eq. 170) print*, "Init_Particles_0", ptl0
 
