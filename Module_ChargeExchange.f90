@@ -318,6 +318,7 @@ Module ChargeExchange
             else if (radial_distance .gt. radial_boundary(2)) then
                flag = 2
                print*, "ERROR: Rerun makes particle to escape!!"
+               print*, rank, iE, iv
                stop
             endif
 

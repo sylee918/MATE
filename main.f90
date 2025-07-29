@@ -29,10 +29,8 @@
 !      nR_loc = nRadial
 !      nR_loc = 1
 
-      if (nprocs .ne. nRadial * nLon * (nLat-1) + 1) then
+      if (nprocs .ne. nRadial * (nLon * (nLat-1) + 1)) then
          print*, "nprocs", nprocs, "nRadial", nRadial, "nLon", nLon, "nLat", nLat
-         print*, "Warning: Using new parallelization scheme"
-!         stop
       endif
 
       call gen_points_for_NV
