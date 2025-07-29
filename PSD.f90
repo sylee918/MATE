@@ -76,14 +76,16 @@
                      enddo
                      Iph = Iph + bph(iday) * (current_time-int(current_time))*86400.
                   endif
+               else
+                  Iph = 0.d0
                endif
 
-               call Calculate_ChargeExchange(iE,iv, current_time, ICX)
+               call Calculate_ChargeExchange(iE,iv, current_time, ICX) 
 
                !vel = (vel - vel_BC)
                cexo2 = fac*temp_BC
                vel2 = sum(vel*vel)
-               number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph) * exp(-ICX)
+               number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph + ICX) ! dt is negative, so ICX is already negative.
                each_n(iv,iE) = number_density * dV2(iE,iv)
 
             endif
