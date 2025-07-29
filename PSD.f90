@@ -81,6 +81,7 @@
                endif
 
                call Calculate_ChargeExchange(iE,iv, current_time, ICX) 
+!               print*, "ICX, Iph", ICX, Iph, rank
 
                !vel = (vel - vel_BC)
                cexo2 = fac*temp_BC

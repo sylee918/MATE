@@ -32,6 +32,9 @@ if (rank .eq. 4 .and. iE .eq. 32 .and. iv .eq. 170) print*, "Init_Particles_0", 
       vsig_1eV = sqrt(2.d0*e/mH)*100.d0 *5.d-15
       ICX = beta_CX1 * vsig_1eV
 
+!      print*, "ICX, beta_CX1", ICX, beta_CX1, rank
+!      print*, "nps", nps(1,1,1), minval(nps), maxval(nps)
+
 
 
    End Subroutine Calculate_ChargeExchange
@@ -131,9 +134,9 @@ if (rank .eq. 4 .and. iE .eq. 32 .and. iv .eq. 170) print*, "Init_Particles_0", 
       real*8 :: d_rho, d_phi, d_z
       
       ! 입자의 x, y, z 좌표 추출
-      x = one(2)
-      y = one(3) 
-      z = one(4)
+      x = one(2)/Re
+      y = one(3)/Re
+      z = one(4)/Re
       
       ! Cylindrical coordinates로 변환
       rho = sqrt(x**2 + y**2)  ! Radial distance from z-axis
@@ -315,6 +318,8 @@ if (rank .eq. 4 .and. iE .eq. 32 .and. iv .eq. 170) print*, "Init_Particles_0", 
 
             call interpolate_plasmasphere(one, nps1)
             beta_CX1 = beta_CX1 + nps1*dt
+!            print*, "beta_CX1, nps1, dt", beta_CX1, nps1, dt, rank
+!            stop
 
             radial_distance = sqrt(one(2)**2+one(3)**2+one(4)**2)
             if (radial_distance .lt. radial_boundary(1)) then

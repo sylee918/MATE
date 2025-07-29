@@ -42,6 +42,7 @@
          if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
       call Read_Plasmasphere
       call Physical_tag
+      
 
 !      call Initialize_Setting
 
