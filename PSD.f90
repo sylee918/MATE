@@ -80,7 +80,11 @@
                   Iph = 0.d0
                endif
 
-               call Calculate_ChargeExchange(iE,iv, current_time, ICX) 
+               if (i_ChargeExchange .eq. 1) then
+                  call Calculate_ChargeExchange(iE,iv, current_time, ICX) 
+               else
+                  ICX = 0.d0
+               endif
 !               print*, "ICX, Iph", ICX, Iph, rank
 
                !vel = (vel - vel_BC)
