@@ -40,6 +40,7 @@
       call read_Lya_Bph  
          if (ExobaseBC_Model_Name .eq. "CONST") then; Lya = 4.d0; endif
          if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
+         if (i_Photoionization .eq. 1 .and. ExobaseBC_Model_Name .eq. "CONST") then; bph = 1.5d-7; endif
       call Read_Plasmasphere
       call Physical_tag
       
