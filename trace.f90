@@ -116,6 +116,7 @@
       USE SETTING
       USE GRID_PARAMETERS, only: radial_boundary
       USE SOLAR_LYMAN_ALPHA, only: Lya
+      USE ChargeExchange, only: nstep
       IMPLICIT NONE
       external rk4, calculate_final_timestep
 
@@ -128,12 +129,12 @@
       real*8 :: dt, vt,vt_old,dv, ds
       real*8, parameter :: max_ds = 1.d6
       real*8 :: x0, f0, current_time, trace_time
-      integer :: ydoy, ii
+      integer :: ydoy, ii, istep
 
       do iE=1,nEnergy
          do iv=1,nvel
 
-         flag=0; 
+         flag=0; istep=0;
          do i=1,7;   one(i) = ptl(iv,iE,i);   enddo
 
          radial_distance_old = sqrt(one(2)**2+one(3)**2+one(4)**2)
@@ -142,6 +143,7 @@
 
          do while (abs(one(1)) < tmax)
 
+            istep = istep + 1
             radial_distance_old = sqrt(one(2)**2+one(3)**2+one(4)**2)
             vt_old = sqrt(one(5)**2 + one(6)**2 + one(7)**2)
 
@@ -186,12 +188,14 @@
             radial_distance = sqrt(one(2)**2+one(3)**2+one(4)**2)
             if (radial_distance .lt. radial_boundary(1)) then
                flag = 1
+               istep = istep + 1
                call calculate_final_timestep(old,one,dt,f0)
             else if (radial_distance .gt. radial_boundary(2)) then
                flag = 2
             endif
 
             if (flag > 0) then
+               nstep(iv,iE) = istep
                exit
             endif
 

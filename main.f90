@@ -22,6 +22,10 @@
       integer doy, iday, ihour, iminute, it, year, hour, nLon0
       real*8 current_time
       integer:: N_REDUCE
+      real*8, dimension(7) :: one
+      real*8 :: nps1, nH1
+
+
 
       call MPI_INIT(ierr)
       call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
@@ -45,11 +49,24 @@
       call Physical_tag
       
 
+!one = (/ 1.d0, 1.d0, 0.d0, 1.25d0,    0.d0, 0.d0, 0.d0 /)
+!one = one*Re*4
+!call interpolate_plasmasphere(one, nps1)
+!print*, "nps1", nps1
+!print*, ""
+
+!one = (/ 1.d0, -1/sqrt(2.d0), 1/sqrt(2.d0), 1.25d0,    0.d0, 0.d0, 0.d0 /)
+!one = one*Re*4
+!call interpolate_exosphere(one, nH1)
+!print*, "nH0", nH1
+
+
+
 !      call Initialize_Setting
 
       if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not module, just making .in file
 
-      allocate(ptl(nvel,nEnergy,7), flags(nvel,nEnergy))
+      allocate(ptl(nvel,nEnergy,7), flags(nvel,nEnergy), nstep(nvel,nEnergy))
 
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
@@ -110,7 +127,7 @@
 
       print*, "maxnH", rank, maxval(number_density_4D), maxval(number_density_4D_MPI)
 
-      deallocate(ptl,flags)
+      deallocate(ptl,flags, nstep)
 
       call MPI_FINALIZE(ierr)
 

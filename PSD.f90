@@ -17,10 +17,10 @@
 
       real*8, dimension(:,:), allocatable :: each_n
       real*8 pos(3), vel(3), vel2
-      real*8 temp_BC, n_BC, vel_BC(3), fac, number_density
+      real*8 temp_BC, n_BC, vel_BC(3), fac, PhaseSpaceDensity
       integer iE,iv, i
       real*8 finlon, finlat, cexo2
-      real*8 t0, t1, Iph, ICX
+      real*8 t0, t1, Iph, ICX, PSD_CX, PSD_exobase
       integer iflon, iflat, it, quotient
       integer idoy, iday
 
@@ -80,18 +80,19 @@
                   Iph = 0.d0
                endif
 
+               cexo2 = fac*temp_BC
+               vel2 = sum(vel*vel)
                if (i_ChargeExchange .eq. 1) then
-                  call Calculate_ChargeExchange(iE,iv, current_time, ICX) 
+                  call Calculate_ChargeExchange(iE,iv, current_time, ICX, PSD_CX) 
                else
                   ICX = 0.d0
+                  PSD_CX = 0.d0
                endif
 !               print*, "ICX, Iph", ICX, Iph, rank
 
                !vel = (vel - vel_BC)
-               cexo2 = fac*temp_BC
-               vel2 = sum(vel*vel)
-               number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph + ICX) ! dt is negative, so ICX is already negative.
-               each_n(iv,iE) = number_density * dV2(iE,iv)
+               PSD_exobase = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph + ICX) ! dt is negative, so ICX is already negative.
+               each_n(iv,iE) = (PSD_exobase + PSD_CX) * dV2(iE,iv)
 
             endif
          enddo

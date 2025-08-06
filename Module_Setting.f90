@@ -32,8 +32,8 @@ MODULE SETTING
    character*20, parameter :: Runname_in_10char              = "CXtest1"
 
 !! TIME SETTING !!
-   integer, parameter ::      Start_Time_in_YYYYDOY          = 1000005
-   integer, parameter ::      End_Time_in_YYYYDOY            = 1000005
+   integer, parameter ::      Start_Time_in_YYYYDOY          = 1000006
+   integer, parameter ::      End_Time_in_YYYYDOY            = 1000006
    integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
 !! 3-D SPATIAL RESOLUTIONS !!
@@ -53,7 +53,7 @@ MODULE SETTING
    character*70, parameter :: Lya_dir                          = "OMNI_extended.txt"         ! 1964 - 2024 (Oct)
    character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
    character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0728/"
-!   character*70, parameter :: outdir                           = ""
+!   character*70, parameter :: outdir                           = "/home/sylee/exospherecode/MATE/output/0728/"
 
 !! Including Physics !!
    integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
@@ -66,7 +66,7 @@ MODULE SETTING
    character*10, parameter :: ExobaseBC_Model_Name             = "CONST"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
    integer, parameter ::      BC_GEO_Resolution_in_Degree      = 5
    integer, parameter ::      BC_Time_Resolution_in_Minute     = 5
-   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1000005                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1000006                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
 !! Particle Tracing Range !!
    real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location
