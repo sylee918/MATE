@@ -156,7 +156,7 @@ Module ChargeExchange
       phi = atan2(y, x)        ! Azimuthal angle
       z_coord = z              ! Height
 
-      print*, "rho, phi, z_coord", rho, phi, z_coord
+!      print*, "rho, phi, z_coord", rho, phi, z_coord
       
       ! phi를 0-2π 범위로 정규화
       if (phi < 0.d0) phi = phi + 2.d0*pi
