@@ -20,7 +20,7 @@ Module ChargeExchange
       integer :: iE, iv
       real*8 :: current_time, ICX, PSD_CX
       real*8, dimension(7) :: ptl0
-      real*8 :: vrel, sigma, vsig_1eV, fac, cexo2, fac2, T_PS_eV, T_PS_K
+      real*8 :: vrel, sigma, vsig_1eV, fac, cexo2, fac2, T_PS_eV, T_PS_K, ICX_i
       real*8, allocatable :: beta_dt(:), nH_traj(:), vel2(:)
       integer :: i
 
