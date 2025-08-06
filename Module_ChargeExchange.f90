@@ -311,7 +311,7 @@ Module ChargeExchange
       
       ! Read exosphere data
       call Read_Exosphere(nH0)
-      print*, "maxval(nH0)", maxval(nH0)
+!      print*, "maxval(nH0)", maxval(nH0)
       
       ! 입자의 x, y, z 좌표 추출
       x = one(2)/Re
@@ -323,7 +323,7 @@ Module ChargeExchange
       longitude = atan2(y, x)                 ! Longitude (0 to 2π)
       latitude = asin(z/r)                    ! Latitude (-π/2 to π/2)
 
-      print*, "r, longitude, latitude", r, longitude*180/pi, latitude*180/pi
+!      print*, "r, longitude, latitude", r, longitude*180/pi, latitude*180/pi
       
       ! longitude를 0-2π 범위로 정규화
       if (longitude < 0.d0) longitude = longitude + 2.d0*pi
