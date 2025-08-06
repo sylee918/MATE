@@ -43,7 +43,8 @@ Module ChargeExchange
 
       PSD_CX = 0.d0
       do i=1,nstep(iv,iE)
-         PSD_CX = PSD_CX + beta_dt(i) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2
+         ICX_i = sum(beta_dt(1:i)) * vsig_1eV
+         PSD_CX = PSD_CX + beta_dt(i) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
       enddo
       ICX = sum(beta_dt) * vsig_1eV
 
