@@ -89,12 +89,12 @@
                         print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
                         call Init_Particles(ptl)
-         if (rank .eq. 4) print*, "Init_Particles", ptl(170,32,:)
 
                         call Trace_particle(ptl, flags, current_time)
                         call Calculate_Density(ptl, flags, current_time, number_density_0D)
                         number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
                         !print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
+print*, '123'
 
                         if (lat .gt. 0) then    ! N/S symmetry
                            ptl(:,:,4) = -ptl(:,:,4)
