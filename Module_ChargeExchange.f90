@@ -9,7 +9,7 @@ Module ChargeExchange
    real*8, dimension(nh) :: rho_ps
    integer, allocatable, dimension(:,:) :: nstep
 
-   contains
+contains
 
    Subroutine Calculate_ChargeExchange(iE,iv,current_time, ICX, PSD_CX)
 
