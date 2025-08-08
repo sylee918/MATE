@@ -89,11 +89,8 @@
                         print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
                         call Init_Particles(ptl)
-print*, '01', rank, irad, ilon, ilat, it
                         call Trace_particle(ptl, flags, current_time)
-print*, '02', rank, irad, ilon, ilat, it
                         call Calculate_Density(ptl, flags, current_time, number_density_0D)
-print*, '03', rank, irad, ilon, ilat, it
                         number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
                         !print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
 print*, '123'
@@ -101,9 +98,7 @@ print*, '123'
                         if (lat .gt. 0) then    ! N/S symmetry
                            ptl(:,:,4) = -ptl(:,:,4)
                            ptl(:,:,7) = -ptl(:,:,7)
-print*, '04', rank, irad, ilon, ilat, it
                            call Calculate_Density(ptl, flags, current_time, number_density_0D)
-print*, '05', rank, irad, ilon, ilat, it
                            number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
                            !print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
                         endif

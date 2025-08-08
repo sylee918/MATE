@@ -24,14 +24,15 @@ contains
       real*8, allocatable :: beta_dt(:), nH_traj(:), vel2(:)
       integer :: i
 
-print*, "CalCX 01: rank, iE, iv, current_time", rank, iE, iv, current_time
+!print*, "CalCX 01: rank, iE, iv", rank, iE, iv
       call Retrieve_initptl(iE,iv, ptl0)
       ptl0(1) = 0.d0
 
       allocate(beta_dt(nstep(iv,iE)), nH_traj(nstep(iv,iE)), vel2(nstep(iv,iE)))
       call Trace_Again(iE,iv, ptl0, current_time, beta_dt, nH_traj, vel2)
 
-print*, "CalCX 02: rank, iE, iv, current_time", rank, iE, iv, current_time
+!print*, "CalCX 02: rank, iE, iv", rank, iE, iv, nstep(iv,iE), maxval(nstep)
+!stop
       T_PS_eV = 1.d0 ! eV
       T_PS_K = T_PS_eV * 11604.525 ! K
 
