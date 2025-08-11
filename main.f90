@@ -95,22 +95,22 @@
                         call Init_Particles(ptl)
                         
                         ! Trace_particle 시간 측정
-                        call cpu_time(trace_t0)
+!                        call cpu_time(trace_t0)
                         call Trace_particle(ptl, flags, current_time)
-                        call cpu_time(trace_t1)
-                        trace_time_total = trace_t1 - trace_t0
-                        print *, '  1_Trace_particle time (s) =', trace_time_total
+!                        call cpu_time(trace_t1)
+!                        trace_time_total = trace_t1 - trace_t0
+!                        print *, '  1_Trace_particle time (s) =', trace_time_total
                         
                         ! Calculate_Density 시간 측정
-                        call cpu_time(calc_t0)
+!                        call cpu_time(calc_t0)
                         call Calculate_Density(ptl, flags, current_time, number_density_0D)
-                        call cpu_time(calc_t1)
-                        calc_time_total = calc_t1 - calc_t0
-                        print *, '  2_Calculate_Density time (s) =', calc_time_total
+!                        call cpu_time(calc_t1)
+!                        calc_time_total = calc_t1 - calc_t0
+!                        print *, '  2_Calculate_Density time (s) =', calc_time_total
                         
                         number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
                         !print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
-print*, '123'
+!print*, '123'
 
                         if (lat .gt. 0) then    ! N/S symmetry
                            ptl(:,:,4) = -ptl(:,:,4)
@@ -125,7 +125,7 @@ print*, '123'
             enddo ! ilat
          enddo ! ihour
 
-print*, '06', rank, maxval(nstep)
+!print*, '06', rank, maxval(nstep)
 
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
          N_REDUCE = nRadial * nLon * nLat_NS * ntperday
