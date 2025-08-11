@@ -29,7 +29,7 @@ MODULE SETTING
 !!**** Recommended to change the parameters for your run ***!!
 
 !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-   character*20, parameter :: Runname_in_10char              = "CXtest1"
+   character*20, parameter :: Runname_in_10char              = "00"
 
 !! TIME SETTING !!
    integer, parameter ::      Start_Time_in_YYYYDOY          = 1000008
@@ -60,7 +60,7 @@ MODULE SETTING
    integer, parameter ::      i_SolarRadiationPressure         = 1                          ! If you set these values as N, then the force is N-times stronger as a coefficient.
    integer, parameter ::      i_CoriolisForce_GSE              = 1
    integer, parameter ::      i_Photoionization                = 0
-   integer, parameter ::      i_ChargeExchange                 = 1                          ! Not developed yet
+   integer, parameter ::      i_ChargeExchange                 = 0                          !
 
 !! Exobase Boundary Condition (BC) Setting !!
    character*10, parameter :: ExobaseBC_Model_Name             = "CONST"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
