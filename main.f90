@@ -24,7 +24,8 @@
       integer:: N_REDUCE
       real*8, dimension(7) :: one
       real*8 :: nps1, nH1
-
+      real*8 :: trace_t0, trace_t1, trace_time_total
+      real*8 :: calc_t0, calc_t1, calc_time_total
 
 
       call MPI_INIT(ierr)
@@ -46,6 +47,7 @@
          if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
          if (i_Photoionization .eq. 1 .and. ExobaseBC_Model_Name .eq. "CONST") then; bph = 1.5d-7; endif
       call Read_Plasmasphere
+      call Read_Exosphere
       call Physical_tag
       
 
@@ -89,8 +91,21 @@
                         print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
                         call Init_Particles(ptl)
+                        
+                        ! Trace_particle 시간 측정
+                        call cpu_time(trace_t0)
                         call Trace_particle(ptl, flags, current_time)
+                        call cpu_time(trace_t1)
+                        trace_time_total = trace_t1 - trace_t0
+                        print *, '  1_Trace_particle time (s) =', trace_time_total
+                        
+                        ! Calculate_Density 시간 측정
+                        call cpu_time(calc_t0)
                         call Calculate_Density(ptl, flags, current_time, number_density_0D)
+                        call cpu_time(calc_t1)
+                        calc_time_total = calc_t1 - calc_t0
+                        print *, '  2_Calculate_Density time (s) =', calc_time_total
+                        
                         number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
                         !print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
 print*, '123'
@@ -108,7 +123,7 @@ print*, '123'
             enddo ! ilat
          enddo ! ihour
 
-print*, '06', rank
+print*, '06', rank, maxval(nstep)
 
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
          N_REDUCE = nRadial * nLon * nLat_NS * ntperday

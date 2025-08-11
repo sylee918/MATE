@@ -52,15 +52,15 @@ MODULE SETTING
 !! DIRECTORIES SETTING !!
    character*70, parameter :: Lya_dir                          = "OMNI_extended.txt"         ! 1964 - 2024 (Oct)
    character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
-   character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0728/"
-!   character*70, parameter :: outdir                           = "/home/sylee/exospherecode/MATE/output/0728/"
+!   character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0728/"
+   character*70, parameter :: outdir                           = "/home/sylee/exospherecode/MATE/output/0728/"
 
 !! Including Physics !!
    integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
    integer, parameter ::      i_SolarRadiationPressure         = 1                          ! If you set these values as N, then the force is N-times stronger as a coefficient.
    integer, parameter ::      i_CoriolisForce_GSE              = 1
    integer, parameter ::      i_Photoionization                = 0
-   integer, parameter ::      i_ChargeExchange                 = 0                          ! Not developed yet
+   integer, parameter ::      i_ChargeExchange                 = 1                          ! Not developed yet
 
 !! Exobase Boundary Condition (BC) Setting !!
    character*10, parameter :: ExobaseBC_Model_Name             = "CONST"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"

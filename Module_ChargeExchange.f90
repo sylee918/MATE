@@ -8,6 +8,7 @@ Module ChargeExchange
    real*8 :: rho(nh), MLT(nMLT), zps(nz)
    real*8, dimension(nh) :: rho_ps
    integer, allocatable, dimension(:,:) :: nstep
+   real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: nH0
 
 contains
 
@@ -263,7 +264,47 @@ contains
    End Subroutine interpolate_plasmasphere
 
 
-   Subroutine Read_Exosphere(nH0)
+   Subroutine nearest_grid_plasmasphere(one, nps1)
+
+      USE SETTING
+      USE GRID_PARAMETERS
+      IMPLICIT NONE
+      
+      real*8, dimension(7) :: one
+      real*8 :: nps1
+      
+      real*8 :: x, y, z, rho, phi, z_coord
+      integer :: i_rho_nearest, i_phi_nearest, i_z_nearest
+      real*8 :: drho, dphi, dz
+      
+      ! 입자의 x, y, z 좌표 추출
+      x = one(2)/Re
+      y = one(3)/Re
+      z = one(4)/Re
+      
+      ! Cylindrical coordinates로 변환
+      rho = sqrt(x**2 + y**2)  ! Radial distance from z-axis
+      phi = atan2(y, x)        ! Azimuthal angle
+      z_coord = z              ! Height
+      
+      ! phi를 0-2π 범위로 정규화
+      if (phi < 0.d0) phi = phi + 2.d0*pi
+      
+      drho=0.1
+      i_rho_nearest = nint(rho/drho) + 1
+      
+      dphi=2.d0*pi/nphi
+      i_phi_nearest = nint(phi/dphi) + 1
+
+      dz=0.1
+      i_z_nearest = nint(z_coord/dz) + 1
+     
+      nps1 = nps(i_rho_nearest, i_phi_nearest, i_z_nearest)
+      
+   End Subroutine nearest_grid_plasmasphere
+
+
+   Subroutine Read_Exosphere()
 
       USE SETTING
       IMPLICIT NONE
@@ -271,7 +312,6 @@ contains
       character(len=200) :: filename
       integer :: i, j, k, iexist, nlen, IO_unit
       real*4, allocatable :: nH_temp(:,:,:,:)
-      real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: nH0
 
       allocate(nH_temp(nRadial,nLon,nLat_NS,ntperday))
 
@@ -304,7 +344,6 @@ contains
       real*8, dimension(7) :: one
       real*8 :: nH1
       
-      real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: nH0
       real*8 :: x, y, z, r, longitude, latitude
       real*8 :: r_min, r_max, lon_min, lon_max, lat_min, lat_max
       integer :: i_r, i_lon, i_lat, i_time
@@ -314,7 +353,7 @@ contains
       real*8 :: d_r, d_lon, d_lat
       
       ! Read exosphere data
-      call Read_Exosphere(nH0)
+      !call Read_Exosphere(nH0)
 !      print*, "maxval(nH0)", maxval(nH0)
       
       ! 입자의 x, y, z 좌표 추출
@@ -429,6 +468,51 @@ contains
    End Subroutine interpolate_exosphere
 
 
+   Subroutine nearest_grid_exosphere(one, nH1)
+
+      USE SETTING
+      USE GRID_PARAMETERS
+      IMPLICIT NONE
+      
+      real*8, dimension(7) :: one
+      real*8 :: nH1
+      
+      real*8 :: x, y, z, r, longitude, latitude
+      integer :: i_r_nearest, i_lon_nearest, i_lat_nearest
+      real*8 :: dr1, dlon1, dlat1
+      
+      ! Read exosphere data
+!      call Read_Exosphere(nH0)
+      
+      ! 입자의 x, y, z 좌표 추출
+      x = one(2)/Re
+      y = one(3)/Re
+      z = one(4)/Re
+      
+      ! Spherical coordinates로 변환
+      r = sqrt(x**2 + y**2 + z**2)           ! Radial distance from Earth center
+      longitude = atan2(y, x)                 ! Longitude (0 to 2π)
+      latitude = asin(z/r)                    ! Latitude (-π/2 to π/2)
+      
+      ! longitude를 0-2π 범위로 정규화
+      if (longitude < 0.d0) longitude = longitude + 2.d0*pi
+      
+     
+      ! r grid index 찾기 (nearest grid point)
+      dr1=0.5
+      i_r_nearest = nint(r/dr1) + 1
+
+      dlon1=2.d0*pi/nLon
+      i_lon_nearest = nint(longitude/dlon1) + 1
+
+      dlat1=pi/(nLat_NS-1)
+      i_lat_nearest = nint(latitude/dlat1) + 1
+
+      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, 1)
+      
+   End Subroutine nearest_grid_exosphere
+
+
 
    Subroutine Trace_Again(iE,iv, ptl0, current_time, beta_dt, nH_traj, vel2)
 
@@ -504,8 +588,10 @@ contains
                goto 101
          endif
 
-         call interpolate_plasmasphere(one, nps1)
-         call interpolate_exosphere(one, nH1)
+         call nearest_grid_plasmasphere(one, nps1)
+         call nearest_grid_exosphere(one, nH1)
+         !call interpolate_plasmasphere(one, nps1)
+         !call interpolate_exosphere(one, nH1)
          beta_dt(istep) = nps1*dt
          nH_traj(istep) = nH1
          vel2(istep) = vt**2
@@ -517,8 +603,10 @@ contains
             flag = 1
             call calculate_final_timestep(old,one,dt,f0)
                istep = istep + 1
-               call interpolate_plasmasphere(one, nps1)
-               call interpolate_exosphere(one, nH1)
+               call nearest_grid_plasmasphere(one, nps1)
+               call nearest_grid_exosphere(one, nH1)
+               !call interpolate_plasmasphere(one, nps1)
+               !call interpolate_exosphere(one, nH1)
                beta_dt(istep) = nps1*dt
                nH_traj(istep) = nH1
                vel2(istep) = vt**2
