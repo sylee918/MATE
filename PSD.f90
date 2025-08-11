@@ -96,7 +96,7 @@
                   ICX = 0.d0
                   PSD_CX = 0.d0
                endif
-!               print*, "ICX, Iph", ICX, Iph, rank
+               !print*, "ICX, Iph", ICX, Iph, rank
 
                !vel = (vel - vel_BC)
                PSD_exobase = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph + ICX) ! dt is negative, so ICX is already negative.
@@ -111,6 +111,7 @@
        else
           print *, 'ChargeExchange was not called.'
        endif
+!       stop
 
       deallocate(each_n)
       deallocate(dV2,solid_angle)
