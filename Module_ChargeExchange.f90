@@ -500,7 +500,9 @@ contains
      
       ! r grid index 찾기 (nearest grid point)
       dr1=0.5
-      i_r_nearest = nint(r/dr1) + 1
+      i_r_nearest = nint((r-RadialRange_min)/dr1) + 1
+      if (i_r_nearest .lt. 1) i_r_nearest = 1
+      if (i_r_nearest .gt. nRadial) i_r_nearest = nRadial
 
       dlon1=2.d0*pi/nLon
       i_lon_nearest = nint(longitude/dlon1) + 1
@@ -508,8 +510,15 @@ contains
       dlat1=pi/(nLat_NS-1)
       i_lat_nearest = nint(latitude/dlat1) + 1
 
+
       nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, 1)
-      
+
+      print*, x,y,z
+      print*, r,longitude,latitude
+      print*, i_r_nearest, i_lon_nearest, i_lat_nearest
+      print*, nH1
+
+
    End Subroutine nearest_grid_exosphere
 
 
@@ -588,10 +597,10 @@ contains
                goto 101
          endif
 
-         call nearest_grid_plasmasphere(one, nps1)
-         call nearest_grid_exosphere(one, nH1)
-         !call interpolate_plasmasphere(one, nps1)
-         !call interpolate_exosphere(one, nH1)
+         !call nearest_grid_plasmasphere(one, nps1)
+         !call nearest_grid_exosphere(one, nH1)
+         call interpolate_plasmasphere(one, nps1)
+         call interpolate_exosphere(one, nH1)
          beta_dt(istep) = nps1*dt
          nH_traj(istep) = nH1
          vel2(istep) = vt**2
@@ -603,10 +612,10 @@ contains
             flag = 1
             call calculate_final_timestep(old,one,dt,f0)
                istep = istep + 1
-               call nearest_grid_plasmasphere(one, nps1)
-               call nearest_grid_exosphere(one, nH1)
-               !call interpolate_plasmasphere(one, nps1)
-               !call interpolate_exosphere(one, nH1)
+               !call nearest_grid_plasmasphere(one, nps1)
+               !call nearest_grid_exosphere(one, nH1)
+               call interpolate_plasmasphere(one, nps1)
+               call interpolate_exosphere(one, nH1)
                beta_dt(istep) = nps1*dt
                nH_traj(istep) = nH1
                vel2(istep) = vt**2

@@ -58,10 +58,12 @@
 !print*, ""
 
 !one = (/ 1.d0, -1/sqrt(2.d0), 1/sqrt(2.d0), 1.25d0,    0.d0, 0.d0, 0.d0 /)
-!one = one*Re*4
+!one = one*Re
 !call interpolate_exosphere(one, nH1)
+!call nearest_grid_exosphere(one, nH1)
 !print*, "nH0", nH1
 
+!stop
 
 
 !      call Initialize_Setting

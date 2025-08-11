@@ -21,8 +21,8 @@
       integer iE,iv, i
       real*8 finlon, finlat, cexo2
        real*8 t0, t1, Iph, ICX, PSD_CX, PSD_exobase
-       real*8 :: cx_t0, cx_t1, cx_time_total
-       integer :: cx_calls
+!       real*8 :: cx_t0, cx_t1, cx_time_total
+!       integer :: cx_calls
       integer iflon, iflat, it, quotient
       integer idoy, iday
 
@@ -34,8 +34,8 @@
       allocate(each_n(nvel,nEnergy))
        each_n = 0.d0
        number_density_0D = 0.d0
-       cx_time_total = 0.d0
-       cx_calls = 0
+!       cx_time_total = 0.d0
+!       cx_calls = 0
 
       fac = 2.d0*kb/mH
 
@@ -87,11 +87,11 @@
                cexo2 = fac*temp_BC
                vel2 = sum(vel*vel)
                if (i_ChargeExchange .eq. 1) then
-                  call cpu_time(cx_t0)
+!                  call cpu_time(cx_t0)
                   call Calculate_ChargeExchange(iE,iv, current_time, ICX, PSD_CX)
-                  call cpu_time(cx_t1)
-                  cx_time_total = cx_time_total + (cx_t1 - cx_t0)
-                  cx_calls = cx_calls + 1
+!                  call cpu_time(cx_t1)
+!                  cx_time_total = cx_time_total + (cx_t1 - cx_t0)
+!                  cx_calls = cx_calls + 1
                else
                   ICX = 0.d0
                   PSD_CX = 0.d0
@@ -106,11 +106,11 @@
          enddo
       enddo
        number_density_0D = sum(each_n(:,:))
-       if (cx_calls > 0) then
-          print *, 'ChargeExchange total time (s) =', cx_time_total, ' average per call (s) =', cx_time_total / cx_calls
-       else
-          print *, 'ChargeExchange was not called.'
-       endif
+!       if (cx_calls > 0) then
+!          print *, 'ChargeExchange total time (s) =', cx_time_total, ' average per call (s) =', cx_time_total / cx_calls
+!       else
+!          print *, 'ChargeExchange was not called.'
+!       endif
 !       stop
 
       deallocate(each_n)
