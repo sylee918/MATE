@@ -513,11 +513,6 @@ contains
 
       nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, 1)
 
-      print*, x,y,z
-      print*, r,longitude,latitude
-      print*, i_r_nearest, i_lon_nearest, i_lat_nearest
-      print*, nH1
-
 
    End Subroutine nearest_grid_exosphere
 
