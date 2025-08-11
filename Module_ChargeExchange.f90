@@ -315,7 +315,8 @@ contains
 
       allocate(nH_temp(nRadial,nLon,nLat_NS,ntperday))
 
-      filename = trim(outdir)//"MATE_nH_GRCX_CXtest1_1000004.data"
+!      filename = trim(outdir)//"MATE_nH_GRCX_CXtest1_1000004.data"
+      filename = trim(outdir)//"MATE_nH_GRC_00_1000008.data"
       inquire(file=filename, exist=iexist)
       if (iexist .eq. 0) then
          print*, "File is not exist: ", filename

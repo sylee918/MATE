@@ -32,8 +32,8 @@ MODULE SETTING
    character*20, parameter :: Runname_in_10char              = "00"
 
 !! TIME SETTING !!
-   integer, parameter ::      Start_Time_in_YYYYDOY          = 1000008
-   integer, parameter ::      End_Time_in_YYYYDOY            = 1000008
+   integer, parameter ::      Start_Time_in_YYYYDOY          = 1000009
+   integer, parameter ::      End_Time_in_YYYYDOY            = 1000009
    integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
 !! 3-D SPATIAL RESOLUTIONS !!
@@ -60,13 +60,13 @@ MODULE SETTING
    integer, parameter ::      i_SolarRadiationPressure         = 1                          ! If you set these values as N, then the force is N-times stronger as a coefficient.
    integer, parameter ::      i_CoriolisForce_GSE              = 1
    integer, parameter ::      i_Photoionization                = 0
-   integer, parameter ::      i_ChargeExchange                 = 0                          !
+   integer, parameter ::      i_ChargeExchange                 = 1                          !
 
 !! Exobase Boundary Condition (BC) Setting !!
    character*10, parameter :: ExobaseBC_Model_Name             = "CONST"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
    integer, parameter ::      BC_GEO_Resolution_in_Degree      = 5
    integer, parameter ::      BC_Time_Resolution_in_Minute     = 5
-   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1000008                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1000009                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
 !! Particle Tracing Range !!
    real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location
