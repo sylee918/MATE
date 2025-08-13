@@ -70,7 +70,8 @@
 
       if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not module, just making .in file
 
-      allocate(ptl(nvel,nEnergy,7), flags(nvel,nEnergy), nstep(nvel,nEnergy))
+!      allocate(ptl(nvel,nEnergy,7), flags(nvel,nEnergy), nstep(nvel,nEnergy))
+      allocate(ptl(nvel,nEnergy,7), flags(nvel,nEnergy))
 
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
@@ -92,18 +93,18 @@
                      if (grid_point_idx >= start_grid .and. grid_point_idx <= end_grid) then
                         print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
-                        call Init_Particles(ptl)
+!                        call Init_Particles(ptl)
                         
                         ! Trace_particle 시간 측정
 !                        call cpu_time(trace_t0)
-                        call Trace_particle(ptl, flags, current_time)
+!                        call Trace_particle(ptl, flags, current_time)
 !                        call cpu_time(trace_t1)
 !                        trace_time_total = trace_t1 - trace_t0
 !                        print *, '  1_Trace_particle time (s) =', trace_time_total
                         
                         ! Calculate_Density 시간 측정
 !                        call cpu_time(calc_t0)
-                        call Calculate_Density(ptl, flags, current_time, number_density_0D)
+                        call Calculate_Density(current_time, number_density_0D)
 !                        call cpu_time(calc_t1)
 !                        calc_time_total = calc_t1 - calc_t0
 !                        print *, '  2_Calculate_Density time (s) =', calc_time_total
@@ -115,7 +116,7 @@
                         if (lat .gt. 0) then    ! N/S symmetry
                            ptl(:,:,4) = -ptl(:,:,4)
                            ptl(:,:,7) = -ptl(:,:,7)
-                           call Calculate_Density(ptl, flags, current_time, number_density_0D)
+                           call Calculate_Density(current_time, number_density_0D)
                            number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
                            !print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
                         endif
@@ -145,7 +146,8 @@
 
       print*, "maxnH", rank, maxval(number_density_4D), maxval(number_density_4D_MPI)
 
-      deallocate(ptl,flags, nstep)
+!      deallocate(ptl,flags, nstep)
+      deallocate(ptl,flags)
 
       call MPI_FINALIZE(ierr)
 

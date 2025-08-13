@@ -195,7 +195,7 @@
             endif
 
             if (flag > 0) then
-               nstep(iv,iE) = istep
+!               nstep(iv,iE) = istep
                exit
             endif
 

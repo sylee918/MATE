@@ -1,4 +1,4 @@
-   Subroutine Calculate_Density(fin, flags, current_time, number_density_0D)
+   Subroutine Calculate_Density(current_time, number_density_0D)
       ! "cdensity" in python code
 !         use omp_lib
       USE SETTING
@@ -10,8 +10,8 @@
       use, intrinsic :: ieee_arithmetic
       external GSE2SPH
 
-      real*8, dimension(nvel,nEnergy,7), intent(in) :: fin
-      integer, dimension(nvel,nEnergy), intent(in) :: flags
+      real*8, dimension(nvel,nEnergy,7) :: ptl
+      integer, dimension(nvel,nEnergy) :: flags
       real*8, intent(in) :: current_time
       real*8, intent(out) :: number_density_0D
 
@@ -32,24 +32,32 @@
       call calculate_Velocity_Volume_Element(dV2)
 
       allocate(each_n(nvel,nEnergy))
-       each_n = 0.d0
-       number_density_0D = 0.d0
-!       cx_time_total = 0.d0
-!       cx_calls = 0
+      each_n = 0.d0
+      number_density_0D = 0.d0
+!      cx_time_total = 0.d0
+!      cx_calls = 0
 
       fac = 2.d0*kb/mH
+      call Init_Particles(ptl)
 
       do iE=1,nEnergy
          do iv=1,nvel
-            t0 = current_time + fin(iv,iE,1)/86400.    ! unit day
+
+            ! Trace here
+            call Calculate_ChargeExchange(iE,iv, ptl(iv,iE,:), flags(iv,iE), current_time, ICX, PSD_CX)
+
+            t0 = current_time + ptl(iv,iE,1)/86400.    ! unit day
             idoy = int(t0)                               ! yyyy+doy
             t1 = (t0 - idoy)*86400.                       ! hms in seconds
             it = floor(t1/tb_res)+1
             if (idoy .lt. start_ydoy-nt_bwd_bc) then ; idoy=start_ydoy-nt_bwd_bc ; it=1 ; endif
-            if (flags(iv,iE) .eq. 1) then
+
+
+
+            if (flags(iv,iE) .eq. 1) then ! Exobase-origin particle
                do i=1,3
-                  pos(i) = fin(iv,iE,i+1)
-                  vel(i) = fin(iv,iE,i+4)
+                  pos(i) = ptl(iv,iE,i+1)
+                  vel(i) = ptl(iv,iE,i+4)
                enddo
 
                call GSE2SPH(pos,finlon,finlat)
@@ -69,10 +77,13 @@
 
                !! ** FIX ME (above): Trilinear interpolation is desired for more accurate calculation.
                !!                    Current code is just the 0th-order interpolation.
+            else ! Plasmasphere-origin particle
+               n_BC = 0.d0
+            endif
 
                if (i_Photoionization .eq. 1) then
                   if (idoy .eq. int(current_time)) then
-                     Iph = bph(idoy) * abs(fin(iv,iE,1))
+                     Iph = bph(idoy) * abs(ptl(iv,iE,1))
                   else
                      Iph = bph(idoy) * (86400.-t1)
                      do iday=idoy+1,int(current_time)-1
@@ -88,7 +99,7 @@
                vel2 = sum(vel*vel)
                if (i_ChargeExchange .eq. 1) then
 !                  call cpu_time(cx_t0)
-                  call Calculate_ChargeExchange(iE,iv, current_time, ICX, PSD_CX)
+!                  call Calculate_ChargeExchange(iE,iv, ptl(iv,iE,:), flags(iv,iE), current_time, ICX, PSD_CX)
 !                  call cpu_time(cx_t1)
 !                  cx_time_total = cx_time_total + (cx_t1 - cx_t0)
 !                  cx_calls = cx_calls + 1
@@ -102,7 +113,6 @@
                PSD_exobase = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph + ICX) ! dt is negative, so ICX is already negative.
                each_n(iv,iE) = (PSD_exobase + PSD_CX) * dV2(iE,iv)
 
-            endif
          enddo
       enddo
        number_density_0D = sum(each_n(:,:))

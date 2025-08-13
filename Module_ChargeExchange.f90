@@ -7,33 +7,31 @@ Module ChargeExchange
    real*8, dimension(nh,nMLT,nz) :: nps, Tps
    real*8 :: rho(nh), MLT(nMLT), zps(nz)
    real*8, dimension(nh) :: rho_ps
-   integer, allocatable, dimension(:,:) :: nstep
+!   integer, allocatable, dimension(:,:) :: nstep
    real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: nH0
 
 contains
 
-   Subroutine Calculate_ChargeExchange(iE,iv,current_time, ICX, PSD_CX)
+   Subroutine Calculate_ChargeExchange(iE,iv,ptl0,flag,current_time, ICX, PSD_CX)
 
       USE SETTING
       USE MPI_MATE, only: rank
       IMPLICIT NONE
 
       integer :: iE, iv
-      real*8 :: current_time, ICX, PSD_CX
       real*8, dimension(7) :: ptl0
+      integer :: flag
+      real*8, intent(in) :: current_time
+      real*8 :: ICX, PSD_CX
       real*8 :: vrel, sigma, vsig_1eV, fac, cexo2, fac2, T_PS_eV, T_PS_K, ICX_i
-      real*8, allocatable :: beta_dt(:), nH_traj(:), vel2(:)
-      integer :: i
+!      real*8, allocatable :: beta_dt(:), nH_traj(:), vel2(:)
+      real*8, dimension(nstep) :: beta_dt, nH_traj, vel2
+      integer :: i, istep
 
-!print*, "CalCX 01: rank, iE, iv", rank, iE, iv
-      call Retrieve_initptl(iE,iv, ptl0)
-      ptl0(1) = 0.d0
+      beta_dt = 0.d0; nH_traj = 0.d0; vel2 = 0.d0
+      call Trace_Again(iE,iv, ptl0, flag, current_time, beta_dt, nH_traj, vel2, istep)
 
-      allocate(beta_dt(nstep(iv,iE)), nH_traj(nstep(iv,iE)), vel2(nstep(iv,iE)))
-      call Trace_Again(iE,iv, ptl0, current_time, beta_dt, nH_traj, vel2)
-
-!print*, "CalCX 02: rank, iE, iv", rank, iE, iv, nstep(iv,iE), maxval(nstep)
-!stop
+!      allocate(beta_dt(nstep(iv,iE)), nH_traj(nstep(iv,iE)), vel2(nstep(iv,iE)))
       T_PS_eV = 1.d0 ! eV
       T_PS_K = T_PS_eV * 11604.525 ! K
 
@@ -46,46 +44,17 @@ contains
       fac2 = 1.d0/(pi*cexo2)**1.5
 
       PSD_CX = 0.d0
-      do i=1,nstep(iv,iE)
+      do i=1,istep
          ICX_i = sum(beta_dt(1:i)) * vsig_1eV
          PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
       enddo
       ICX = sum(beta_dt) * vsig_1eV
 
-      deallocate(beta_dt, nH_traj, vel2)
+!      deallocate(beta_dt, nH_traj, vel2)
 
 
    End Subroutine Calculate_ChargeExchange
 
-
-   Subroutine Retrieve_initptl(iE,iv, ptl0)
-
-      USE SETTING
-      USE SET_VELOCITY_DIRECTION, only: gen_points
-      USE MPI_MATE, only: rad, lon, lat
-      USE GRID_PARAMETERS, only: radial_distance_range, energy_range
-      IMPLICIT NONE
-
-      integer :: iE, iv
-      real*8, dimension(7) :: ptl0
-      real*8, dimension(nvel,3) :: vel_dir
-      real*8 :: sin_lat, cos_lat, sin_lon, cos_lon, energy_to_speed
-
-
-      call gen_points(vel_dir)
-      sin_lat = sin(lat)  ;  cos_lat = cos(lat)
-      sin_lon = sin(lon)  ;  cos_lon = cos(lon)
-
-      energy_to_speed = sqrt(energy_range(iE)*e*2.d0/mH)
-      ptl0(2) = rad*cos_lat*cos_lon        ! X
-      ptl0(3) = rad*cos_lat*sin_lon        ! Y
-      ptl0(4) = rad*sin_lat                ! Z
-      ptl0(5) = vel_dir(iv,1) * energy_to_speed       ! Vx
-      ptl0(6) = vel_dir(iv,2) * energy_to_speed       ! Vy
-      ptl0(7) = vel_dir(iv,3) * energy_to_speed       ! Vz
-
-
-   End Subroutine Retrieve_initptl
 
 
    Subroutine Read_Plasmasphere()
@@ -519,7 +488,7 @@ contains
 
 
 
-   Subroutine Trace_Again(iE,iv, ptl0, current_time, beta_dt, nH_traj, vel2)
+   Subroutine Trace_Again(iE,iv, ptl0,flag, current_time, beta_dt, nH_traj, vel2, istep)
 
       USE SETTING
       USE MPI_MATE, only: rank
@@ -528,21 +497,23 @@ contains
       IMPLICIT NONE
       external rk4, calculate_final_timestep
 
-      integer :: iE, iv
+      integer :: iE, iv, istep
       real*8, dimension(7) :: ptl0
       real*8, dimension(7) :: one, old
-      real*8, dimension(nstep(iv,iE)) :: beta_dt, nH_traj, vel2
+      real*8, intent(in) :: current_time
+!      real*8, dimension(nstep(iv,iE)) :: beta_dt, nH_traj, vel2
+      real*8, dimension(nstep) :: beta_dt, nH_traj, vel2
       integer :: flag     ! 0: orbiting Earth t<tmax;   1: into exobase;  2: out of outer boundary;  3: orbiting but t>tmax
       real*8 :: radial_distance, radial_distance_old
       integer :: i
       real*8 :: dt, vt,vt_old,dv, ds
       real*8, parameter :: max_ds = 1.d6
-      real*8 :: x0, f0, current_time, trace_time
-      integer :: ydoy, ii, istep
+      real*8 :: x0, f0, trace_time
+      integer :: ydoy, ii
       real*8 ::  nps1, nH1
 
 
-      istep = 0
+      istep = 0; flag=0
       one = ptl0
 
       radial_distance_old = sqrt(one(2)**2+one(3)**2+one(4)**2)
@@ -617,13 +588,14 @@ contains
                vel2(istep) = vt**2
          else if (radial_distance .gt. radial_boundary(2)) then
             flag = 2
-            print*, "ERROR: Rerun makes particle to escape!!"
-            print*, rank, iE, iv
-            stop
          endif
 
          if (flag > 0) then
             exit
+         endif
+
+         if (istep .ge. nstep) then
+            print*, "WARNING: istep >= nstep"
          endif
 
       enddo ! end while
@@ -631,6 +603,6 @@ contains
    ptl0 = one
 
    return
-End
+End Subroutine Trace_Again
 
 End Module ChargeExchange
