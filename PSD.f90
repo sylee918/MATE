@@ -15,6 +15,7 @@
       real*8, intent(in) :: current_time
       real*8, intent(out) :: number_density_0D
 
+      real*8, dimension(7) :: ptl0
       real*8, dimension(:,:), allocatable :: each_n
       real*8 pos(3), vel(3), vel2
       real*8 temp_BC, n_BC, vel_BC(3), fac, PhaseSpaceDensity
@@ -44,7 +45,9 @@
          do iv=1,nvel
 
             ! Trace here
-            call Calculate_ChargeExchange(iE,iv, ptl(iv,iE,:), flags(iv,iE), current_time, ICX, PSD_CX)
+            ptl0 = ptl(iv,iE,:)
+            call Calculate_ChargeExchange(iE,iv, ptl0, flags(iv,iE), current_time, ICX, PSD_CX)
+            ptl(iv,iE,:) = ptl0
 
             t0 = current_time + ptl(iv,iE,1)/86400.    ! unit day
             idoy = int(t0)                               ! yyyy+doy

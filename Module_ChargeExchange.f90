@@ -81,6 +81,7 @@ contains
 
       allocate(nps_real(nh,nMLT,nz))
 
+      IO_unit = 110
       filename = "GCPM_example_cylindrical_kp0.dat"
       inquire(file=filename, exist=iexist)
       if (iexist .eq. 0) then
@@ -243,6 +244,7 @@ contains
       real*8 :: nps1
       
       real*8 :: x, y, z, rho, phi, z_coord
+      real*8 :: rho_min, rho_max, phi_min, phi_max, z_min, z_max
       integer :: i_rho_nearest, i_phi_nearest, i_z_nearest
       real*8 :: drho, dphi, dz
       
@@ -255,19 +257,35 @@ contains
       rho = sqrt(x**2 + y**2)  ! Radial distance from z-axis
       phi = atan2(y, x)        ! Azimuthal angle
       z_coord = z              ! Height
-      
+
+      rho_min = minval(rho_ps)
+      rho_max = maxval(rho_ps)
+      phi_min = 0.d0
+      phi_max = 2.d0*pi
+      z_min = minval(zps)
+      z_max = maxval(zps)
+
       ! phi를 0-2π 범위로 정규화
       if (phi < 0.d0) phi = phi + 2.d0*pi
       
       drho=0.1
-      i_rho_nearest = nint(rho/drho) + 1
+      i_rho_nearest = nint((rho-rho_min)/drho) + 1
       
       dphi=2.d0*pi/nphi
-      i_phi_nearest = nint(phi/dphi) + 1
+      i_phi_nearest = nint((phi-phi_min)/dphi) + 1
+      if (i_phi_nearest .le. 0) i_phi_nearest = i_phi_nearest + nphi
+      if (i_phi_nearest .gt. nphi) i_phi_nearest = i_phi_nearest - nphi
 
       dz=0.1
-      i_z_nearest = nint(z_coord/dz) + 1
-     
+      i_z_nearest = nint((z_coord-z_min)/dz) + 1
+
+      if (i_phi_nearest .eq. 0) then
+         print*, "i_phi_nearest", i_phi_nearest, phi, dphi
+         print*, x,y,z, rho, phi, z_coord, atan2(y,x)
+         stop
+      endif
+!      if (i_z_nearest .ge. nz) i_z_nearest = i_z_nearest - nz
+    
       nps1 = nps(i_rho_nearest, i_phi_nearest, i_z_nearest)
       
    End Subroutine nearest_grid_plasmasphere
@@ -284,6 +302,7 @@ contains
 
       allocate(nH_temp(nRadial,nLon,nLat_NS,ntperday))
 
+      IO_unit = 120
 !      filename = trim(outdir)//"MATE_nH_GRCX_CXtest1_1000004.data"
       filename = trim(outdir)//"MATE_nH_GRC_00_1000008.data"
       inquire(file=filename, exist=iexist)
@@ -448,6 +467,7 @@ contains
       real*8 :: nH1
       
       real*8 :: x, y, z, r, longitude, latitude
+      real*8 :: r_min, r_max, lon_min, lon_max, lat_min, lat_max
       integer :: i_r_nearest, i_lon_nearest, i_lat_nearest
       real*8 :: dr1, dlon1, dlat1
       
@@ -463,22 +483,31 @@ contains
       r = sqrt(x**2 + y**2 + z**2)           ! Radial distance from Earth center
       longitude = atan2(y, x)                 ! Longitude (0 to 2π)
       latitude = asin(z/r)                    ! Latitude (-π/2 to π/2)
-      
+
+      r_min = minval(radial_distance_range)/Re
+      r_max = maxval(radial_distance_range)/Re
+      lon_min = 0.d0
+      lon_max = 2.d0*pi
+      lat_min = minval(latitudeNS_range)
+      lat_max = maxval(latitudeNS_range)
+
       ! longitude를 0-2π 범위로 정규화
       if (longitude < 0.d0) longitude = longitude + 2.d0*pi
       
      
       ! r grid index 찾기 (nearest grid point)
       dr1=0.5
-      i_r_nearest = nint((r-RadialRange_min)/dr1) + 1
+      i_r_nearest = nint((r-r_min)/dr1) + 1
       if (i_r_nearest .lt. 1) i_r_nearest = 1
       if (i_r_nearest .gt. nRadial) i_r_nearest = nRadial
 
       dlon1=2.d0*pi/nLon
-      i_lon_nearest = nint(longitude/dlon1) + 1
+      i_lon_nearest = nint((longitude-lon_min)/dlon1) + 1
+      if (i_lon_nearest .le. 0) i_lon_nearest = i_lon_nearest + nLon
+      if (i_lon_nearest .gt. nLon) i_lon_nearest = i_lon_nearest - nLon
 
       dlat1=pi/(nLat_NS-1)
-      i_lat_nearest = nint(latitude/dlat1) + 1
+      i_lat_nearest = nint((latitude-lat_min)/dlat1) + 1
 
 
       nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, 1)

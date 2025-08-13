@@ -1,12 +1,12 @@
 #FC = ifort
 FC = mpif90 -fc=ifort
 
-flags = -O2 -mcmodel=medium
+#flags = -O2 -mcmodel=medium
 #flags = -mcmodel=medium -g -check all -warn external -warn declarations,interfaces -traceback
 #flags = -O2 -qopenmp -mcmodel=medium
 #flags = -fopenmp -mcmodel=medium -g -check all -traceback
 #flags = -O2 -axCORE-AVX512,CORE-AVX2 -xAVX
-#flags = -mcmodel=medium -check all -traceback -g
+flags = -mcmodel=medium -g -check all -traceback
 #flags = -mcmodel=medium -check all -warn all,nodec,interfaces -gen_interfaces -traceback -fpe0 -ftrapuv # -fpstkchk
 #flags = -mcmodel=medium -xCOMMON-AVX512
 #flags = -O2 -xAVX
