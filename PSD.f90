@@ -114,6 +114,7 @@
 
                !vel = (vel - vel_BC)
                PSD_exobase = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph + ICX) ! dt is negative, so ICX is already negative.
+            PSD_CX=0.d0
                each_n(iv,iE) = (PSD_exobase + PSD_CX) * dV2(iE,iv)
 
          enddo
