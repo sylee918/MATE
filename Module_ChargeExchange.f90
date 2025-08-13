@@ -270,6 +270,11 @@ contains
       
       drho=0.1
       i_rho_nearest = nint((rho-rho_min)/drho) + 1
+      if (i_rho_nearest .le. 0) i_rho_nearest = 1
+      if (i_rho_nearest .gt. nrho) then
+         nps1 = 0.d0
+         return
+      endif
       
       dphi=2.d0*pi/nphi
       i_phi_nearest = nint((phi-phi_min)/dphi) + 1
@@ -278,15 +283,14 @@ contains
 
       dz=0.1
       i_z_nearest = nint((z_coord-z_min)/dz) + 1
-
-      if (i_phi_nearest .eq. 0) then
-         print*, "i_phi_nearest", i_phi_nearest, phi, dphi
-         print*, x,y,z, rho, phi, z_coord, atan2(y,x)
-         stop
+      if (i_z_nearest .le. 0 .or. i_z_nearest .gt. nz) then
+         nps1 = 0.d0
+         return
       endif
-!      if (i_z_nearest .ge. nz) i_z_nearest = i_z_nearest - nz
-    
+   
       nps1 = nps(i_rho_nearest, i_phi_nearest, i_z_nearest)
+
+      return
       
    End Subroutine nearest_grid_plasmasphere
 
@@ -499,7 +503,10 @@ contains
       dr1=0.5
       i_r_nearest = nint((r-r_min)/dr1) + 1
       if (i_r_nearest .lt. 1) i_r_nearest = 1
-      if (i_r_nearest .gt. nRadial) i_r_nearest = nRadial
+      if (i_r_nearest .gt. nRadial) then
+         nH1 = 0.d0
+         return
+      endif
 
       dlon1=2.d0*pi/nLon
       i_lon_nearest = nint((longitude-lon_min)/dlon1) + 1
@@ -512,6 +519,7 @@ contains
 
       nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, 1)
 
+      return
 
    End Subroutine nearest_grid_exosphere
 
