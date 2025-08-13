@@ -42,6 +42,7 @@
       call Init_Particles(ptl)
 
       do iE=1,nEnergy
+         print*, "iE", iE
          do iv=1,nvel
 
             ! Trace here

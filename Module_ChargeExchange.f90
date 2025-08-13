@@ -3,7 +3,7 @@ Module ChargeExchange
    USE SETTING
    IMPLICIT NONE
 
-   integer, parameter :: nx=201, ny=201, nz=201, nh=101, nMLT=24, nphi=24, nrho=201
+   integer, parameter :: nx=201, ny=201, nz=201, nh=101, nMLT=24, nphi=24, nrho=101
    real*8, dimension(nh,nMLT,nz) :: nps, Tps
    real*8 :: rho(nh), MLT(nMLT), zps(nz)
    real*8, dimension(nh) :: rho_ps
@@ -287,6 +287,8 @@ contains
          nps1 = 0.d0
          return
       endif
+
+!      print*, "i_rho_nearest", i_rho_nearest, i_phi_nearest, i_z_nearest
    
       nps1 = nps(i_rho_nearest, i_phi_nearest, i_z_nearest)
 

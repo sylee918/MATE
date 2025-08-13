@@ -40,7 +40,7 @@ MODULE SETTING
    integer, parameter ::      GEO_Resolution_in_Degree       = 15
    real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
    real*8, parameter  ::      RadialRange_max                = 10.0
-   real*8, parameter  ::      dR                             = 0.5
+   real*8, parameter  ::      dR                             = 8.0
 
 !! Number of Particle Direction !!
    integer, parameter ::      dV_theta                         = 6                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
@@ -71,7 +71,7 @@ MODULE SETTING
 !! Particle Tracing Range !!
    real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location
    real*8, parameter :: outer_boundary                         = 100*Re
-   real*8, parameter :: Max_Travel_Time_in_Days                = 60                         ! DEFAULT = 60
+   real*8, parameter :: Max_Travel_Time_in_Days                = 30                         ! DEFAULT = 60
 
    integer, parameter :: nstep = 50000 ! 10000                                               ! Maximum number of steps for particle tracing (typical maximum is 3e4)
 
