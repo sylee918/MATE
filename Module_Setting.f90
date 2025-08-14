@@ -29,11 +29,11 @@ MODULE SETTING
 !!**** Recommended to change the parameters for your run ***!!
 
 !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-   character*20, parameter :: Runname_in_10char              = "CXL1"
+   character*20, parameter :: Runname_in_10char              = "CX2"
 
 !! TIME SETTING !!
-   integer, parameter ::      Start_Time_in_YYYYDOY          = 1000011
-   integer, parameter ::      End_Time_in_YYYYDOY            = 1000011
+   integer, parameter ::      Start_Time_in_YYYYDOY          = 1000012
+   integer, parameter ::      End_Time_in_YYYYDOY            = 1000012
    integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
 !! 3-D SPATIAL RESOLUTIONS !!
@@ -47,7 +47,7 @@ MODULE SETTING
    integer, parameter ::      nTheta                           = 180/dV_theta + 1          ! # of theta grids
 
 !! (FIX ME!!) Energy Grid !!
-   integer, parameter ::      nEnergy                          = 61                        ! # of energy grid
+   integer, parameter ::      nEnergy                          = 81                        ! # of energy grid (61 for <1 eV, 81 for <10 eV)
 
 !! DIRECTORIES SETTING !!
    character*70, parameter :: Lya_dir                          = "OMNI_extended.txt"         ! 1964 - 2024 (Oct)
@@ -66,7 +66,7 @@ MODULE SETTING
    character*10, parameter :: ExobaseBC_Model_Name             = "CONST"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
    integer, parameter ::      BC_GEO_Resolution_in_Degree      = 5
    integer, parameter ::      BC_Time_Resolution_in_Minute     = 5
-   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1000011                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1000012                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
 !! Particle Tracing Range !!
    real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location

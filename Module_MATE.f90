@@ -100,7 +100,7 @@ contains
                   energy_range(iE+1-index_Emin) = 0.01 * 1000.d0 ** (iE/100.d0)
             enddo
       else
-            if (nEnergy .eq. 61) then  ! for 0.001 - 1 eV
+            if (nEnergy .eq. 61 .or. nEnergy .eq. 81) then  ! for 0.001 - 1 eV
                   do iE=1,nEnergy 
                         energy_range(iE) = 10.d0 ** ((iE-1)/20.d0 - 3.d0)
                   enddo
