@@ -32,8 +32,6 @@
       call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
       call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierr)
       call Calculate_Local_nRadial
-!      nR_loc = nRadial
-!      nR_loc = 1
 
       if (nprocs .ne. nRadial * (nLon * (nLat-1) + 1) .and. rank .eq. 0) then
          print*, "nprocs", nprocs, "nRadial", nRadial, "nLon", nLon, "nLat", nLat
@@ -51,26 +49,8 @@
       call Physical_tag
       
 
-!one = (/ 1.d0, 1.d0, 0.d0, 1.25d0,    0.d0, 0.d0, 0.d0 /)
-!one = one*Re*4
-!call interpolate_plasmasphere(one, nps1)
-!print*, "nps1", nps1
-!print*, ""
-
-!one = (/ 1.d0, -1/sqrt(2.d0), 1/sqrt(2.d0), 1.25d0,    0.d0, 0.d0, 0.d0 /)
-!one = one*Re
-!call interpolate_exosphere(one, nH1)
-!call nearest_grid_exosphere(one, nH1)
-!print*, "nH0", nH1
-
-!stop
-
-
-!      call Initialize_Setting
-
       if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not module, just making .in file
 
-!      allocate(ptl(nvel,nEnergy,7), flags(nvel,nEnergy), nstep(nvel,nEnergy))
       allocate(ptl(nvel,nEnergy,7), flags(nvel,nEnergy))
 
       do iday=start_ydoy, end_ydoy
@@ -93,40 +73,20 @@
                      if (grid_point_idx >= start_grid .and. grid_point_idx <= end_grid) then
                         print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
-!                        call Init_Particles(ptl)
-                        
-                        ! Trace_particle 시간 측정
-!                        call cpu_time(trace_t0)
-!                        call Trace_particle(ptl, flags, current_time)
-!                        call cpu_time(trace_t1)
-!                        trace_time_total = trace_t1 - trace_t0
-!                        print *, '  1_Trace_particle time (s) =', trace_time_total
-                        
-                        ! Calculate_Density 시간 측정
-!                        call cpu_time(calc_t0)
-                        call Calculate_Density(current_time, number_density_0D)
-!                        call cpu_time(calc_t1)
-!                        calc_time_total = calc_t1 - calc_t0
-!                        print *, '  2_Calculate_Density time (s) =', calc_time_total
-                        
+                        call Calculate_Density(current_time, number_density_0D)                      
                         number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
-                        !print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
-!print*, '123'
 
                         if (lat .gt. 0) then    ! N/S symmetry
                            ptl(:,:,4) = -ptl(:,:,4)
                            ptl(:,:,7) = -ptl(:,:,7)
                            call Calculate_Density(current_time, number_density_0D)
                            number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
-                           !print '(a, 5i3, f10.3)', 'nH', rank, irad, ilon, nLat_NS+1-ilat, it, number_density_0D
                         endif
                      endif
                   enddo ! irad
                enddo ! ilon
             enddo ! ilat
          enddo ! ihour
-
-!print*, '06', rank, maxval(nstep)
 
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
          N_REDUCE = nRadial * nLon * nLat_NS * ntperday
@@ -146,7 +106,6 @@
 
       print*, "maxnH", rank, maxval(number_density_4D), maxval(number_density_4D_MPI)
 
-!      deallocate(ptl,flags, nstep)
       deallocate(ptl,flags)
 
       call MPI_FINALIZE(ierr)
