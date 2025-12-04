@@ -1,0 +1,34 @@
+ 1            ! itype:1=initialRun,2=continuousRun
+ 0.           ! tstart (UT second)
+ 10.          ! DT(sec)
+ 259200.      ! TMAX
+ 3600.        ! tint: PRINT_tmin
+ 2  1         ! imod:0=no Bext,1=t96,2=t04,3=hybrid; intB:0=dip,1=IGRF
+ 1            ! ires: 0=fixed B, 1=changing B
+ 300. 300.    ! tstep: time for updating B; tf1: time for smoothing input data
+ 3            ! ijs: no. of species
+ 1  2  5      ! js: 1=H+, 2=O+, 3=He+, 4=N+, 5=HiE e-
+ 1  1  0      ! init(1:ijs): ions,0=zero,1=data; e-,0=AE8MAX,1=AE8MIN,-ve=+local
+ 99 99 3   ! ibset(1:ijs), at boundary: (99) Maxwellian, (<99) Kappa
+ 2  2         ! iplsh:1=Ebi-Eji,2=Tsy-Mukai,4=geosyn; icom:1=Young,2=1+Pandya_Pw
+ 3            ! eplsh:(1)ne=ni,TiTe, (2)RBE, (3)Dubyagin's model
+ 7.8          ! TiTe: Ti/Te at booundary. TiTe=-1. when RBE b.c. for e-
+ 10.          ! rb: boundary(RE)@equator. Recommend 10. 
+ 100.         ! hlosscone: alt in km
+ 4            ! ipot: 1=Weimer, 2=SCE+Hardy, 3=SCE+J||, 4=SCE+Preci
+ 0  2         ! ihigh:highLatPot,0=Weimer,1=Boyle,2=Hill; icon:1=storm,2=cimi
+ 2  1.0       ! iain: potential polar boundary, ExAC: para for Sigma expansion
+ 2008_164     ! storm for storm.level file
+ 2008a164     ! outname: name of output files
+ 1 10800.     ! iplsp: 0=no Psphere, 1=PP by n, 2=PP by gradient;  tpls in sec
+ 1            ! icoul: 0=no Coulomb collision, 1=w/ Coulomb collision
+ 1            ! ichor: 0=no LB Chorus, 1=LB_BU 
+ 2            ! icP, ChorusPower: 1=GaussianFit(GF),2=BU,3=Aryan+GF,4=Aryan+BU
+ 1            ! ihiss: for e-, 0=no Hiss, 1=use D_hiss_BU
+ 3            ! ihP, hiss power: 1=Gaussian fit, 3=Aryan
+ 0            ! iEMIC: 0=no EMIC, 1=with EMIC
+ 0            ! iEMICdiff: 0=no EMIC, 1=with EMIC diffusion
+ 1 0.         ! iflc: 0=no FLC, 1=with FC; tflc=time to apply FLC
+ 1            ! igeo: 1=Rairden, 2=Hodges geocorona model
+Hodges_EquinoxF107_80.dat 
+summer        ! defines if winter or summer for Solstice data files
