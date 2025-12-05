@@ -53,6 +53,7 @@
 
       allocate(ptl(nvel,nEnergy,7), flags(nvel,nEnergy))
 
+      dnLon0=1
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
          do it=1,ntperday  ! hour loop
@@ -68,8 +69,6 @@
                   if (ilat .gt. nLat .and. ilat .lt. nLat_NS) then
                      dnLon0=nLon0/4
                   endif
-               else
-                  dnLon0=1
                endif
 
                do ilon=1,nLon0,dnLon0
