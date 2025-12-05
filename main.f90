@@ -95,8 +95,7 @@
                      endif
 
                      if (i_Three_Slices .eq. 1) then
-                        i2=i1*nRadial+irad-1
-                        if (rank .eq. i1) then
+                        if (rank/nRadial .eq. i1) then
                            print '(a, i4, i4)', "(LON, LAT) = ", int(lon*180/pi), int(lat*180/pi)
                            number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it)=1
 
