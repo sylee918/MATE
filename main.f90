@@ -21,7 +21,7 @@
 
       integer doy, iday, ihour, iminute, it, year, hour, nLon0
       real*8 current_time
-      integer:: N_REDUCE
+      integer:: N_REDUCE, dnLon0
       real*8, dimension(7) :: one
       real*8 :: nps1, nH1
       real*8 :: trace_t0, trace_t1, trace_time_total
@@ -31,7 +31,7 @@
       call MPI_INIT(ierr)
       call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
       call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierr)
-      call Calculate_Local_nRadial
+      if (i_Full_3D .eq. 1) call Calculate_Local_nRadial
 
       if (nprocs .ne. nRadial * (nLon * (nLat-1) + 1) .and. rank .eq. 0) then
          print*, "nprocs", nprocs, "nRadial", nRadial, "nLon", nLon, "nLat", nLat
@@ -64,26 +64,55 @@
             do ilat=nLat,nLat_NS
                lat = latitudeNS_range(ilat)
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
-               do ilon=1,nLon0
+               if (i_Three_Slices .eq. 1) then
+                  if (ilat .gt. nLat .and. ilat .lt. nLat_NS) then
+                     dnLon0=nLon0/4
+                  endif
+               else
+                  dnLon0=1
+               endif
+
+               do ilon=1,nLon0,dnLon0
                   lon = longitude_range(ilon)
-                  i1 = (ilon-1 + (ilat-nLat)*nLong)      ! starts from 0
+                  i1 = ilon-1 + (ilat-nLat)*nLong      ! starts from 0
                   do irad=1,nRadial
                      rad = radial_distance_range(irad)
-                     grid_point_idx = i1*nRadial + irad-1
-                     if (grid_point_idx >= start_grid .and. grid_point_idx <= end_grid) then
-                        print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
-                        call Calculate_Density(current_time, number_density_0D)                      
-                        number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
+                     if (i_Full_3D .eq. 1) then
+                        grid_point_idx = i1*nRadial + irad-1
+                        if (grid_point_idx >= start_grid .and. grid_point_idx <= end_grid) then
+                           print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
-                        if (lat .gt. 0) then    ! N/S symmetry
-                           ptl(:,:,4) = -ptl(:,:,4)
-                           ptl(:,:,7) = -ptl(:,:,7)
-                           call Calculate_Density(current_time, number_density_0D)
-                           number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
+                           call Calculate_Density(current_time, number_density_0D)                      
+                           number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
+                           if (lat .gt. 0) then    ! N/S symmetry
+                              ptl(:,:,4) = -ptl(:,:,4)
+                              ptl(:,:,7) = -ptl(:,:,7)
+                              call Calculate_Density(current_time, number_density_0D)
+                              number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
+                           endif
                         endif
                      endif
+
+                     if (i_Three_Slices .eq. 1) then
+                        i2=i1*nRadial+irad-1
+                        if (rank .eq. i1) then
+                           print '(a, i4, i4)', "(LON, LAT) = ", int(lon*180/pi), int(lat*180/pi)
+                           number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it)=1
+
+!                           call Calculate_Density(current_time, number_density_0D)                      
+!                           number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
+!                           if (lat .gt. 0) then    ! N/S symmetry
+!                              ptl(:,:,4) = -ptl(:,:,4)
+!                              ptl(:,:,7) = -ptl(:,:,7)
+!                              call Calculate_Density(current_time, number_density_0D)
+!                              number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
+!                           endif
+                        endif 
+                     endif
+
                   enddo ! irad
+
                enddo ! ilon
             enddo ! ilat
          enddo ! ihour

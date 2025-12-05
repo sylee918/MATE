@@ -9,6 +9,7 @@ Module ChargeExchange
    real*8, dimension(nh) :: rho_ps
 !   integer, allocatable, dimension(:,:) :: nstep
    real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: nH0
+   real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,start_ydoy-nt_bwd_bc:end_ydoy) :: beta_RCCX
 
 contains
 
@@ -28,10 +29,13 @@ contains
       real*8, dimension(nstep) :: beta_dt, nH_traj, vel2
       integer :: i, istep
 
+      call Get_Beta_RCCX()
+
       beta_dt = 0.d0; nH_traj = 0.d0; vel2 = 0.d0
       call Trace_Again(iE,iv, ptl0, flag, current_time, beta_dt, nH_traj, vel2, istep)
 
 !      allocate(beta_dt(nstep(iv,iE)), nH_traj(nstep(iv,iE)), vel2(nstep(iv,iE)))
+
       T_PS_eV = 1.d0 ! eV
       T_PS_K = T_PS_eV * 11604.525 ! K
 
@@ -43,17 +47,71 @@ contains
       cexo2 = fac*T_PS_K
       fac2 = 1.d0/(pi*cexo2)**1.5
 
-      PSD_CX = 0.d0
-      do i=1,istep
-         ICX_i = sum(beta_dt(1:i)) * vsig_1eV
-         PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
-      enddo
-      ICX = sum(beta_dt) * vsig_1eV
+      ! PSD_CX is the PSD of CX-created nH. Below is not necessary for RCCX.
+!      PSD_CX = 0.d0
+!      do i=1,istep
+!         ICX_i = sum(beta_dt(1:i)) * vsig_1eV
+!         PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
+!      enddo
+!      ICX = sum(beta_dt) * vsig_1eV
+
+      ICX = sum(beta_dt)
 
 !      deallocate(beta_dt, nH_traj, vel2)
 
 
    End Subroutine Calculate_ChargeExchange
+
+
+
+   Subroutine Get_Beta_RCCX()
+
+      USE SETTING
+      IMPLICIT NONE
+
+      real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: beta_ring_current
+      character(len=100) :: filename_RC
+      character(len=7) :: ydoy_str, yearst
+      integer :: iday, iexist, nlen, IO_unit
+
+      if (start_ydoy/1000 .eq. end_ydoy/1000) then
+!         write(yearst, '(I4.4)') start_ydoy/1000
+
+         do iday=start_ydoy-nt_bwd_bc,end_ydoy
+            write(ydoy_str,'(I7.7)') iday
+            filename_RC = trim(RCCX_dir) // "RCCX_p_" // trim(ydoy_str) //  ".data"
+            call Read_beta_Ring_Current(filename_RC, beta_ring_current)
+            beta_RCCX(:,:,:,:,iday) = beta_ring_current
+         enddo
+      endif
+
+   End Subroutine Get_Beta_RCCX
+
+
+
+   Subroutine Read_beta_Ring_Current(filename, beta_ring_current)
+
+      USE SETTING
+      IMPLICIT NONE
+
+      real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: beta_ring_current
+      real, allocatable :: beta_ring_current_real(:,:,:,:)
+      character(len=100) :: filename
+      integer :: i, j, k, iexist, nlen, IO_unit
+
+      allocate(beta_ring_current_real(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX))
+
+      IO_unit = 111
+      inquire(iolength=nlen) beta_ring_current_real
+      open(file=filename,unit=IO_unit,form='unformatted',access='direct',recl=nlen,status='old')
+      read(IO_unit,rec=1) beta_ring_current_real
+      close(IO_unit)
+
+      beta_ring_current = beta_ring_current_real*1.d0
+
+      deallocate(beta_ring_current_real)
+
+   End Subroutine Read_beta_Ring_Current  
 
 
 
@@ -463,20 +521,25 @@ contains
    End Subroutine interpolate_exosphere
 
 
-   Subroutine nearest_grid_exosphere(one, nH1)
+   Subroutine nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1)
 
       USE SETTING
       USE GRID_PARAMETERS
       IMPLICIT NONE
       
-      real*8, dimension(7) :: one
-      real*8 :: nH1
+      real*8, intent(in) :: one(7), current_time 
+      real*8, intent(out) :: nH1, beta_RCCX1
       
       real*8 :: x, y, z, r, longitude, latitude
       real*8 :: r_min, r_max, lon_min, lon_max, lat_min, lat_max
       integer :: i_r_nearest, i_lon_nearest, i_lat_nearest
       real*8 :: dr1, dlon1, dlat1
-      
+
+      integer :: it_nearest, iday, iyear
+      real*8 :: year_doy_frac, frac_day, hour_val
+      integer :: days_in_year
+      logical :: is_leap_year
+
       ! Read exosphere data
 !      call Read_Exosphere(nH0)
       
@@ -518,8 +581,31 @@ contains
       dlat1=pi/(nLat_NS-1)
       i_lat_nearest = nint((latitude-lat_min)/dlat1) + 1
 
+      year_doy_frac = mod(current_time, 1000.d0)
+      iday = int(year_doy_frac)
+      
+      frac_day = year_doy_frac - dble(iday)
+      
+      hour_val = frac_day * 24.d0
+      
+      it_nearest = nint(hour_val) + 1
+      
+      ! 경계 처리: 23:30 이상(hour_val > 23.5)이 되어 반올림으로 25가 될 경우
+      ! 0시(index 1)로 순환
+      if (it_nearest > 24) then
+         it_nearest = 1
+         iday=iday+1
+      endif
+      if (it_nearest < 1) then
+         it_nearest = 24
+         iday=iday-1
+      endif
 
-      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, 1)
+      ! -----------------------------------------------------------
+
+
+      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest)
+      beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
 
       return
 
@@ -549,7 +635,7 @@ contains
       real*8, parameter :: max_ds = 1.d6
       real*8 :: x0, f0, trace_time
       integer :: ydoy, ii
-      real*8 ::  nps1, nH1
+      real*8 ::  nps1, nH1, beta_RCCX1
 
 
       istep = 0; flag=0
@@ -603,11 +689,13 @@ contains
                goto 101
          endif
 
-         call nearest_grid_plasmasphere(one, nps1)
-         call nearest_grid_exosphere(one, nH1)
+!         call nearest_grid_plasmasphere(one, nps1)
+!         call nearest_grid_exosphere(one, nH1)
+         call nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1)
          !call interpolate_plasmasphere(one, nps1)
          !call interpolate_exosphere(one, nH1)
-         beta_dt(istep) = nps1*dt
+!         beta_dt(istep) = nps1*dt
+         beta_dt(istep) = beta_RCCX1*dt
          nH_traj(istep) = nH1
          vel2(istep) = vt**2
 !            print*, "beta_CX1, nps1, dt", beta_CX1, nps1, dt, rank
@@ -618,11 +706,12 @@ contains
             flag = 1
             call calculate_final_timestep(old,one,dt,f0)
                istep = istep + 1
-               call nearest_grid_plasmasphere(one, nps1)
-               call nearest_grid_exosphere(one, nH1)
+!               call nearest_grid_plasmasphere(one, nps1)
+               call nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1)
                !call interpolate_plasmasphere(one, nps1)
                !call interpolate_exosphere(one, nH1)
-               beta_dt(istep) = nps1*dt
+!               beta_dt(istep) = nps1*dt
+               beta_dt(istep) = beta_RCCX1*dt
                nH_traj(istep) = nH1
                vel2(istep) = vt**2
          else if (radial_distance .gt. radial_boundary(2)) then

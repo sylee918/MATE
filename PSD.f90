@@ -102,7 +102,7 @@
                vel2 = sum(vel*vel)
                if (i_ChargeExchange .eq. 1) then
 !                  call cpu_time(cx_t0)
-!                  call Calculate_ChargeExchange(iE,iv, ptl(iv,iE,:), flags(iv,iE), current_time, ICX, PSD_CX)
+                  call Calculate_ChargeExchange(iE,iv, ptl(iv,iE,:), flags(iv,iE), current_time, ICX, PSD_CX)
 !                  call cpu_time(cx_t1)
 !                  cx_time_total = cx_time_total + (cx_t1 - cx_t0)
 !                  cx_calls = cx_calls + 1
@@ -114,8 +114,9 @@
 
                !vel = (vel - vel_BC)
                PSD_exobase = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph + ICX) ! dt is negative, so ICX is already negative.
-!            PSD_CX=0.d0
-               each_n(iv,iE) = (PSD_exobase + PSD_CX) * dV2(iE,iv)
+               each_n(iv,iE) = PSD_exobase * dV2(iE,iv)
+!               PSD_CX=0.d0
+!               each_n(iv,iE) = (PSD_exobase + PSD_CX) * dV2(iE,iv)
 
          enddo
       enddo

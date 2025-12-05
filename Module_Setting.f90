@@ -20,6 +20,9 @@ MODULE CONSTANTS
 END MODULE CONSTANTS
 
 
+!! Limitation of Current Version (12/05/2025) !!
+! - RCCX and GEO_Resolution_in_Degree must be the same as 5 degree.
+
 
 MODULE SETTING
 
@@ -29,15 +32,15 @@ MODULE SETTING
 !!**** Recommended to change the parameters for your run ***!!
 
 !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-   character*20, parameter :: Runname_in_10char              = "CX2"
+   character*20, parameter :: Runname_in_10char              = "RCCX1"
 
 !! TIME SETTING !!
-   integer, parameter ::      Start_Time_in_YYYYDOY          = 1000012
-   integer, parameter ::      End_Time_in_YYYYDOY            = 1000012
+   integer, parameter ::      Start_Time_in_YYYYDOY          = 2008164
+   integer, parameter ::      End_Time_in_YYYYDOY            = 2008164
    integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
 !! 3-D SPATIAL RESOLUTIONS !!
-   integer, parameter ::      GEO_Resolution_in_Degree       = 15
+   integer, parameter ::      GEO_Resolution_in_Degree       = 5
    real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
    real*8, parameter  ::      RadialRange_max                = 10.0
    real*8, parameter  ::      dR                             = 0.5
@@ -52,21 +55,34 @@ MODULE SETTING
 !! DIRECTORIES SETTING !!
    character*70, parameter :: Lya_dir                          = "OMNI_extended.txt"         ! 1964 - 2024 (Oct)
    character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
+   character*70, parameter :: RCCX_dir                         = "RCCX/output/"
    character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0728/"
 !   character*70, parameter :: outdir                           = "/home/sylee/exospherecode/MATE/output/0728/"
+
+!! Output Setting !!
+   integer, parameter ::      i_Full_3D                        = 0                          ! 0 for turn off / 1 for turn on
+   integer, parameter ::      i_Three_Slices                   = 1                          ! 0 for turn off / 1 for turn on
+
 
 !! Including Physics !!
    integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
    integer, parameter ::      i_SolarRadiationPressure         = 1                          ! If you set these values as N, then the force is N-times stronger as a coefficient.
    integer, parameter ::      i_CoriolisForce_GSE              = 1
    integer, parameter ::      i_Photoionization                = 0
-   integer, parameter ::      i_ChargeExchange                 = 1                          !
+   integer, parameter ::      i_ChargeExchange                 = 1                          ! (1,2,3) for (PS,RC,both)
 
 !! Exobase Boundary Condition (BC) Setting !!
-   character*10, parameter :: ExobaseBC_Model_Name             = "CONST"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
+   character*10, parameter :: ExobaseBC_Model_Name             = "TIMEGCM"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
    integer, parameter ::      BC_GEO_Resolution_in_Degree      = 5
    integer, parameter ::      BC_Time_Resolution_in_Minute     = 5
-   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1000012                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 2008164                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+
+!! Beta_CX (Charge Exchange Loss Rate) Setting !!   (Only for Ring current now.)
+   integer, parameter ::      Beta_CX_nRadial                  = 17                         ! 2-10 Re with dR=0.5
+   integer, parameter ::      Beta_CX_GEO_Resolution_in_Degree = 5
+   integer, parameter ::      Beta_CX_Time_Resolution_in_Minute = 60
+   integer, parameter ::      Beta_CX_Start_Time_in_YYYYDOY    = BC_Start_Time_in_YYYYDOY
+
 
 !! Particle Tracing Range !!
    real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location
@@ -102,6 +118,13 @@ MODULE SETTING
    integer, parameter :: nbx = 360/bc_res, nby = 180/bc_res        ! 360-longitude and 180-latitude degree
    integer, parameter :: nbtperday = 86400/tb_res                  ! Total number of time grid for BC
    integer, parameter :: nt_bwd_bc = Start_Time_in_YYYYDOY - BC_Start_Time_in_YYYYDOY    ! # of days earlier than start_doy for BC
+
+   integer, parameter :: beta_res = Beta_CX_GEO_Resolution_in_Degree      ! 5-degree resolution for both LON & LAT
+   integer, parameter :: beta_tb_res = Beta_CX_Time_Resolution_in_Minute*60  ! Time resolution for BC (5-min resolution = 300s)
+   integer, parameter :: nRadial_CX = Beta_CX_nRadial
+   integer, parameter :: nLon_CX = 360/beta_res, nLat_CX = 180/beta_res+1        ! 360-longitude and 180-latitude degree
+   integer, parameter :: ntperday_CX = 86400/beta_tb_res                  ! Total number of time grid for BC
+   integer, parameter :: nt_bwd_CX = Start_Time_in_YYYYDOY - Beta_CX_Start_Time_in_YYYYDOY    ! # of days earlier than start_doy for BC
 
    integer, parameter :: time_resolution = 60*Output_Time_Interval_in_Minute     ! Unit second
    integer, parameter :: ntperday = 86400/time_resolution              ! Number of time grid per day
