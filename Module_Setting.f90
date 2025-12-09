@@ -32,16 +32,16 @@ MODULE SETTING
 !!**** Recommended to change the parameters for your run ***!!
 
 !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-   character*20, parameter :: Runname_in_10char              = "RCCX1"
+   character*20, parameter :: Runname_in_10char              = "RCCX2"
 
 !! Output Setting !!
    integer, parameter ::      i_Full_3D                        = 0                          ! 0 for turn off / 1 for turn on
    integer, parameter ::      i_Three_Slices                   = 1                          ! 0 for turn off / 1 for turn on
 
 !! TIME SETTING !!
-   integer, parameter ::      Start_Time_in_YYYYDOY          = 2008164
-   integer, parameter ::      End_Time_in_YYYYDOY            = 2008164
-   integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
+   integer, parameter ::      Start_Time_in_YYYYDOY          = 2008166
+   integer, parameter ::      End_Time_in_YYYYDOY            = 2008174
+   integer, parameter ::      Output_Time_Interval_in_Minute = 60
 
 !! 3-D SPATIAL RESOLUTIONS !!
    integer, parameter ::      GEO_Resolution_in_Degree       = 5
@@ -80,7 +80,7 @@ MODULE SETTING
    integer, parameter ::      Beta_CX_nRadial                  = 17                         ! 2-10 Re with dR=0.5
    integer, parameter ::      Beta_CX_GEO_Resolution_in_Degree = 5
    integer, parameter ::      Beta_CX_Time_Resolution_in_Minute = 60
-   integer, parameter ::      Beta_CX_Start_Time_in_YYYYDOY    = BC_Start_Time_in_YYYYDOY
+   integer, parameter ::      Beta_CX_Start_Time_in_YYYYDOY    = 2008164
 
 
 !! Particle Tracing Range !!

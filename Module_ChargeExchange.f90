@@ -599,8 +599,9 @@ contains
          it_nearest = 24
          iday=iday-1
       endif
-      if (iday < Start_Time_in_YYYYDOY) then
-         iday = Start_Time_in_YYYYDOY
+      if (iday < Beta_CX_Start_Time_in_YYYYDOY) then
+         iday = Beta_CX_Start_Time_in_YYYYDOY
+         it_nearest = 1
       endif
 
       ! -----------------------------------------------------------
