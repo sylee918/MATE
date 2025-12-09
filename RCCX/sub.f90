@@ -846,7 +846,7 @@ end subroutine readInputData
 
 
 
-   Subroutine write_4D(array4D,iday,is)
+   Subroutine write_4D(array4D,iday,is,tag)
       use MATEgrid
 
       IMPLICIT NONE
@@ -854,8 +854,9 @@ end subroutine readInputData
       real, dimension(nRadial,nLon,nLat,nt) :: array4D
       real, dimension(:,:,:,:), allocatable :: real_array4D
       integer iday, nlen, is
-      character*10 dayst
-      character*100 filename
+      character(len=7) dayst
+      character(len=*), intent(in) :: tag
+      character(len=100) filename
 
       allocate(real_array4D(nRadial,nLon,nLat,nt))
       real_array4D = real(array4D)
@@ -864,8 +865,8 @@ end subroutine readInputData
       write(dayst, '(I7.7)') iday
 !      filename = trim(outdir) // 'MATE_beta_' // trim(dayst) // '.data'
 !      filename = 'RCCX_' // trim(dayst) // '.data'
-      if (is==1) filename = 'RCCX_p_' // trim(dayst) // '.data'
-      if (is==2) filename = 'RCCX_o_' // trim(dayst) // '.data'
+      if (is==1) filename = trim(tag) // '_p_' // trim(dayst) // '.data'
+      if (is==2) filename = trim(tag) // '_o_' // trim(dayst) // '.data'
       inquire(iolength=nlen) real_array4D
       open(file=filename,unit=45,form='unformatted',access='direct',recl=nlen,status='replace')
       write(45,rec=1) real_array4D

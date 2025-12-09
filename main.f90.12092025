@@ -26,9 +26,6 @@
       real*8 :: nps1, nH1
       real*8 :: trace_t0, trace_t1, trace_time_total
       real*8 :: calc_t0, calc_t1, calc_time_total
-      integer :: global_task_idx, total_valid_tasks
-      integer :: tasks_per_proc, remainder
-      integer :: my_start_idx, my_end_idx
 
 
       call MPI_INIT(ierr)
@@ -56,43 +53,7 @@
 
       allocate(ptl(nvel,nEnergy,7), flags(nvel,nEnergy))
 
-      total_valid_tasks = 0
-      do ilat = nLat, nLat_NS
-         ! --- 위도별 경도 간격 설정 로직 (기존 코드 유지) ---
-         if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then
-            nLon0 = 1
-         else
-            nLon0 = nLong
-         endif
-    
-         dnLon0 = 1 ! 기본값 (Full mode or Equator)
-         if (i_Three_Slices .eq. 1) then
-            if (ilat .gt. nLat .and. ilat .lt. nLat_NS) then
-               dnLon0 = nLon0 / 4 ! 90도 간격
-            endif
-         endif
-    
-         do ilon = 1, nLon0, dnLon0
-            do irad = 1, nRadial
-               total_valid_tasks = total_valid_tasks + 1
-            end do
-         end do
-      end do
-
-      tasks_per_proc = total_valid_tasks / nProcs
-      remainder = mod(total_valid_tasks, nProcs)
-
-      ! 랭크별 시작/끝 인덱스 계산 (나머지 처리 포함)
-      if (rank < remainder) then
-         tasks_per_proc = tasks_per_proc + 1
-         my_start_idx = rank * tasks_per_proc + 1
-      else
-         my_start_idx = rank * tasks_per_proc + remainder + 1
-      endif
-      my_end_idx = my_start_idx + tasks_per_proc - 1
-
-      global_task_idx = 0 ! 카운터 초기화
-
+      dnLon0=1
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
          do it=1,ntperday  ! hour loop
@@ -112,10 +73,9 @@
 
                do ilon=1,nLon0,dnLon0
                   lon = longitude_range(ilon)
-!                  i1 = ilon-1 + (ilat-nLat)*nLong      ! starts from 0
+                  i1 = ilon-1 + (ilat-nLat)*nLong      ! starts from 0
                   do irad=1,nRadial
                      rad = radial_distance_range(irad)
-                     global_task_idx = global_task_idx + 1  
 
                      if (i_Full_3D .eq. 1) then
                         grid_point_idx = i1*nRadial + irad-1
@@ -134,10 +94,7 @@
                      endif
 
                      if (i_Three_Slices .eq. 1) then
-!                       ** 핵심: 현재 인덱스가 내 담당 구간인지 확인 **
-                        if (global_task_idx >= my_start_idx .and. global_task_idx <= my_end_idx) then
-                           ! === [여기에 실제 물리 계산 코드 삽입] ===
-                            print *, "Rank", rank, "computing idx:", global_task_idx                    
+                        if (rank/nRadial .eq. i1) then
                            print '(a, i4, i4)', "(LON, LAT) = ", int(lon*180/pi), int(lat*180/pi)
 
 !                           call Calculate_Density(current_time, number_density_0D)                      
