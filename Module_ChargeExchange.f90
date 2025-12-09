@@ -9,7 +9,7 @@ Module ChargeExchange
    real*8, dimension(nh) :: rho_ps
 !   integer, allocatable, dimension(:,:) :: nstep
    real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: nH0
-   real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,start_ydoy-nt_bwd_bc:end_ydoy) :: beta_RCCX
+   real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,start_ydoy-nt_bwd_CX:end_ydoy) :: beta_RCCX
 
 contains
 
@@ -77,7 +77,7 @@ contains
       if (start_ydoy/1000 .eq. end_ydoy/1000) then
 !         write(yearst, '(I4.4)') start_ydoy/1000
 
-         do iday=start_ydoy-nt_bwd_bc,end_ydoy
+         do iday=start_ydoy-nt_bwd_CX,end_ydoy
             write(ydoy_str,'(I7.7)') iday
             filename_RC = trim(RCCX_dir) // "RCCX_p_" // trim(ydoy_str) //  ".data"
             call Read_beta_Ring_Current(filename_RC, beta_ring_current)
@@ -607,7 +607,7 @@ contains
       ! -----------------------------------------------------------
 
 
-      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest)
+!      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest)
       beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
 
       return
