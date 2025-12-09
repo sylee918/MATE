@@ -608,6 +608,7 @@ contains
 
 
 !      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest)
+      print*, 'nearest', i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday
       beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
 
       return
