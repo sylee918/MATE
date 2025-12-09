@@ -111,7 +111,8 @@
                lat = latitudeNS_range(ilat)
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
                if (i_Three_Slices .eq. 1) then
-                  if (ilat .gt. nLat .and. ilat .lt. nLat_NS) then
+!                  if (ilat .gt. nLat .and. ilat .lt. nLat_NS) then
+                  if (ilat .ne. nLat .and. ilat .ne. 1 .and. ilat .ne. nLat_NS) then
                      dnLon0=nLon0/4
                   endif
                endif
