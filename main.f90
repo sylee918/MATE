@@ -140,15 +140,15 @@
                             print *, "Rank", rank, "computing idx:", global_task_idx                    
                            print '(a, i4, i4)', "(LON, LAT) = ", int(lon*180/pi), int(lat*180/pi)
 
-!                           call Calculate_Density(current_time, number_density_0D)                      
-!                           number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
-                           number_density_4D_MPI(irad,ilon,ilat,it) = 1.d0
+                           call Calculate_Density(current_time, number_density_0D)                      
+                           number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
+!                           number_density_4D_MPI(irad,ilon,ilat,it) = 1.d0
                            if (lat .gt. 0) then    ! N/S symmetry
 !                              ptl(:,:,4) = -ptl(:,:,4)
 !                              ptl(:,:,7) = -ptl(:,:,7)
-!                              call Calculate_Density(current_time, number_density_0D)
-!                              number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
-                              number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = 1.d0
+                              call Calculate_Density(current_time, number_density_0D)
+                              number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
+!                              number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = 1.d0
                            endif
                         endif 
                      endif
