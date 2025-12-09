@@ -54,6 +54,7 @@ contains
 !      ICX = sum(beta_dt) * vsig_1eV
 
       ICX = sum(beta_dt)
+      ICX = abs(ICX)*(-1.d0)  ! Make sure to be negative.
 
 !      deallocate(beta_dt, nH_traj, vel2)
 
