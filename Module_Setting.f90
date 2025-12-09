@@ -34,6 +34,10 @@ MODULE SETTING
 !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
    character*20, parameter :: Runname_in_10char              = "RCCX1"
 
+!! Output Setting !!
+   integer, parameter ::      i_Full_3D                        = 0                          ! 0 for turn off / 1 for turn on
+   integer, parameter ::      i_Three_Slices                   = 1                          ! 0 for turn off / 1 for turn on
+
 !! TIME SETTING !!
    integer, parameter ::      Start_Time_in_YYYYDOY          = 2008164
    integer, parameter ::      End_Time_in_YYYYDOY            = 2008164
@@ -58,11 +62,6 @@ MODULE SETTING
    character*70, parameter :: RCCX_dir                         = "RCCX/output/"
    character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0728/"
 !   character*70, parameter :: outdir                           = "/home/sylee/exospherecode/MATE/output/0728/"
-
-!! Output Setting !!
-   integer, parameter ::      i_Full_3D                        = 0                          ! 0 for turn off / 1 for turn on
-   integer, parameter ::      i_Three_Slices                   = 1                          ! 0 for turn off / 1 for turn on
-
 
 !! Including Physics !!
    integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on

@@ -47,9 +47,13 @@
          if (ExobaseBC_Model_Name .eq. "CONST") then; Lya = 4.d0; endif
          if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
          if (i_Photoionization .eq. 1 .and. ExobaseBC_Model_Name .eq. "CONST") then; bph = 1.5d-7; endif
-      call Read_Plasmasphere
-      call Read_Exosphere
-      call Get_Beta_RCCX()
+      if (i_ChargeExchange .eq. 1 .or. i_ChargeExchange .eq. 3) then
+         call Read_Plasmasphere
+         call Read_Exosphere
+      endif
+      if (i_ChargeExchange .eq. 2 .or. i_ChargeExchange .eq. 3) then
+         call Get_Beta_RCCX() 
+      endif
       call Physical_tag
       
 
@@ -58,7 +62,7 @@
       allocate(ptl(nvel,nEnergy,7), flags(nvel,nEnergy))
 
       total_valid_tasks = 0
-      do ilat = nLat, nLat_NS
+      do ilat = 1, nLat_NS
          ! --- 위도별 경도 간격 설정 로직 (기존 코드 유지) ---
          if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then
             nLon0 = 1
@@ -68,7 +72,8 @@
     
          dnLon0 = 1 ! 기본값 (Full mode or Equator)
          if (i_Three_Slices .eq. 1) then
-            if (ilat .gt. nLat .and. ilat .lt. nLat_NS) then
+!            if (ilat .gt. nLat .and. ilat .lt. nLat_NS) then
+            if (ilat .ne. nLat .and. ilat .ne. 1 .and. ilat .ne. nLat_NS) then
                dnLon0 = nLon0 / 4 ! 90도 간격
             endif
          endif
@@ -102,7 +107,7 @@
             iminute = it*(time_resolution/60.d0)-ihour*60
             if (rank .eq. 0) print*, 'Current time:', iday, ihour, iminute
 
-            do ilat=nLat,nLat_NS
+            do ilat=1,nLat_NS
                lat = latitudeNS_range(ilat)
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
                if (i_Three_Slices .eq. 1) then
@@ -125,12 +130,6 @@
 
                            call Calculate_Density(current_time, number_density_0D)                      
                            number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
-                           if (lat .gt. 0) then    ! N/S symmetry
-                              ptl(:,:,4) = -ptl(:,:,4)
-                              ptl(:,:,7) = -ptl(:,:,7)
-                              call Calculate_Density(current_time, number_density_0D)
-                              number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
-                           endif
                         endif
                      endif
 
@@ -143,14 +142,6 @@
 
                            call Calculate_Density(current_time, number_density_0D)                      
                            number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
-!                           number_density_4D_MPI(irad,ilon,ilat,it) = 1.d0
-                           if (lat .gt. 0) then    ! N/S symmetry
-!                              ptl(:,:,4) = -ptl(:,:,4)
-!                              ptl(:,:,7) = -ptl(:,:,7)
-                              call Calculate_Density(current_time, number_density_0D)
-                              number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = number_density_0D
-!                              number_density_4D_MPI(irad,ilon,nLat_NS+1-ilat,it) = 1.d0
-                           endif
                         endif 
                      endif
 
