@@ -600,6 +600,9 @@ contains
          it_nearest = 24
          iday=iday-1
       endif
+      if (it_nearest < Start_Time_in_YYYYDOY) then
+         it_nearest = Start_Time_in_YYYYDOY
+      endif
 
       ! -----------------------------------------------------------
 
