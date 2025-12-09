@@ -49,6 +49,7 @@
          if (i_Photoionization .eq. 1 .and. ExobaseBC_Model_Name .eq. "CONST") then; bph = 1.5d-7; endif
       call Read_Plasmasphere
       call Read_Exosphere
+      call Get_Beta_RCCX()
       call Physical_tag
       
 

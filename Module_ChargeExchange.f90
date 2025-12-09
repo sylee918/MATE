@@ -29,8 +29,6 @@ contains
       real*8, dimension(nstep) :: beta_dt, nH_traj, vel2
       integer :: i, istep
 
-      call Get_Beta_RCCX()
-
       beta_dt = 0.d0; nH_traj = 0.d0; vel2 = 0.d0
       call Trace_Again(iE,iv, ptl0, flag, current_time, beta_dt, nH_traj, vel2, istep)
 
