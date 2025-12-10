@@ -32,15 +32,15 @@ MODULE SETTING
 !!**** Recommended to change the parameters for your run ***!!
 
 !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-   character*20, parameter :: Runname_in_10char              = "RCCX4"
+   character*20, parameter :: Runname_in_10char              = "NoCX"
 
 !! Output Setting !!
    integer, parameter ::      i_Full_3D                        = 0                          ! 0 for turn off / 1 for turn on
    integer, parameter ::      i_Three_Slices                   = 1                          ! 0 for turn off / 1 for turn on
 
 !! TIME SETTING !!
-   integer, parameter ::      Start_Time_in_YYYYDOY          = 2008167
-   integer, parameter ::      End_Time_in_YYYYDOY            = 2008174
+   integer, parameter ::      Start_Time_in_YYYYDOY          = 2008166
+   integer, parameter ::      End_Time_in_YYYYDOY            = 2008168
    integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
 !! 3-D SPATIAL RESOLUTIONS !!
