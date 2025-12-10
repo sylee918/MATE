@@ -106,6 +106,8 @@
             ihour = it*(time_resolution/3600.d0)
             iminute = it*(time_resolution/60.d0)-ihour*60
             if (rank .eq. 0) print*, 'Current time:', iday, ihour, iminute
+            
+            global_task_idx = 0
 
             do ilat=1,nLat_NS
                lat = latitudeNS_range(ilat)
