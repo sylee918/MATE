@@ -100,14 +100,18 @@
 
                cexo2 = fac*temp_BC
                vel2 = sum(vel*vel)
-               if (i_ChargeExchange .eq. 1) then
+!               if (i_ChargeExchange .eq. 1) then
 !                  call cpu_time(cx_t0)
-                  call Calculate_ChargeExchange(iE,iv, ptl(iv,iE,:), flags(iv,iE), current_time, ICX, PSD_CX)
+!                  call Calculate_ChargeExchange(iE,iv, ptl(iv,iE,:), flags(iv,iE), current_time, ICX, PSD_CX)  !! Already used above?
 !                  call cpu_time(cx_t1)
 !                  cx_time_total = cx_time_total + (cx_t1 - cx_t0)
 !                  cx_calls = cx_calls + 1
-               else
+!               endif
+               if (i_ChargeExchange .eq. 0) then
                   ICX = 0.d0
+                  PSD_CX = 0.d0
+               endif
+               if (i_ChargeExchange .eq. 2) then
                   PSD_CX = 0.d0
                endif
                !print*, "ICX, Iph", ICX, Iph, rank
