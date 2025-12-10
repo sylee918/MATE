@@ -32,16 +32,16 @@ MODULE SETTING
 !!**** Recommended to change the parameters for your run ***!!
 
 !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-   character*20, parameter :: Runname_in_10char              = "RCCX2"
+   character*20, parameter :: Runname_in_10char              = "RCCX3"
 
 !! Output Setting !!
    integer, parameter ::      i_Full_3D                        = 0                          ! 0 for turn off / 1 for turn on
    integer, parameter ::      i_Three_Slices                   = 1                          ! 0 for turn off / 1 for turn on
 
 !! TIME SETTING !!
-   integer, parameter ::      Start_Time_in_YYYYDOY          = 2008166
+   integer, parameter ::      Start_Time_in_YYYYDOY          = 2008167
    integer, parameter ::      End_Time_in_YYYYDOY            = 2008174
-   integer, parameter ::      Output_Time_Interval_in_Minute = 60
+   integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
 !! 3-D SPATIAL RESOLUTIONS !!
    integer, parameter ::      GEO_Resolution_in_Degree       = 5
@@ -68,7 +68,7 @@ MODULE SETTING
    integer, parameter ::      i_SolarRadiationPressure         = 1                          ! If you set these values as N, then the force is N-times stronger as a coefficient.
    integer, parameter ::      i_CoriolisForce_GSE              = 1
    integer, parameter ::      i_Photoionization                = 0
-   integer, parameter ::      i_ChargeExchange                 = 2                          ! (1,2,3) for (PS,RC,both)
+   integer, parameter ::      i_ChargeExchange                 = 0                          ! (1,2,3) for (PS,RC,both)
 
 !! Exobase Boundary Condition (BC) Setting !!
    character*10, parameter :: ExobaseBC_Model_Name             = "TIMEGCM"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"

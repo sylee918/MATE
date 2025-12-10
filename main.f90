@@ -102,6 +102,7 @@
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
          do it=1,ntperday  ! hour loop
+
             current_time = iday*1.d0 + it*(time_resolution/86400.d0)
             ihour = it*(time_resolution/3600.d0)
             iminute = it*(time_resolution/60.d0)-ihour*60
