@@ -695,7 +695,8 @@ contains
 
 !         call nearest_grid_plasmasphere(one, nps1)
 !         call nearest_grid_exosphere(one, nH1)
-         call nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1)
+!         call nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1)
+         call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1)
          !call interpolate_plasmasphere(one, nps1)
          !call interpolate_exosphere(one, nH1)
 !         beta_dt(istep) = nps1*dt
@@ -711,7 +712,7 @@ contains
             call calculate_final_timestep(old,one,dt,f0)
                istep = istep + 1
 !               call nearest_grid_plasmasphere(one, nps1)
-               call nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1)
+               call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1)
                !call interpolate_plasmasphere(one, nps1)
                !call interpolate_exosphere(one, nH1)
 !               beta_dt(istep) = nps1*dt
