@@ -43,10 +43,12 @@
       call gen_points_for_NV
       call Init_Parameter
       call Get_exobaseBC
+      call Physical_tag
       call read_Lya_Bph  
          if (ExobaseBC_Model_Name .eq. "CONST") then; Lya = 4.d0; endif
          if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
          if (i_Photoionization .eq. 1 .and. ExobaseBC_Model_Name .eq. "CONST") then; bph = 1.5d-7; endif
+
       if (i_ChargeExchange .eq. 1 .or. i_ChargeExchange .eq. 3) then
          call Read_Plasmasphere
          call Read_Exosphere
@@ -54,7 +56,10 @@
       if (i_ChargeExchange .eq. 2 .or. i_ChargeExchange .eq. 3) then
          call Get_Beta_RCCX() 
       endif
-      call Physical_tag
+      if (i_ChargeExchange .eq. 0) then
+         beta_RCCX = 0.d0
+         nps = 0.d0
+      endif
       
 
       if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not module, just making .in file

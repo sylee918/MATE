@@ -116,6 +116,11 @@
                endif
                !print*, "ICX, Iph", ICX, Iph, rank
 
+               if (ICX .gt. 0.d0) then
+                  print*, "ICX is positive", ICX
+                  stop
+               endif
+
                !vel = (vel - vel_BC)
                PSD_exobase = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph + ICX) ! dt is negative, so ICX is already negative.
                each_n(iv,iE) = PSD_exobase * dV2(iE,iv)
