@@ -9,11 +9,10 @@ contains
 
    Subroutine read_Lya_Bph
 
-      integer IO_unit
       IMPLICIT NONE
 
       character(len=80) :: line
-      integer :: year, doy, i, yyyydoy
+      integer :: year, doy, i, yyyydoy, IO_unit
       real :: f10_7, f107a, ap, lyman_alpha, beta_ph, factor
 
       open(newunit=IO_unit, file=trim(Lya_dir), status='old', action='read')
