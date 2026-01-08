@@ -162,7 +162,6 @@ contains
 
    Subroutine interpolate_plasmasphere(one, nps1)
 
-      USE GRID_PARAMETERS
       IMPLICIT NONE
       
       real*8, dimension(7) :: one

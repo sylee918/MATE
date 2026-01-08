@@ -101,7 +101,6 @@ MODULE VOLUME_ELEMENT
    Subroutine Radial_Component_Of_Velocity_Volume_Element_For_Flux(v3dv)
       ! 'v3dv' = v^3 dv (v=vr for initial condition)
       ! 'vollist' in python code.
-      USE GRID_PARAMETERS
       IMPLICIT NONE
 
       real*8, dimension(nEnergy) :: energy_to_speed, v3dv

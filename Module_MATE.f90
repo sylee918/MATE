@@ -1,4 +1,7 @@
 Module MPI_MATE
+
+   USE SETTING
+
    integer :: nprocs, ierr
    integer :: rank
       real*8 :: rad, lon, lat   ! RANK dependent variables
@@ -16,7 +19,6 @@ contains
 
    Subroutine Calculate_Local_nRadial
 
-      use SETTING, only: nRadial, nLat, nLat_NS, nLon, nLong
       IMPLICIT NONE
 
       integer :: total_grid_points, grid_per_proc, remainder
