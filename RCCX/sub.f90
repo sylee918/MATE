@@ -8,26 +8,26 @@ Subroutine read_CIMI_flux(CIMI_flux_file, it, is)
    use useless
    character(len=80) :: CIMI_flux_file
    integer :: rc_Re1, ir1, ip1, je1, ig1, i, j, k, m, n
-   integer :: it, is
+   integer :: it, is, IO_unit
    real :: hour, ro1, xmlto1
 
    if (it == 1) then
-      open(unit=11,file=trim(CIMI_flux_file),status='old')
-      read(11,*) rc_Re1, ir1, ip1, je1, ig1
+      open(unit=IO_unit,file=trim(CIMI_flux_file),status='old')
+      read(IO_unit,*) rc_Re1, ir1, ip1, je1, ig1
 
       if (ir1.ne.ir.or.ip1.ne.ip.or.je1.ne.je.or.ig1.ne.ig) then
          write(*,*) 'Error: ir, ip, je, ig do not match'
          stop
       endif
 
-      read(11,*) (varL(i),i=1,ir)
-      read(11,*) (mphi(j),j=1,ip)
-      read(11,*) (gride(is,k),k=1,je)
-      read(11,*) (gridy(m),m=1,ig)
+      read(IO_unit,*) (varL(i),i=1,ir)
+      read(IO_unit,*) (mphi(j),j=1,ip)
+      read(IO_unit,*) (gride(is,k),k=1,je)
+      read(IO_unit,*) (gridy(m),m=1,ig)
    endif
 
    ! Read hour, parmod, and Lstar_max
-   read(11,*) hour, parmod, Lstar_max(0)
+   read(IO_unit,*) hour, parmod, Lstar_max(0)
    ihour = int(hour) + 1
 
    print*, hour, parmod, Lstar_max(0)
@@ -36,18 +36,18 @@ Subroutine read_CIMI_flux(CIMI_flux_file, it, is)
    do i=1,ir
       do j=1,ip
 !         read(11,*) xlati(i,j), xmlt(j), xlatiS(i,j), xmltS(i,j), ro1, xmlto1, &
-         read(11,*) xlati(i,j), xmlt(j), xlatiS(i,j), xmltS(i,j), ro(i,j), xmlto(i,j), &
+         read(IO_unit,*) xlati(i,j), xmlt(j), xlatiS(i,j), xmltS(i,j), ro(i,j), xmlto(i,j), &
                     BriN(i,j), BriS(i,j), bo(i,j), iba(j)
-         read(11,*) density(i,j), ompe(i,j), CHpower(i,j), HIpower(i,j), &
+         read(IO_unit,*) density(i,j), ompe(i,j), CHpower(i,j), HIpower(i,j), &
                     denWP(n,i,j), TparaWP(n,i,j), TperpWP(n,i,j), &
                     HRPee(n,i,j), HRPii(n,i,j), rppa(j), Lstar(i,j,0), volume(i,j)
          do k=1,je
-            read(11,*) (fl(i,j,k,m), m=1,ig)
+            read(IO_unit,*) (fl(i,j,k,m), m=1,ig)
          enddo
       enddo
    enddo
 
-   if (it == nt) close(11)
+   if (it == nt) close(IO_unit)
 
 
 End Subroutine read_CIMI_flux
@@ -75,6 +75,7 @@ Subroutine calculate_Parmod
   use cread1
   use cread2
   use cfield
+  integer IO_unit
   COMMON /GEOPACK1/ST0,CT0,SL0,CL0,CTCL,STCL,CTSL,STSL,SFI,CFI, &
           SPS,CPS,DS3,CGST,SGST,PSI,A11,A21,A31,A12,A22,A32,A13,A23,A33, &
           E11,E21,E31,E12,E22,E32,E13,E23,E33
@@ -83,10 +84,10 @@ Subroutine calculate_Parmod
    thalf=t+0.5*tstep
    if (t.eq.tstart) then
       if (ires.eq.0.and.itype.eq.2) then
-         open(unit=11,file=trim(outname)//'.le',status='old')
-         read(11,'(a80)') header
-         read(11,*) parmod0
-         close(11)
+         open(newunit=IO_unit,file=trim(outname)//'.le',status='old')
+         read(IO_unit,'(a80)') header
+         read(IO_unit,*) parmod0
+         close(IO_unit)
       else
          call TsyParmod(thalf,tsw,xnswa,vswa,nsw,tdst,Dsta,ndst,timf,byw,bzw,&
                         nimf,imod,parmod0,Dst,DstRC)
@@ -853,7 +854,7 @@ end subroutine readInputData
       
       real, dimension(nRadial,nLon,nLat,nt) :: array4D
       real, dimension(:,:,:,:), allocatable :: real_array4D
-      integer iday, nlen, is
+      integer iday, nlen, is, IO_unit
       character(len=7) dayst
       character(len=*), intent(in) :: tag
       character(len=100) filename
@@ -868,9 +869,9 @@ end subroutine readInputData
       if (is==1) filename = trim(tag) // '_p_' // trim(dayst) // '.data'
       if (is==2) filename = trim(tag) // '_o_' // trim(dayst) // '.data'
       inquire(iolength=nlen) real_array4D
-      open(file=filename,unit=45,form='unformatted',access='direct',recl=nlen,status='replace')
-      write(45,rec=1) real_array4D
-      close(45)
+      open(file=filename,newunit=IO_unit,form='unformatted',access='direct',recl=nlen,status='replace')
+      write(IO_unit,rec=1) real_array4D
+      close(IO_unit)
 
       deallocate(real_array4D)
 

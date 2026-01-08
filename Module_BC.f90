@@ -95,7 +95,6 @@
          logical iexist
 
          allocate(nH_real(nbx,nby,nbtperday),TH_real(nbx,nby,nbtperday))
-         IO_unit=600
 
          if (rank .eq. 0) print*, "Read exobase BC file: ", filename_BC
 
@@ -106,7 +105,7 @@
             inquire(iolength=nlen) nH_real
             nlen=nlen*2
 
-            open(file=filename_BC,unit=IO_unit,form='unformatted', &
+            open(file=filename_BC,newunit=IO_unit,form='unformatted', &
                access='direct',action='read',recl=nlen,status='old')
             read(IO_unit,rec=1) nH_real, TH_real
             close(IO_unit)

@@ -1,7 +1,7 @@
 Module ChargeExchange
 
-   USE SETTING
    USE GRID_PARAMETERS
+!     USE SETTING
    USE MPI_MATE, only: rank
 IMPLICIT NONE
 
@@ -100,9 +100,8 @@ contains
 
       allocate(beta_ring_current_real(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX))
 
-      IO_unit = 111
       inquire(iolength=nlen) beta_ring_current_real
-      open(file=filename,unit=IO_unit,form='unformatted',access='direct',recl=nlen,status='old')
+      open(file=filename,newunit=IO_unit,form='unformatted',access='direct',recl=nlen,status='old')
       read(IO_unit,rec=1) beta_ring_current_real
       close(IO_unit)
 
@@ -138,14 +137,13 @@ contains
 
       allocate(nps_real(nh,nMLT,nz))
 
-      IO_unit = 110
       filename = "GCPM_example_cylindrical_kp0.dat"
       inquire(file=filename, exist=iexist)
       if (.not. iexist) then
          print*, "File is not exist: ", filename
       else
          inquire(iolength=nlen) nps_real
-         open(file=filename,unit=IO_unit,form='unformatted', &
+         open(file=filename,newunit=IO_unit,form='unformatted', &
             access='direct',action='read',recl=nlen,status='old')
          read(IO_unit,rec=1) nps_real
          close(IO_unit)
@@ -361,15 +359,14 @@ contains
 
       allocate(nH_temp(nRadial,nLon,nLat_NS,ntperday))
 
-      IO_unit = 120
-!      filename = trim(outdir)//"MATE_nH_GRCX_CXtest1_1000004.data"
+      inquire(iolength=nlen) nH_temp
       filename = trim(outdir)//"MATE_nH_GRC_00_1000008.data"
       inquire(file=filename, exist=iexist)
       if (.not. iexist) then
          print*, "File is not exist: ", filename
       else
          inquire(iolength=nlen) nH_temp
-         open(file=filename,unit=IO_unit,form='unformatted', &
+         open(file=filename,newunit=IO_unit,form='unformatted', &
             access='direct',action='read',recl=nlen,status='old')
          read(IO_unit,rec=1) nH_temp
          close(IO_unit)
