@@ -1,6 +1,6 @@
    Program main
 
-      USE SETTING
+!      USE SETTING
       USE MPI_MATE
       USE SET_VELOCITY_DIRECTION
       USE GRID_PARAMETERS
