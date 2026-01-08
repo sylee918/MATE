@@ -363,7 +363,8 @@ contains
       IMPLICIT NONE
 
       character(len=200) :: filename
-      integer :: i, j, k, iexist, nlen, IO_unit
+      integer :: i, j, k, nlen, IO_unit
+      logical :: iexist
       real*4, allocatable :: nH_temp(:,:,:,:)
 
       allocate(nH_temp(nRadial,nLon,nLat_NS,ntperday))
@@ -372,7 +373,7 @@ contains
 !      filename = trim(outdir)//"MATE_nH_GRCX_CXtest1_1000004.data"
       filename = trim(outdir)//"MATE_nH_GRC_00_1000008.data"
       inquire(file=filename, exist=iexist)
-      if (iexist .eq. 0) then
+      if (.not. iexist) then
          print*, "File is not exist: ", filename
       else
          inquire(iolength=nlen) nH_temp
