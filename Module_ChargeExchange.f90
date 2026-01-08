@@ -71,7 +71,8 @@ contains
       real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: beta_ring_current
       character(len=100) :: filename_RC
       character(len=7) :: ydoy_str, yearst
-      integer :: iday, iexist, nlen, IO_unit
+      integer :: iday, nlen, IO_unit
+      logical :: iexist
 
       if (start_ydoy/1000 .eq. end_ydoy/1000) then
 !         write(yearst, '(I4.4)') start_ydoy/1000
@@ -96,7 +97,8 @@ contains
       real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: beta_ring_current
       real, allocatable :: beta_ring_current_real(:,:,:,:)
       character(len=100) :: filename
-      integer :: i, j, k, iexist, nlen, IO_unit
+      integer :: i, j, k, nlen, IO_unit
+      logical :: iexist
 
       allocate(beta_ring_current_real(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX))
 
@@ -121,7 +123,8 @@ contains
 
       real, allocatable :: nps_real(:,:,:)
       character(len=200) :: filename
-      integer :: i, j, k, iexist, nlen, IO_unit
+      integer :: i, j, k, nlen, IO_unit
+      logical :: iexist
 
       do i=1,nz
          zps(i) = -10.d0 + (i-1)*0.1
@@ -141,7 +144,7 @@ contains
       IO_unit = 110
       filename = "GCPM_example_cylindrical_kp0.dat"
       inquire(file=filename, exist=iexist)
-      if (iexist .eq. 0) then
+      if (.not. iexist) then
          print*, "File is not exist: ", filename
       else
          inquire(iolength=nlen) nps_real
