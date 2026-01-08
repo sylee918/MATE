@@ -1,7 +1,9 @@
 Module ChargeExchange
 
    USE SETTING
-   IMPLICIT NONE
+   USE GRID_PARAMETERS
+   USE MPI_MATE, only: rank
+IMPLICIT NONE
 
    integer, parameter :: nx=201, ny=201, nz=201, nh=101, nMLT=24, nphi=24, nrho=101
    real*8, dimension(nh,nMLT,nz) :: nps, Tps
@@ -15,8 +17,6 @@ contains
 
    Subroutine Calculate_ChargeExchange(iE,iv,ptl0,flag,current_time, ICX, PSD_CX)
 
-      USE SETTING
-      USE MPI_MATE, only: rank
       IMPLICIT NONE
 
       integer :: iE, iv
@@ -65,7 +65,6 @@ contains
 
    Subroutine Get_Beta_RCCX()
 
-      USE SETTING
       IMPLICIT NONE
 
       real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: beta_ring_current
@@ -91,7 +90,6 @@ contains
 
    Subroutine Read_beta_Ring_Current(filename, beta_ring_current)
 
-      USE SETTING
       IMPLICIT NONE
 
       real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: beta_ring_current
@@ -118,7 +116,6 @@ contains
 
    Subroutine Read_Plasmasphere()
 
-      USE SETTING
       IMPLICIT NONE
 
       real, allocatable :: nps_real(:,:,:)
@@ -295,8 +292,6 @@ contains
 
    Subroutine nearest_grid_plasmasphere(one, nps1)
 
-      USE SETTING
-      USE GRID_PARAMETERS
       IMPLICIT NONE
       
       real*8, dimension(7) :: one
@@ -358,7 +353,6 @@ contains
 
    Subroutine Read_Exosphere()
 
-      USE SETTING
       IMPLICIT NONE
 
       character(len=200) :: filename
@@ -392,8 +386,6 @@ contains
 
    Subroutine interpolate_exosphere(one, nH1)
 
-      USE SETTING
-      USE GRID_PARAMETERS
       IMPLICIT NONE
       
       real*8, dimension(7) :: one
@@ -525,8 +517,6 @@ contains
 
    Subroutine nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1)
 
-      USE SETTING
-      USE GRID_PARAMETERS
       IMPLICIT NONE
       
       real*8, intent(in) :: one(7), current_time 
@@ -622,9 +612,6 @@ contains
 
    Subroutine Trace_Again(iE,iv, ptl0,flag, current_time, beta_dt, nH_traj, vel2, istep)
 
-      USE SETTING
-      USE MPI_MATE, only: rank
-      USE GRID_PARAMETERS, only: radial_boundary
       USE SOLAR_LYMAN_ALPHA, only: Lya
       IMPLICIT NONE
       external rk4, calculate_final_timestep
