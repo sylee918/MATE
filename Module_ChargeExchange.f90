@@ -165,7 +165,6 @@ contains
 
    Subroutine interpolate_plasmasphere(one, nps1)
 
-      USE SETTING
       USE GRID_PARAMETERS
       IMPLICIT NONE
       
