@@ -45,6 +45,7 @@ contains
       cexo2 = fac*T_PS_K
       fac2 = 1.d0/(pi*cexo2)**1.5
 
+<<<<<<< Updated upstream
       ! PSD_CX is the PSD of CX-created nH. Below is not necessary for RCCX.
 !      PSD_CX = 0.d0
 !      do i=1,istep
@@ -55,6 +56,14 @@ contains
 
       ICX = sum(beta_dt)
       ICX = abs(ICX)*(-1.d0)  ! Make sure to be negative.
+=======
+      PSD_CX = 0.d0  ! H created by charge exchange
+      do i=1,istep
+         ICX_i = sum(beta_dt(1:i)) * vsig_1eV
+         PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
+      enddo
+      ICX = sum(beta_dt) * vsig_1eV
+>>>>>>> Stashed changes
 
 !      deallocate(beta_dt, nH_traj, vel2)
 

@@ -85,7 +85,10 @@
       real, dimension(ns,iw) :: dkeV, pcEo, vel
       ! 5D arrays
       real, dimension(ir,ip,je,ig) :: fl
+<<<<<<< Updated upstream
       real, dimension(ir,ip) :: density
+=======
+>>>>>>> Stashed changes
   end module
 
   module cfield
@@ -106,8 +109,13 @@
 
   module useless
     use cimigrid_dim
+<<<<<<< Updated upstream
     real, dimension(ir,ip) :: ompe, CHpower, HIpower
     real, dimension(ns,ir,ip) :: TparaWP, TperpWP, HRPee, HRPii, denWP
+=======
+    real, dimension(ir,ip) :: density, ompe, CHpower, HIpower
+    real, dimension(ns,ir,ip) :: denWP, TparaWP, TperpWP, HRPee, HRPii
+>>>>>>> Stashed changes
     real, dimension(ip) :: rppa
     real :: Lstar_max(0:ik), Lstar(ir,ip,0:ik)
   end module
@@ -123,6 +131,10 @@
     ! lat: -90 to 90 degrees with 5-degree intervals (37 values)
     real, parameter, dimension(nLat) :: latMATE = [(real(i-1)*dangleMATE - 90.0, i=1,nLat)]
     real, parameter, dimension(nt) :: tMATE = [(real(i-1)*dtMATE, i=1,nt)]
+<<<<<<< Updated upstream
     real, dimension(nRadial,nLon,nLat,nt) :: betaMATE, nPS_MATE
+=======
+    real, dimension(nRadial,nLon,nLat,nt) :: betaMATE
+>>>>>>> Stashed changes
     real, dimension(nRadial,nLon,nLat) :: weight1
   End Module
