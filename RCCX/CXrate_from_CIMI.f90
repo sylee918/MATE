@@ -18,11 +18,7 @@ Program CXrate_from_CIMI
    character(len=80) :: CIMI_flux_file
    real, dimension(ns,je) :: CXsigma
    real, dimension(ir,ip,ig) :: beta2D
-<<<<<<< Updated upstream
    real, allocatable :: beta1D(:), np1D(:), temp(:,:,:,:)
-=======
-   real, allocatable :: beta1D(:), temp(:,:,:,:)
->>>>>>> Stashed changes
    real, allocatable :: xGSE(:), yGSE(:), zGSE(:), xGSW(:), yGSW(:), zGSW(:)
    real :: bm_mirror
    real :: r_gse, lat_gse, lon_gse, dr, dlon, dlat, weight, wr, wlon, wlat
@@ -30,25 +26,18 @@ Program CXrate_from_CIMI
    real :: wr_w(-1:1), wlon_w(-1:1), wlat_w(-1:1)  ! 3개 포인트 (-1, 0, 1)
    integer :: ii, jj, kk
    real :: d, d2, d3
-<<<<<<< Updated upstream
    real, dimension(ir,ip) :: np2D
-=======
->>>>>>> Stashed changes
    COMMON /GEOPACK1/ST0,CT0,SL0,CL0,CTCL,STCL,CTSL,STSL,SFI,CFI, &
           SPS,CPS,DS3,CGST,SGST,PSI,A11,A21,A31,A12,A22,A32,A13,A23,A33, &
           E11,E21,E31,E12,E22,E32,E13,E23,E33
-
-<<<<<<< Updated upstream
    is=1  ! H+
 !   is=2  ! O+
 
    iRC=0
    iPS=1
       
-=======
 !   is=1  ! H+
    is=2  ! O+
->>>>>>> Stashed changes
 
    if (is==1) then
       CIMI_flux_file="/home/sylee/CIMI/output/June2008/2008164_MATE_h.fls"
@@ -56,10 +45,6 @@ Program CXrate_from_CIMI
       CIMI_flux_file="/home/sylee/CIMI/output/June2008/2008164_MATE_o.fls"
    endif
 
-<<<<<<< Updated upstream
-   
-=======
->>>>>>> Stashed changes
    nday=11
 
    intB=1 ; imod=2 ; ires=1
@@ -88,26 +73,20 @@ print*, intB, imod, ires, itype, tstart, dt, tmax, tint, rb, hlosscone, rc
 !do iday1=2008164,2008165
 do iday1=2008164,2008164+nday-1
    betaMATE = 0.
-<<<<<<< Updated upstream
    nPS_MATE = 0.
-=======
->>>>>>> Stashed changes
    do it=1,nt
    !do it=1,1
       it2=it2+1
 
       call read_CIMI_flux(CIMI_flux_file,it2,is)
-<<<<<<< Updated upstream
 !      if (iday1<2008168) cycle
 !      if (it<4) cycle
 
       print*, 'maxval(fl)', maxval(fl)
       print*, 'maxval(density)', maxval(density)
-=======
       if (iday1<2008168) cycle
 
       print*, 'maxval(fl)', maxval(fl)
->>>>>>> Stashed changes
       call ChargeExchangeCrossSection(CXsigma)
       phi=xmlt*pi/12
 
@@ -147,11 +126,7 @@ do iday1=2008164,2008164+nday-1
    !         npf=npf1+npf2-1
 
 
-<<<<<<< Updated upstream
             beta2D=0. 
-=======
-            beta2D=0.
->>>>>>> Stashed changes
             dlgE=log10(gride(is,2))-log10(gride(is,1))
             do iE=1, je
                sig=CXsigma(is,iE)
@@ -168,40 +143,25 @@ do iday1=2008164,2008164+nday-1
                enddo 
             enddo 
 
-<<<<<<< Updated upstream
             allocate(beta1D(npf), np1D(npf))
             beta1D=0.; np1D=0.
-=======
-            allocate(beta1D(npf))
-            beta1D=0.
->>>>>>> Stashed changes
             do iPA=1,ig
                bm_mirror=bo(i,j)*1e9/gridy(iPA)**2
                do k=1,npf1
                   if (bs1(k).lt.bm_mirror) then
                      beta1D(k) = beta1D(k) + beta2D(i,j,iPA)
-<<<<<<< Updated upstream
                      np1D(k) = np1D(k) + density(i,j)
-=======
->>>>>>> Stashed changes
                   endif
                enddo
 
                do k=1,npf2
                   if (bs2(k).lt.bm_mirror) then
                      beta1D(npf1+k) = beta1D(npf1+k) + beta2D(i,j,iPA)
-<<<<<<< Updated upstream
                      np1D(npf1+k) = np1D(npf1+k) + density(i,j)
                   endif
                enddo
             enddo
-!            print*, 'np1D_2', maxval(np1D)
-=======
-                  endif
-               enddo
-            enddo
->>>>>>> Stashed changes
-
+            print*, 'np1D_2', maxval(np1D)
             allocate(xGSE(npf), yGSE(npf), zGSE(npf), xGSW(npf), yGSW(npf), zGSW(npf))
 
             ! SM to GSE coordinate conversion
@@ -325,10 +285,7 @@ do iday1=2008164,2008164+nday-1
                            weight = wr_w(i_off) * wlon_w(j_off) * wlat_w(k_off)
                            
                            betaMATE(ii, jj, kk, it) = betaMATE(ii, jj, kk, it) + beta1D(k) * weight
-<<<<<<< Updated upstream
                            nPS_MATE(ii, jj, kk, it) = nPS_MATE(ii, jj, kk, it) + np1D(k) * weight
-=======
->>>>>>> Stashed changes
                            weight1(ii, jj, kk)      = weight1(ii, jj, kk) + weight
                         enddo
                      enddo
@@ -339,12 +296,7 @@ do iday1=2008164,2008164+nday-1
    !         print*, i, j, maxval(beta1D)
 
             deallocate(xGSE, yGSE, zGSE, xGSW, yGSW, zGSW)
-<<<<<<< Updated upstream
             deallocate(beta1D, np1D)
-=======
-            deallocate(beta1D)
->>>>>>> Stashed changes
-
          enddo iloop
          print*, 'it, j', it, j
       enddo jloop
@@ -352,27 +304,21 @@ do iday1=2008164,2008164+nday-1
       ! Normalize betaMATE by weight1
       where (weight1 > 0.0)
          betaMATE(:,:,:,it) = betaMATE(:,:,:,it) / weight1(:,:,:)
-<<<<<<< Updated upstream
          nPS_MATE(:,:,:,it) = nPS_MATE(:,:,:,it) / weight1(:,:,:)
-=======
->>>>>>> Stashed changes
       end where
 
    !if (iday1==2008166 .and. it==19) exit
    !if (iday1==2008164 .and. it==2) exit
-<<<<<<< Updated upstream
    !if (iday1==2008164 .and. it==4) exit
 
    enddo !it
 
    call write_4D(betaMATE,iday1,is,'RCCX')
    call write_4D(nPS_MATE,iday1,is,'nPS')
-=======
 
    enddo !it
 
    call write_4D(betaMATE,iday1,is)
->>>>>>> Stashed changes
 !   stop
 !if (iday1==2008166 .and. it==19) stop
 !if (iday1==2008164 .and. it==2) stop
