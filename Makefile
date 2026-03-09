@@ -2,6 +2,7 @@
 FC = mpif90 -fc=ifort
 
 flags = -O2 -mcmodel=medium
+#flags = -O2 -mcmodel=medium -h nomessage=878
 #flags = -mcmodel=medium -g -check all -warn external -warn declarations,interfaces -traceback
 #flags = -O2 -qopenmp -mcmodel=medium
 #flags = -fopenmp -mcmodel=medium -g -check all -traceback
