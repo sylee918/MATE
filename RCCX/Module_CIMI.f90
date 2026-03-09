@@ -106,8 +106,6 @@
 
   module useless
     use cimigrid_dim
-    real, dimension(ir,ip) :: ompe, CHpower, HIpower
-    real, dimension(ns,ir,ip) :: TparaWP, TperpWP, HRPee, HRPii, denWP
     real, dimension(ir,ip) :: density, ompe, CHpower, HIpower
     real, dimension(ns,ir,ip) :: denWP, TparaWP, TperpWP, HRPee, HRPii
     real, dimension(ip) :: rppa

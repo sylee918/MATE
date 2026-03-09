@@ -108,10 +108,10 @@
 !                  cx_calls = cx_calls + 1
 !               endif
                if (i_ChargeExchange .eq. 0) then
-                  ICX = 0.d0
-                  PSD_CX = 0.d0
+                  ICX = 0.d0     ! loss rate by CX
+                  PSD_CX = 0.d0  ! PSD of CX-created H
                endif
-               if (i_ChargeExchange .eq. 2) then
+               if (i_ChargeExchange .eq. 2) then  ! RCCX only
                   PSD_CX = 0.d0
                endif
                !print*, "ICX, Iph", ICX, Iph, rank
