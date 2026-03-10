@@ -127,7 +127,7 @@ contains
 
          do iday=start_ydoy-nt_bwd_CX,end_ydoy
             write(ydoy_str,'(I7.7)') iday
-            filename_RC = trim(PSCX_dir) // "nps_p_" // trim(ydoy_str) //  ".data"
+            filename_RC = trim(RCCX_dir) // "nps_p_" // trim(ydoy_str) //  ".data"
             call Read_beta_Ring_Current(filename_RC, PSdensity_PSCX)
             nps_PSCX(:,:,:,:,iday) = PSdensity_PSCX
          enddo
