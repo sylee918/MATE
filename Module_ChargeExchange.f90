@@ -11,7 +11,8 @@ IMPLICIT NONE
    real*8, dimension(nh) :: rho_ps
 !   integer, allocatable, dimension(:,:) :: nstep
    real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: nH0
-   real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,start_ydoy-nt_bwd_CX:end_ydoy) :: beta_RCCX
+   real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,start_ydoy-nt_bwd_CX:end_ydoy) :: beta_RCCX, beta_PSCX, nps_PSCX
+   real*8 :: vsig_1eV
 
 contains
 
@@ -24,7 +25,7 @@ contains
       integer :: flag
       real*8, intent(in) :: current_time
       real*8 :: ICX, PSD_CX
-      real*8 :: vrel, sigma, vsig_1eV, fac, cexo2, fac2, T_PS_eV, T_PS_K, ICX_i
+      real*8 :: vrel, sigma, fac, cexo2, fac2, T_PS_eV, T_PS_K, ICX_i
 !      real*8, allocatable :: beta_dt(:), nH_traj(:), vel2(:)
       real*8, dimension(nstep) :: beta_dt, nH_traj, vel2
       integer :: i, istep
@@ -86,8 +87,6 @@ contains
 
    End Subroutine Get_Beta_RCCX
 
-
-
    Subroutine Read_beta_Ring_Current(filename, beta_ring_current)
 
       IMPLICIT NONE
@@ -113,7 +112,56 @@ contains
 
 
 
-   Subroutine Read_Plasmasphere()
+   Subroutine Get_Beta_PSCX()
+
+      IMPLICIT NONE
+
+      real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: PSdensity_PSCX
+      character(len=100) :: filename_RC
+      character(len=7) :: ydoy_str, yearst
+      integer :: iday, nlen, IO_unit
+      logical :: iexist
+
+      if (start_ydoy/1000 .eq. end_ydoy/1000) then
+!         write(yearst, '(I4.4)') start_ydoy/1000
+
+         do iday=start_ydoy-nt_bwd_CX,end_ydoy
+            write(ydoy_str,'(I7.7)') iday
+            filename_RC = trim(PSCX_dir) // "nps_p_" // trim(ydoy_str) //  ".data"
+            call Read_beta_Ring_Current(filename_RC, PSdensity_PSCX)
+            nps_PSCX(:,:,:,:,iday) = PSdensity_PSCX
+         enddo
+      endif
+      beta_PSCX = nps_PSCX * vsig_1eV
+
+   End Subroutine Get_Beta_PSCX
+
+   Subroutine Read_Plasmasphere_CIMI()
+
+      IMPLICIT NONE
+      real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: PSdensity_PSCX
+      real, allocatable :: nps_PSCX_real(:,:,:,:)
+      character(len=100) :: filename
+      integer :: i, j, k, nlen, IO_unit
+      logical :: iexist
+
+      allocate(nps_PSCX_real(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX))
+
+      inquire(iolength=nlen) nps_PSCX_real
+      open(file=filename,newunit=IO_unit,form='unformatted',access='direct',recl=nlen,status='old')
+      read(IO_unit,rec=1) nps_PSCX_real
+      close(IO_unit)
+
+      PSdensity_PSCX = nps_PSCX_real*1.d0
+
+      deallocate(nps_PSCX_real)
+      
+
+   End Subroutine Read_Plasmasphere_CIMI
+
+
+
+   Subroutine Read_Plasmasphere_GCPM()
 
       IMPLICIT NONE
 
@@ -511,12 +559,12 @@ contains
    End Subroutine interpolate_exosphere
 
 
-   Subroutine nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1)
+   Subroutine nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1, beta_PSCX1)
 
       IMPLICIT NONE
       
       real*8, intent(in) :: one(7), current_time 
-      real*8, intent(out) :: nH1, beta_RCCX1
+      real*8, intent(out) :: nH1, beta_RCCX1, beta_PSCX1
       
       real*8 :: x, y, z, r, longitude, latitude
       real*8 :: r_min, r_max, lon_min, lon_max, lat_min, lat_max
@@ -599,6 +647,7 @@ contains
 !      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest)
 !      print*, 'nearest', i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday
       beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
+      beta_PSCX1 = beta_PSCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
 
       return
 
@@ -625,7 +674,7 @@ contains
       real*8, parameter :: max_ds = 1.d6
       real*8 :: x0, f0, trace_time
       integer :: ydoy, ii
-      real*8 ::  nps1, nH1, beta_RCCX1
+      real*8 ::  nps1, nH1, beta_RCCX1, beta_PSCX1
 
 
       istep = 0; flag=0
@@ -682,11 +731,11 @@ contains
 !         call nearest_grid_plasmasphere(one, nps1)
 !         call nearest_grid_exosphere(one, nH1)
 !         call nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1)
-         call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1)
+         call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
          !call interpolate_plasmasphere(one, nps1)
          !call interpolate_exosphere(one, nH1)
 !         beta_dt(istep) = nps1*dt
-         beta_dt(istep) = beta_RCCX1*dt
+         beta_dt(istep) = (beta_RCCX1+beta_PSCX1)*dt
          nH_traj(istep) = nH1
          vel2(istep) = vt**2
 !            print*, "beta_CX1, nps1, dt", beta_CX1, nps1, dt, rank
@@ -698,11 +747,11 @@ contains
             call calculate_final_timestep(old,one,dt,f0)
                istep = istep + 1
 !               call nearest_grid_plasmasphere(one, nps1)
-               call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1)
+               call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
                !call interpolate_plasmasphere(one, nps1)
                !call interpolate_exosphere(one, nH1)
 !               beta_dt(istep) = nps1*dt
-               beta_dt(istep) = beta_RCCX1*dt
+               beta_dt(istep) = (beta_RCCX1+beta_PSCX1)*dt
                nH_traj(istep) = nH1
                vel2(istep) = vt**2
          else if (radial_distance .gt. radial_boundary(2)) then

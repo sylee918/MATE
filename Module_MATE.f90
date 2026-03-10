@@ -288,17 +288,21 @@ contains
    Subroutine Physical_tag
       ! Example: tag = "GRCPX" or "GRC"
       integer i
-      character(len=1), dimension(n_physics) :: phy_name=''
+      character(len=2), dimension(n_physics) :: phy_name=''
 
       if (i_EarthGravity .eq. 1)           phy_name(1)='G'
       if (i_SolarRadiationPressure .eq. 1) phy_name(2)='R'
       if (i_CoriolisForce_GSE .eq. 1)      phy_name(3)='C'
       if (i_Photoionization .eq. 1)        phy_name(4)='P'
-      if (i_ChargeExchange .eq. 1)         phy_name(5)='X'
+!      if (i_ChargeExchange .ge. 1)         phy_name(5)='X'
+      if (i_ChargeExchange >= 1) then
+         write(tmp_char, '(I1)') i_ChargeExchange
+         phy_name(5) = 'X' // tmp_char
+      endif
 
       tag_phys = ''
       do i=1,n_physics
-         tag_phys = trim(tag_phys) // trim(phy_name(i))
+         tag_phys = trim(tag_phys) // trim(adjustl(phy_name(i)))
       enddo
 
       return
