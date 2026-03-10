@@ -12,6 +12,7 @@ IMPLICIT NONE
 !   integer, allocatable, dimension(:,:) :: nstep
    real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: nH0
    real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,start_ydoy-nt_bwd_CX:end_ydoy) :: beta_RCCX, beta_PSCX, nps_PSCX
+   real*8, parameter :: T_PS_eV=1.d0, T_PS_K=T_PS_eV*11604.525d0
 
 contains
 
@@ -24,23 +25,20 @@ contains
       integer :: flag
       real*8, intent(in) :: current_time
       real*8 :: ICX, PSD_CX
-      real*8 :: vrel, sigma, fac, cexo2, fac2, vsig_1eV, T_PS_eV, T_PS_K, ICX_i
+      real*8 :: vrel, sigma, fac, cexo2, fac2, vsig_1eV, ICX_i
 !      real*8, allocatable :: beta_dt(:), nH_traj(:), vel2(:)
       real*8, dimension(nstep) :: beta_dt, nH_traj, vel2
       integer :: i, istep
 
-      T_PS_eV = 1.d0 ! eV
-      T_PS_K = T_PS_eV * 11604.525 ! K
-
-      vrel = sqrt(2.d0*T_PS_eV*e/mH)*100.d0 ! cm/s
-      sigma = 5.d-15 ! cm^2
-      vsig_1eV = vrel * sigma
+!      vrel = sqrt(2.d0*T_PS_eV*e/mH)*100.d0 ! cm/s
+!      sigma = 5.d-15 ! cm^2
+!      vsig_1eV = vrel * sigma
+!      beta_PSCX = nps_PSCX * vsig_1eV
+!     >> Moved to Get_Beta_PSCX
 
       fac = 2.d0*kb/mH
       cexo2 = fac*T_PS_K
       fac2 = 1.d0/(pi*cexo2)**1.5
-
-      beta_PSCX = nps_PSCX * vsig_1eV
 
       beta_dt = 0.d0; nH_traj = 0.d0; vel2 = 0.d0
       call Trace_Again(iE,iv, ptl0, flag, current_time, beta_dt, nH_traj, vel2, istep)
@@ -122,6 +120,11 @@ contains
       character(len=7) :: ydoy_str, yearst
       integer :: iday, nlen, IO_unit
       logical :: iexist
+      real*8 :: vrel, sigma, vsig_1eV
+
+      vrel = sqrt(2.d0*T_PS_eV*e/mH)*100.d0 ! cm/s
+      sigma = 5.d-15 ! cm^2
+      vsig_1eV = vrel * sigma
 
       if (start_ydoy/1000 .eq. end_ydoy/1000) then
 !         write(yearst, '(I4.4)') start_ydoy/1000
@@ -133,6 +136,7 @@ contains
             nps_PSCX(:,:,:,:,iday) = PSdensity_PSCX
          enddo
       endif
+      beta_PSCX = vsig_1eV * nps_PSCX
 
    End Subroutine Get_Beta_PSCX
 

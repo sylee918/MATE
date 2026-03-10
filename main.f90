@@ -51,17 +51,16 @@
 
       if (i_ChargeExchange .eq. 1 .or. i_ChargeExchange .eq. 3) then
 !         call Read_Plasmasphere_GCPM
-         beta_RCCX = 0.d0 ; beta_PSCX = 0.d0
+         beta_RCCX = 0.d0 ; beta_PSCX = 0.d0 ; nps_PSCX = 0.d0 ; nps=0.d0
          call Get_Beta_PSCX()
 !         call Read_Exosphere    ! for CX-created nH
       endif
       if (i_ChargeExchange .eq. 2 .or. i_ChargeExchange .eq. 3) then
-         beta_RCCX = 0.d0 ; beta_PSCX = 0.d0
+         beta_RCCX = 0.d0 ; beta_PSCX = 0.d0 ; nps_PSCX = 0.d0 ; nps=0.d0
          call Get_Beta_RCCX() 
       endif
       if (i_ChargeExchange .eq. 0) then
-         beta_RCCX = 0.d0 ; beta_PSCX = 0.d0
-         nps = 0.d0
+         beta_RCCX = 0.d0 ; beta_PSCX = 0.d0 ; nps_PSCX = 0.d0 ; nps=0.d0
       endif
       
 
