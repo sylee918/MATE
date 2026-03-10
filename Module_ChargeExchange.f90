@@ -30,11 +30,6 @@ contains
       real*8, dimension(nstep) :: beta_dt, nH_traj, vel2
       integer :: i, istep
 
-      beta_dt = 0.d0; nH_traj = 0.d0; vel2 = 0.d0
-      call Trace_Again(iE,iv, ptl0, flag, current_time, beta_dt, nH_traj, vel2, istep)
-
-!      allocate(beta_dt(nstep(iv,iE)), nH_traj(nstep(iv,iE)), vel2(nstep(iv,iE)))
-
       T_PS_eV = 1.d0 ! eV
       T_PS_K = T_PS_eV * 11604.525 ! K
 
@@ -45,6 +40,13 @@ contains
       fac = 2.d0*kb/mH
       cexo2 = fac*T_PS_K
       fac2 = 1.d0/(pi*cexo2)**1.5
+
+      beta_PSCX = nps_PSCX * vsig_1eV
+
+      beta_dt = 0.d0; nH_traj = 0.d0; vel2 = 0.d0
+      call Trace_Again(iE,iv, ptl0, flag, current_time, beta_dt, nH_traj, vel2, istep)
+
+!      allocate(beta_dt(nstep(iv,iE)), nH_traj(nstep(iv,iE)), vel2(nstep(iv,iE)))
 
       ! PSD_CX is the PSD of CX-created nH. Below is not necessary for RCCX.
 !      PSD_CX = 0.d0
@@ -132,7 +134,6 @@ contains
             nps_PSCX(:,:,:,:,iday) = PSdensity_PSCX
          enddo
       endif
-      beta_PSCX = nps_PSCX * vsig_1eV
 
    End Subroutine Get_Beta_PSCX
 
