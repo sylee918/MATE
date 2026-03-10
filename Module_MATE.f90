@@ -289,7 +289,8 @@ contains
       ! Example: tag = "GRCPX" or "GRC"
       integer i
       character(len=2), dimension(n_physics) :: phy_name=''
-
+      character(len=1) :: tmp_char  ! 숫자를 문자로 잠시 담을 변수
+      
       if (i_EarthGravity .eq. 1)           phy_name(1)='G'
       if (i_SolarRadiationPressure .eq. 1) phy_name(2)='R'
       if (i_CoriolisForce_GSE .eq. 1)      phy_name(3)='C'
