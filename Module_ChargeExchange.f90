@@ -12,7 +12,6 @@ IMPLICIT NONE
 !   integer, allocatable, dimension(:,:) :: nstep
    real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: nH0
    real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,start_ydoy-nt_bwd_CX:end_ydoy) :: beta_RCCX, beta_PSCX, nps_PSCX
-   real*8 :: vsig_1eV
 
 contains
 
@@ -25,7 +24,7 @@ contains
       integer :: flag
       real*8, intent(in) :: current_time
       real*8 :: ICX, PSD_CX
-      real*8 :: vrel, sigma, fac, cexo2, fac2, T_PS_eV, T_PS_K, ICX_i
+      real*8 :: vrel, sigma, fac, cexo2, fac2, vsig_1eV, T_PS_eV, T_PS_K, ICX_i
 !      real*8, allocatable :: beta_dt(:), nH_traj(:), vel2(:)
       real*8, dimension(nstep) :: beta_dt, nH_traj, vel2
       integer :: i, istep
@@ -130,7 +129,7 @@ contains
          do iday=start_ydoy-nt_bwd_CX,end_ydoy
             write(ydoy_str,'(I7.7)') iday
             filename_RC = trim(RCCX_dir) // "nPS_p_" // trim(ydoy_str) //  ".data"
-            call Read_beta_Ring_Current(filename_RC, PSdensity_PSCX)
+            call Read_Plasmasphere_CIMI(filename_RC, PSdensity_PSCX)
             nps_PSCX(:,:,:,:,iday) = PSdensity_PSCX
          enddo
       endif
