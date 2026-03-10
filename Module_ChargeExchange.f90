@@ -136,7 +136,7 @@ contains
             nps_PSCX(:,:,:,:,iday) = PSdensity_PSCX
          enddo
       endif
-      beta_PSCX = vsig_1eV * nps_PSCX
+      beta_PSCX = nps_PSCX * vsig_1eV
 
    End Subroutine Get_Beta_PSCX
 
@@ -622,7 +622,8 @@ contains
       i_lat_nearest = nint((latitude-lat_min)/dlat1) + 1
 
       year_doy_frac = mod(current_time, 1000.d0)
-      iday = int(year_doy_frac)
+!      iday = int(year_doy_frac)
+      iday = int(current_time)
       
       frac_day = year_doy_frac - dble(iday)
       
