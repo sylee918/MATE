@@ -118,7 +118,7 @@ contains
       IMPLICIT NONE
 
       real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: PSdensity_PSCX
-      character(len=100) :: filename_RC
+      character(len=100) :: filename_PS
       character(len=7) :: ydoy_str, yearst
       integer :: iday, nlen, IO_unit
       logical :: iexist
@@ -128,15 +128,15 @@ contains
 
          do iday=start_ydoy-nt_bwd_CX,end_ydoy
             write(ydoy_str,'(I7.7)') iday
-            filename_RC = trim(RCCX_dir) // "nPS_p_" // trim(ydoy_str) //  ".data"
-            call Read_Plasmasphere_CIMI(filename_RC, PSdensity_PSCX)
+            filename_PS = trim(RCCX_dir) // "nPS_p_" // trim(ydoy_str) //  ".data"
+            call Read_Plasmasphere_CIMI(filename_PS, PSdensity_PSCX)
             nps_PSCX(:,:,:,:,iday) = PSdensity_PSCX
          enddo
       endif
 
    End Subroutine Get_Beta_PSCX
 
-   Subroutine Read_Plasmasphere_CIMI(filename_RC, PSdensity_PSCX)
+   Subroutine Read_Plasmasphere_CIMI(filename, PSdensity_PSCX)
 
       IMPLICIT NONE
       real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: PSdensity_PSCX
