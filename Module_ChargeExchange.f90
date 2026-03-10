@@ -136,7 +136,7 @@ contains
 
    End Subroutine Get_Beta_PSCX
 
-   Subroutine Read_Plasmasphere_CIMI()
+   Subroutine Read_Plasmasphere_CIMI(filename_RC, PSdensity_PSCX)
 
       IMPLICIT NONE
       real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: PSdensity_PSCX
