@@ -203,7 +203,7 @@ contains
       Tps = 0.d0 !! FIX ME!!
 
 
-   End Subroutine Read_Plasmasphere
+   End Subroutine Read_Plasmasphere_GCPM
 
 
    Subroutine interpolate_plasmasphere(one, nps1)
