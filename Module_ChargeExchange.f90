@@ -49,7 +49,9 @@ contains
 !      PSD_CX = 0.d0
 !      do i=1,istep
 !         ICX_i = sum(beta_dt(1:i)) * vsig_1eV
-!         PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
+!!         PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
+!         PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
+!           >> beta_dt(i) 대신에 beta_PSCX(i)를 사용해야 함. RCCX도 섞여있음.
 !      enddo
 !      ICX = sum(beta_dt) * vsig_1eV
 
@@ -136,7 +138,7 @@ contains
             nps_PSCX(:,:,:,:,iday) = PSdensity_PSCX
          enddo
       endif
-      beta_PSCX = nps_PSCX * vsig_1eV
+      beta_PSCX = nps_PSCX * vsig_1eV * 1e-6 ! m^-3 to cm^-3
 
    End Subroutine Get_Beta_PSCX
 
