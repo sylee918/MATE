@@ -649,13 +649,6 @@ contains
          iday = Beta_CX_Start_Time_in_YYYYDOY
          it_nearest = 1
 
-!! Special case for 2008164 run for CIMI plasmasphere (nPS)
-!! The nPS data is 0 for the first 3 hour in 2008/164.
-!! So the lower bound of it_nearest is 4 for 2008/164.
-         if (iday == 2008164 .and. it_nearest <= 3) then
-            it_nearest = 4
-         endif
-
       endif
 
       ! -----------------------------------------------------------
@@ -664,6 +657,15 @@ contains
 !      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest)
 !      print*, 'nearest', i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday
       beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
+
+!! FIX ME !!
+!! Special case for 2008164 run for CIMI plasmasphere (nPS)
+!! The nPS data is 0 for the first 3 hour in 2008/164.
+!! So the lower bound of it_nearest is 4 for 2008/164.
+!! Delete this part when using the new nPS data.
+      if (iday == 2008164 .and. it_nearest <= 3) then
+         it_nearest = 4
+      endif
       beta_PSCX1 = beta_PSCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
 
       return
