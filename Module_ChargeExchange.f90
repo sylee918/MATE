@@ -612,6 +612,8 @@ contains
       if (i_r_nearest .lt. 1) i_r_nearest = 1
       if (i_r_nearest .gt. nRadial) then
          nH1 = 0.d0
+         beta_RCCX1=0.d0
+         beta_PSCX1=0.d0
          return
       endif
 
@@ -635,17 +637,25 @@ contains
       
       ! 경계 처리: 23:30 이상(hour_val > 23.5)이 되어 반올림으로 25가 될 경우
       ! 0시(index 1)로 순환
-      if (it_nearest > 24) then
+      if (it_nearest > ntperday_CX) then
          it_nearest = 1
          iday=iday+1
       endif
       if (it_nearest < 1) then
-         it_nearest = 24
+         it_nearest = ntperday_CX
          iday=iday-1
       endif
       if (iday < Beta_CX_Start_Time_in_YYYYDOY) then
          iday = Beta_CX_Start_Time_in_YYYYDOY
          it_nearest = 1
+
+!! Special case for 2008164 run for CIMI plasmasphere (nPS)
+!! The nPS data is 0 for the first 3 hour in 2008/164.
+!! So the lower bound of it_nearest is 4 for 2008/164.
+         if (iday == 2008164 .and. it_nearest <= 3) then
+            it_nearest = 4
+         endif
+
       endif
 
       ! -----------------------------------------------------------

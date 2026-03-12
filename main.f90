@@ -70,7 +70,9 @@
 
       total_valid_tasks = 0
       do ilat = 1, nLat_NS
-         ! --- 위도별 경도 간격 설정 로직 (기존 코드 유지) ---
+         ! i_Dayside_1D 모드인 경우 적도(nLat)만 통과
+         if (i_Dayside_1D .eq. 1 .and. ilat .ne. nLat) cycle
+
          if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then
             nLon0 = 1
          else
@@ -79,13 +81,15 @@
     
          dnLon0 = 1 ! 기본값 (Full mode or Equator)
          if (i_Three_Slices .eq. 1) then
-!            if (ilat .gt. nLat .and. ilat .lt. nLat_NS) then
             if (ilat .ne. nLat .and. ilat .ne. 1 .and. ilat .ne. nLat_NS) then
                dnLon0 = nLon0 / 4 ! 90도 간격
             endif
          endif
     
          do ilon = 1, nLon0, dnLon0
+            ! i_Dayside_1D 모드인 경우 첫 번째 경도(0)만 통과
+            if (i_Dayside_1D .eq. 1 .and. ilon .ne. 1) cycle
+
             do irad = 1, nRadial
                total_valid_tasks = total_valid_tasks + 1
             end do
@@ -118,17 +122,22 @@
             global_task_idx = 0
 
             do ilat=1,nLat_NS
+               ! i_Dayside_1D 모드인 경우 적도(nLat)만 통과
+               if (i_Dayside_1D .eq. 1 .and. ilat .ne. nLat) cycle
+
                lat = latitudeNS_range(ilat)
                if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
                dnLon0 = 1
                if (i_Three_Slices .eq. 1) then
-!                  if (ilat .gt. nLat .and. ilat .lt. nLat_NS) then
                   if (ilat .ne. nLat .and. ilat .ne. 1 .and. ilat .ne. nLat_NS) then
                      dnLon0=nLon0/4
                   endif
                endif
 
                do ilon=1,nLon0,dnLon0
+                  ! i_Dayside_1D 모드인 경우 첫 번째 경도(0)만 통과
+                  if (i_Dayside_1D .eq. 1 .and. ilon .ne. 1) cycle
+
                   lon = longitude_range(ilon)
 !                  i1 = ilon-1 + (ilat-nLat)*nLong      ! starts from 0
                   do irad=1,nRadial
@@ -136,6 +145,7 @@
                      global_task_idx = global_task_idx + 1  
 
                      if (i_Full_3D .eq. 1) then
+                        i1 = (ilon-1) + (ilat-nLat)*nLong
                         grid_point_idx = i1*nRadial + irad-1
                         if (grid_point_idx >= start_grid .and. grid_point_idx <= end_grid) then
                            print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
@@ -145,11 +155,9 @@
                         endif
                      endif
 
-                     if (i_Three_Slices .eq. 1) then
-!                       ** 핵심: 현재 인덱스가 내 담당 구간인지 확인 **
+                     if (i_Three_Slices .eq. 1 .or. i_Dayside_1D .eq. 1) then
                         if (global_task_idx >= my_start_idx .and. global_task_idx <= my_end_idx) then
-                           ! === [여기에 실제 물리 계산 코드 삽입] ===
-                            print *, "Rank", rank, "computing idx:", global_task_idx                    
+                           print *, "Rank", rank, "computing idx:", global_task_idx                    
                            print '(a, i4, i4)', "(LON, LAT) = ", int(lon*180/pi), int(lat*180/pi)
 
                            call Calculate_Density(current_time, number_density_0D)                      
@@ -158,7 +166,6 @@
                      endif
 
                   enddo ! irad
-
                enddo ! ilon
             enddo ! ilat
          enddo ! ihour

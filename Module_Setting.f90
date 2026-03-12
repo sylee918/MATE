@@ -36,7 +36,8 @@ MODULE SETTING
 
 !! Output Setting !!
    integer, parameter ::      i_Full_3D                        = 0                          ! 0 for turn off / 1 for turn on
-   integer, parameter ::      i_Three_Slices                   = 1                          ! 0 for turn off / 1 for turn on
+   integer, parameter ::      i_Three_Slices                   = 0                          ! 0 for turn off / 1 for turn on
+   integer, parameter ::      i_Dayside_1D                     = 1                          ! 0 for turn off / 1 for turn on
 
 !! TIME SETTING !!
    integer, parameter ::      Start_Time_in_YYYYDOY          = 2008166
