@@ -27,35 +27,32 @@ contains
       real*8 :: ICX, PSD_CX
       real*8 :: vrel, sigma, fac, cexo2, fac2, vsig_1eV, ICX_i
 !      real*8, allocatable :: beta_dt(:), nH_traj(:), vel2(:)
-      real*8, dimension(nstep) :: beta_dt, nH_traj, vel2
+      real*8, dimension(nstep) :: beta_RCCX_dt, beta_PSCX_dt, nH_traj, vel2
       integer :: i, istep
 
-!      vrel = sqrt(2.d0*T_PS_eV*e/mH)*100.d0 ! cm/s
-!      sigma = 5.d-15 ! cm^2
-!      vsig_1eV = vrel * sigma
-!      beta_PSCX = nps_PSCX * vsig_1eV
-!     >> Moved to Get_Beta_PSCX
+      vrel = sqrt(2.d0*T_PS_eV*e/mH)*100.d0 ! cm/s
+      sigma = 5.d-15 ! cm^2
+      vsig_1eV = vrel * sigma
 
       fac = 2.d0*kb/mH
       cexo2 = fac*T_PS_K
       fac2 = 1.d0/(pi*cexo2)**1.5
 
-      beta_dt = 0.d0; nH_traj = 0.d0; vel2 = 0.d0
-      call Trace_Again(iE,iv, ptl0, flag, current_time, beta_dt, nH_traj, vel2, istep)
+      beta_RCCX_dt = 0.d0; beta_PSCX_dt = 0.d0; nH_traj = 0.d0; vel2 = 0.d0
+      call Trace_Again(iE,iv, ptl0, flag, current_time, beta_RCCX_dt, beta_PSCX_dt, nH_traj, vel2, istep)
+      beta_PSCX_dt = beta_PSCX_dt * vsig_1eV
 
 !      allocate(beta_dt(nstep(iv,iE)), nH_traj(nstep(iv,iE)), vel2(nstep(iv,iE)))
 
       ! PSD_CX is the PSD of CX-created nH. Below is not necessary for RCCX.
-!      PSD_CX = 0.d0
-!      do i=1,istep
-!         ICX_i = sum(beta_dt(1:i)) * vsig_1eV
-!!         PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
-!         PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
-!           >> beta_dt(i) 대신에 beta_PSCX(i)를 사용해야 함. RCCX도 섞여있음.
-!      enddo
-!      ICX = sum(beta_dt) * vsig_1eV
+      PSD_CX = 0.d0
+      do i=1,istep
+         ICX_i = sum(beta_PSCX_dt(1:i))
+!         PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
+         PSD_CX = PSD_CX + abs(beta_PSCX_dt(i)) * nH_traj(i) * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
+      enddo
 
-      ICX = sum(beta_dt)
+      ICX = sum(beta_RCCX_dt + beta_PSCX_dt)
       ICX = abs(ICX)*(-1.d0)  ! Make sure to be negative.
 
 !      deallocate(beta_dt, nH_traj, vel2)
@@ -122,11 +119,7 @@ contains
       character(len=7) :: ydoy_str, yearst
       integer :: iday, nlen, IO_unit
       logical :: iexist
-      real*8 :: vrel, sigma, vsig_1eV
-
-      vrel = sqrt(2.d0*T_PS_eV*e/mH)*100.d0 ! cm/s
-      sigma = 5.d-15 ! cm^2
-      vsig_1eV = vrel * sigma
+      real*8 :: vrel, sigma
 
       if (start_ydoy/1000 .eq. end_ydoy/1000) then
 !         write(yearst, '(I4.4)') start_ydoy/1000
@@ -138,7 +131,7 @@ contains
             nps_PSCX(:,:,:,:,iday) = PSdensity_PSCX
          enddo
       endif
-      beta_PSCX = nps_PSCX * vsig_1eV * 1e-6 ! m^-3 to cm^-3
+      beta_PSCX = nps_PSCX * 1e-6 ! m^-3 to cm^-3
 
    End Subroutine Get_Beta_PSCX
 
@@ -674,7 +667,7 @@ contains
 
 
 
-   Subroutine Trace_Again(iE,iv, ptl0,flag, current_time, beta_dt, nH_traj, vel2, istep)
+   Subroutine Trace_Again(iE,iv, ptl0,flag, current_time, beta_RCCX_dt, beta_PSCX_dt, nH_traj, vel2, istep)
 
       USE SOLAR_LYMAN_ALPHA, only: Lya
       IMPLICIT NONE
@@ -685,7 +678,7 @@ contains
       real*8, dimension(7) :: one, old
       real*8, intent(in) :: current_time
 !      real*8, dimension(nstep(iv,iE)) :: beta_dt, nH_traj, vel2
-      real*8, dimension(nstep) :: beta_dt, nH_traj, vel2
+      real*8, dimension(nstep) :: beta_RCCX_dt, beta_PSCX_dt, nH_traj, vel2
       integer :: flag     ! 0: orbiting Earth t<tmax;   1: into exobase;  2: out of outer boundary;  3: orbiting but t>tmax
       real*8 :: radial_distance, radial_distance_old
       integer :: i
@@ -754,7 +747,8 @@ contains
          !call interpolate_plasmasphere(one, nps1)
          !call interpolate_exosphere(one, nH1)
 !         beta_dt(istep) = nps1*dt
-         beta_dt(istep) = (beta_RCCX1+beta_PSCX1)*dt
+         beta_RCCX_dt(istep) = beta_RCCX1*dt
+         beta_PSCX_dt(istep) = beta_PSCX1*dt
          nH_traj(istep) = nH1
          vel2(istep) = vt**2
 !            print*, "beta_CX1, nps1, dt", beta_CX1, nps1, dt, rank
@@ -770,7 +764,8 @@ contains
                !call interpolate_plasmasphere(one, nps1)
                !call interpolate_exosphere(one, nH1)
 !               beta_dt(istep) = nps1*dt
-               beta_dt(istep) = (beta_RCCX1+beta_PSCX1)*dt
+               beta_RCCX_dt(istep) = beta_RCCX1*dt
+               beta_PSCX_dt(istep) = beta_PSCX1*dt
                nH_traj(istep) = nH1
                vel2(istep) = vt**2
          else if (radial_distance .gt. radial_boundary(2)) then
