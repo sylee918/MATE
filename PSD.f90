@@ -126,6 +126,7 @@
 !               each_n(iv,iE) = PSD_exobase * dV2(iE,iv)
 !               PSD_CX=0.d0
                each_n(iv,iE) = (PSD_exobase + PSD_CX) * dV2(iE,iv)
+               print *, "PSD_CX = ", PSD_CX, " PSD_exobase = ", PSD_exobase
 
          enddo
       enddo
