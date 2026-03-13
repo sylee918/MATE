@@ -54,7 +54,7 @@
 !         call Read_Plasmasphere_GCPM
          beta_RCCX = 0.d0 ; beta_PSCX = 0.d0 ; nps_PSCX = 0.d0 ; nps=0.d0
          call Get_Beta_PSCX()
-!         call Read_Exosphere    ! for CX-created nH
+!         call Read_Exosphere_GCPM    ! for CX-created nH
       endif
       if (i_ChargeExchange .eq. 2 .or. i_ChargeExchange .eq. 3) then
          beta_RCCX = 0.d0 ; beta_PSCX = 0.d0 ; nps_PSCX = 0.d0 ; nps=0.d0
@@ -180,7 +180,7 @@
                enddo
                nH0(:,:,:,it,iday) = number_density_3D(:,:,:)
             endif
-            call MPI_BROADCAST(nH0(:,:,:,it,iday), N_REDUCE, MPI_DOUBLE, 0, MPI_COMM_WORLD, ierr)
+            call MPI_BCAST(nH0(:,:,:,it,iday), N_REDUCE, MPI_DOUBLE, 0, MPI_COMM_WORLD, ierr)
 
          enddo ! ihour
 

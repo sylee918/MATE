@@ -395,7 +395,7 @@ contains
    End Subroutine nearest_grid_plasmasphere
 
 
-   Subroutine Read_Exosphere()
+   Subroutine Read_Exosphere_GCPM()
 
       IMPLICIT NONE
 
@@ -419,19 +419,20 @@ contains
          close(IO_unit)
       endif
       
-      nH0 = nH_temp*1.d0
+      nH0(:,:,:,:,start_ydoy-nt_bwd_CX) = nH_temp*1.d0
       deallocate(nH_temp)
 
       return
 
-   End Subroutine Read_Exosphere
+   End Subroutine Read_Exosphere_GCPM
 
 
-   Subroutine interpolate_exosphere(one, nH1)
+   Subroutine interpolate_exosphere(current_time, one, nH1)
 
       IMPLICIT NONE
       
       real*8, dimension(7) :: one
+      real*8, intent(in) :: current_time
       real*8 :: nH1
       
       real*8 :: x, y, z, r, longitude, latitude
@@ -441,6 +442,7 @@ contains
       real*8 :: w_r1, w_r2, w_lon1, w_lon2, w_lat1, w_lat2
       real*8 :: nH_interp
       real*8 :: d_r, d_lon, d_lat
+      integer :: iday
       
       ! Read exosphere data
       !call Read_Exosphere(nH0)
@@ -542,16 +544,17 @@ contains
       i_time = 1
       nH_interp = 0.d0
       
+      iday = int(current_time)
       ! 8개 corner points에 대한 interpolation
       nH_interp = nH_interp + &
-                   w_r1 * w_lon1 * w_lat1 * nH0(i_r1, i_lon1, i_lat1, i_time) + &
-                   w_r2 * w_lon1 * w_lat1 * nH0(i_r2, i_lon1, i_lat1, i_time) + &
-                   w_r1 * w_lon2 * w_lat1 * nH0(i_r1, i_lon2, i_lat1, i_time) + &
-                   w_r2 * w_lon2 * w_lat1 * nH0(i_r2, i_lon2, i_lat1, i_time) + &
-                   w_r1 * w_lon1 * w_lat2 * nH0(i_r1, i_lon1, i_lat2, i_time) + &
-                   w_r2 * w_lon1 * w_lat2 * nH0(i_r2, i_lon1, i_lat2, i_time) + &
-                   w_r1 * w_lon2 * w_lat2 * nH0(i_r1, i_lon2, i_lat2, i_time) + &
-                   w_r2 * w_lon2 * w_lat2 * nH0(i_r2, i_lon2, i_lat2, i_time)
+                   w_r1 * w_lon1 * w_lat1 * nH0(i_r1, i_lon1, i_lat1, i_time, iday) + &
+                   w_r2 * w_lon1 * w_lat1 * nH0(i_r2, i_lon1, i_lat1, i_time, iday) + &
+                   w_r1 * w_lon2 * w_lat1 * nH0(i_r1, i_lon2, i_lat1, i_time, iday) + &
+                   w_r2 * w_lon2 * w_lat1 * nH0(i_r2, i_lon2, i_lat1, i_time, iday) + &
+                   w_r1 * w_lon1 * w_lat2 * nH0(i_r1, i_lon1, i_lat2, i_time, iday) + &
+                   w_r2 * w_lon1 * w_lat2 * nH0(i_r2, i_lon1, i_lat2, i_time, iday) + &
+                   w_r1 * w_lon2 * w_lat2 * nH0(i_r1, i_lon2, i_lat2, i_time, iday) + &
+                   w_r2 * w_lon2 * w_lat2 * nH0(i_r2, i_lon2, i_lat2, i_time, iday)
       
       nH1 = nH_interp
       
@@ -647,7 +650,7 @@ contains
       ! -----------------------------------------------------------
 
 
-      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest)
+      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
 !      print*, 'nearest', i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday
       beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
 
@@ -745,7 +748,7 @@ contains
 !         call nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1)
          call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
          !call interpolate_plasmasphere(one, nps1)
-         !call interpolate_exosphere(one, nH1)
+         !call interpolate_exosphere(current_time, one, nH1)
 !         beta_dt(istep) = nps1*dt
          beta_RCCX_dt(istep) = beta_RCCX1*dt
          beta_PSCX_dt(istep) = beta_PSCX1*dt
