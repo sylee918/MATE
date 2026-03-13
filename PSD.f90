@@ -126,7 +126,11 @@
 !               each_n(iv,iE) = PSD_exobase * dV2(iE,iv)
 !               PSD_CX=0.d0
                each_n(iv,iE) = (PSD_exobase + PSD_CX) * dV2(iE,iv)
-               print *, "PSD_CX = ", PSD_CX, " PSD_exobase = ", PSD_exobase
+
+!               if (current_time .gt. 2008164+2.d0/24.d0-1d-5) then
+!                  print *, "current_time = ", real(current_time-2008000), " PSD_CX = ", real(PSD_CX), " PSD_exobase = ", real(PSD_exobase)
+!               endif
+
 
          enddo
       enddo

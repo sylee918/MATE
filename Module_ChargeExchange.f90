@@ -51,6 +51,8 @@ contains
 !         PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
          PSD_CX = PSD_CX + abs(beta_PSCX_dt(i)) * nH_traj(i) * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
       enddo
+!      print*, 'PSD_CX', PSD_CX
+!      print*, 'maxval(nH_traj)', maxval(nH_traj)
 
       ICX = sum(beta_RCCX_dt + beta_PSCX_dt)
       ICX = abs(ICX)*(-1.d0)  ! Make sure to be negative.
@@ -651,6 +653,7 @@ contains
 
 
       nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
+!      print*, 'nH1', nH1
 !      print*, 'nearest', i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday
       beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
 

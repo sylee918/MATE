@@ -64,6 +64,8 @@
          beta_RCCX = 0.d0 ; beta_PSCX = 0.d0 ; nps_PSCX = 0.d0 ; nps=0.d0
       endif
       
+      !! ERASE ME !!
+!      nH0(:,:,:,1,Start_Time_in_YYYYDOY) = 1.d0
 
       if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not module, just making .in file
 
@@ -179,6 +181,15 @@
                   number_density_3D(:,ilon,nLat_NS) = number_density_3D(:,1,nLat_NS)   ! North pole
                enddo
                nH0(:,:,:,it,iday) = number_density_3D(:,:,:)
+
+               if (i_Dayside_1D .eq. 1) then
+                  do ilat=1,nLat_NS
+                     do ilon=1,nLong
+                        nH0(:,ilon,ilat,it,iday) = nH0(:,1,nLat,it,iday)
+                     enddo
+                  enddo
+               endif
+
             endif
             call MPI_BCAST(nH0(:,:,:,it,iday), N_REDUCE, MPI_DOUBLE, 0, MPI_COMM_WORLD, ierr)
 

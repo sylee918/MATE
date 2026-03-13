@@ -32,7 +32,7 @@ MODULE SETTING
 !!**** Recommended to change the parameters for your run ***!!
 
 !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-   character*20, parameter :: Runname_in_10char              = "PSonly1"
+   character*20, parameter :: Runname_in_10char              = "test"
 
 !! Output Setting !!
    integer, parameter ::      i_Full_3D                        = 0                          ! 0 for turn off / 1 for turn on
@@ -40,9 +40,9 @@ MODULE SETTING
    integer, parameter ::      i_Dayside_1D                     = 1                          ! 0 for turn off / 1 for turn on
 
 !! TIME SETTING !!
-   integer, parameter ::      Start_Time_in_YYYYDOY          = 2008166
-   integer, parameter ::      End_Time_in_YYYYDOY            = 2008168
-   integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
+   integer, parameter ::      Start_Time_in_YYYYDOY          = 2008164
+   integer, parameter ::      End_Time_in_YYYYDOY            = 2008164
+   integer, parameter ::      Output_Time_Interval_in_Minute = 60
 
 !! 3-D SPATIAL RESOLUTIONS !!
    integer, parameter ::      GEO_Resolution_in_Degree       = 5
@@ -51,7 +51,7 @@ MODULE SETTING
    real*8, parameter  ::      dR                             = 0.5
 
 !! Number of Particle Direction !!
-   integer, parameter ::      dV_theta                         = 6                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
+   integer, parameter ::      dV_theta                         = 30                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
    integer, parameter ::      nTheta                           = 180/dV_theta + 1          ! # of theta grids
 
 !! (FIX ME!!) Energy Grid !!
@@ -59,16 +59,18 @@ MODULE SETTING
 
 !! DIRECTORIES SETTING !!
    character*70, parameter :: Lya_dir                          = "OMNI_extended.txt"         ! 1964 - 2024 (Oct)
-   character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
+!   character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
+   character*70, parameter :: BC_dir                           = "/home/sylee/exospherecode/TIMEGCM/BC/"
+   
    character*70, parameter :: RCCX_dir                         = "RCCX/output/"
-   character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0728/"
-!   character*70, parameter :: outdir                           = "/home/sylee/exospherecode/MATE/output/0728/"
+!   character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0728/"
+   character*70, parameter :: outdir                           = "/home/sylee/exospherecode/MATE/output/0728/"
 
 !! Including Physics !!
    integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
    integer, parameter ::      i_SolarRadiationPressure         = 1                          ! If you set these values as N, then the force is N-times stronger as a coefficient.
    integer, parameter ::      i_CoriolisForce_GSE              = 1
-   integer, parameter ::      i_Photoionization                = 0
+   integer, parameter ::      i_Photoionization                = 1
    integer, parameter ::      i_ChargeExchange                 = 1                          ! (1,2,3) for (PS,RC,both)
 
 !! Exobase Boundary Condition (BC) Setting !!
