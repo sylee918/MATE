@@ -10,7 +10,7 @@ IMPLICIT NONE
    real*8 :: rho(nh), MLT(nMLT), zps(nz)
    real*8, dimension(nh) :: rho_ps
 !   integer, allocatable, dimension(:,:) :: nstep
-   real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: nH0
+   real*8, dimension(nRadial,nLon,nLat_NS,ntperday,start_ydoy-nt_bwd_CX:end_ydoy) :: nH0
    real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,start_ydoy-nt_bwd_CX:end_ydoy) :: beta_RCCX, beta_PSCX, nps_PSCX
    real*8, parameter :: T_PS_eV=1.d0, T_PS_K=T_PS_eV*11604.525d0
 
@@ -647,7 +647,7 @@ contains
       ! -----------------------------------------------------------
 
 
-!      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest)
+      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest)
 !      print*, 'nearest', i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday
       beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
 

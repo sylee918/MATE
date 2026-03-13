@@ -14,6 +14,7 @@
       external Trace_particle, Calculate_Density
       external write_density_4D, Make_Parameters_OutFile
 
+      real*8, dimension(nRadial,nLon,nLat_NS) :: number_density_3D
       real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: number_density_4D, number_density_4D_MPI
       real*8, allocatable, dimension(:,:,:) :: ptl
       integer, allocatable, dimension(:,:) :: flags
@@ -168,20 +169,34 @@
                   enddo ! irad
                enddo ! ilon
             enddo ! ilat
+
+            call MPI_BARRIER(MPI_COMM_WORLD, ierr)
+            N_REDUCE = nRadial * nLon * nLat_NS
+            call MPI_REDUCE(number_density_4D_MPI(:,:,:,it), number_density_3D, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
+            if (rank .eq. 0) then
+               do ilon=2,nLong
+                  number_density_3D(:,ilon,1)       = number_density_3D(:,1,1)         ! South pole
+                  number_density_3D(:,ilon,nLat_NS) = number_density_3D(:,1,nLat_NS)   ! North pole
+               enddo
+               nH0(:,:,:,it,iday) = number_density_3D(:,:,:)
+            endif
+            call MPI_BROADCAST(nH0(:,:,:,it,iday), N_REDUCE, MPI_DOUBLE, 0, MPI_COMM_WORLD, ierr)
+
          enddo ! ihour
 
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
-         N_REDUCE = nRadial * nLon * nLat_NS * ntperday
-         call MPI_REDUCE(number_density_4D_MPI, number_density_4D, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
+!         N_REDUCE = nRadial * nLon * nLat_NS * ntperday
+!         call MPI_REDUCE(number_density_4D_MPI, number_density_4D, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
          if (rank .eq. 0) then
-            do it=1,ntperday
-               do ilon=2,nLong
-                  number_density_4D(:,ilon,1,it)       = number_density_4D(:,1,1,it)         ! South pole
-                  number_density_4D(:,ilon,nLat_NS,it) = number_density_4D(:,1,nLat_NS,it)   ! North pole
-               enddo
-            enddo ! it
-
+!            do it=1,ntperday
+!               do ilon=2,nLong
+!                  number_density_4D(:,ilon,1,it)       = number_density_4D(:,1,1,it)         ! South pole
+!                  number_density_4D(:,ilon,nLat_NS,it) = number_density_4D(:,1,nLat_NS,it)   ! North pole
+!               enddo
+!            enddo ! it
+            number_density_4D(:,:,:,:) = nH0(:,:,:,:,iday)
             call write_density_4D(number_density_4D, iday)
+
          endif
 
       enddo ! iday
