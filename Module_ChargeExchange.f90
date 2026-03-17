@@ -54,6 +54,12 @@ contains
 !      print*, 'PSD_CX', PSD_CX
 !      print*, 'maxval(nH_traj)', maxval(nH_traj)
 
+!! FIX ME !!
+      if (PSD_CX < 0.d0) then
+         print*, "PSD_CX is negative", PSD_CX
+         stop
+      endif
+
       ICX = sum(beta_RCCX_dt + beta_PSCX_dt)
       ICX = abs(ICX)*(-1.d0)  ! Make sure to be negative.
 
@@ -601,19 +607,7 @@ contains
       lat_max = maxval(latitudeNS_range)
 
       ! longitude를 0-2π 범위로 정규화
-      if (longitude < 0.d0) longitude = longitude + 2.d0*pi
-      
-     
-      ! r grid index 찾기 (nearest grid point)
-      dr1=0.5
-      i_r_nearest = nint((r-r_min)/dr1) + 1
-      if (i_r_nearest .lt. 1) i_r_nearest = 1
-      if (i_r_nearest .gt. nRadial) then
-         nH1 = 0.d0
-         beta_RCCX1=0.d0
-         beta_PSCX1=0.d0
-         return
-      endif
+      if (longitude < 0.d0) longitude = longitude + 2.d0*pi     
 
       dlon1=2.d0*pi/nLon
       i_lon_nearest = nint((longitude-lon_min)/dlon1) + 1
@@ -649,23 +643,37 @@ contains
 
       endif
 
-      ! -----------------------------------------------------------
-
-
-      nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
-!      print*, 'nH1', nH1
-!      print*, 'nearest', i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday
-      beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
-
-!! FIX ME !!
-!! Special case for 2008164 run for CIMI plasmasphere (nPS)
-!! The nPS data is 0 for the first 3 hour in 2008/164.
-!! So the lower bound of it_nearest is 4 for 2008/164.
-!! Delete this part when using the new nPS data.
-      if (iday == 2008164 .and. it_nearest <= 3) then
-         it_nearest = 4
+     
+      ! r grid index 찾기 (nearest grid point)
+      dr1=dR
+      i_r_nearest = nint((r-r_min)/dr1) + 1
+      if (i_r_nearest < 1) i_r_nearest = 1
+      if (i_r_nearest > nRadial) then
+         nH1 = 0.d0
+         beta_RCCX1=0.d0
+         beta_PSCX1=0.d0
+      else
+         nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
       endif
-      beta_PSCX1 = beta_PSCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
+
+!      i_r_nearest_CX = nint((r-r_min)/dr1) + 1  
+!      if (i_r_nearest_CX < 1) i_r_nearest_CX = 1
+      if (i_r_nearest > nRadial_CX) then
+         beta_RCCX1 = 0.d0
+         beta_PSCX1 = 0.d0
+      else
+         beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
+         !! FIX ME !!
+         !! Special case for 2008164 run for CIMI plasmasphere (nPS)
+         !! The nPS data is 0 for the first 3 hour in 2008/164.
+         !! So the lower bound of it_nearest is 4 for 2008/164.
+         !! Delete this part when using the new nPS data.
+         if (iday == 2008164 .and. it_nearest <= 3) then
+            it_nearest = 4
+         endif
+         beta_PSCX1 = beta_PSCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
+      endif
+
 
       return
 
