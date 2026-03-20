@@ -559,25 +559,25 @@ contains
       nH1 = nH_interp
 
       beta_RCCX_interp = beta_RCCX_interp + &
-                   w_r1 * w_lon1 * w_lat1 * beta_RCCX0(i_r1, i_lon1, i_lat1, i_time, iday) + &
-                   w_r2 * w_lon1 * w_lat1 * beta_RCCX0(i_r2, i_lon1, i_lat1, i_time, iday) + &
-                   w_r1 * w_lon2 * w_lat1 * beta_RCCX0(i_r1, i_lon2, i_lat1, i_time, iday) + &
-                   w_r2 * w_lon2 * w_lat1 * beta_RCCX0(i_r2, i_lon2, i_lat1, i_time, iday) + &
-                   w_r1 * w_lon1 * w_lat2 * beta_RCCX0(i_r1, i_lon1, i_lat2, i_time, iday) + &
-                   w_r2 * w_lon1 * w_lat2 * beta_RCCX0(i_r2, i_lon1, i_lat2, i_time, iday) + &
-                   w_r1 * w_lon2 * w_lat2 * beta_RCCX0(i_r1, i_lon2, i_lat2, i_time, iday) + &
-                   w_r2 * w_lon2 * w_lat2 * beta_RCCX0(i_r2, i_lon2, i_lat2, i_time, iday)
+                   w_r1 * w_lon1 * w_lat1 * beta_RCCX(i_r1, i_lon1, i_lat1, i_time, iday) + &
+                   w_r2 * w_lon1 * w_lat1 * beta_RCCX(i_r2, i_lon1, i_lat1, i_time, iday) + &
+                   w_r1 * w_lon2 * w_lat1 * beta_RCCX(i_r1, i_lon2, i_lat1, i_time, iday) + &
+                   w_r2 * w_lon2 * w_lat1 * beta_RCCX(i_r2, i_lon2, i_lat1, i_time, iday) + &
+                   w_r1 * w_lon1 * w_lat2 * beta_RCCX(i_r1, i_lon1, i_lat2, i_time, iday) + &
+                   w_r2 * w_lon1 * w_lat2 * beta_RCCX(i_r2, i_lon1, i_lat2, i_time, iday) + &
+                   w_r1 * w_lon2 * w_lat2 * beta_RCCX(i_r1, i_lon2, i_lat2, i_time, iday) + &
+                   w_r2 * w_lon2 * w_lat2 * beta_RCCX(i_r2, i_lon2, i_lat2, i_time, iday)
       beta_RCCX1 = beta_RCCX_interp
 
       beta_PSCX_interp = beta_PSCX_interp + &
-                   w_r1 * w_lon1 * w_lat1 * beta_PSCX0(i_r1, i_lon1, i_lat1, i_time, iday) + &
-                   w_r2 * w_lon1 * w_lat1 * beta_PSCX0(i_r2, i_lon1, i_lat1, i_time, iday) + &
-                   w_r1 * w_lon2 * w_lat1 * beta_PSCX0(i_r1, i_lon2, i_lat1, i_time, iday) + &
-                   w_r2 * w_lon2 * w_lat1 * beta_PSCX0(i_r2, i_lon2, i_lat1, i_time, iday) + &
-                   w_r1 * w_lon1 * w_lat2 * beta_PSCX0(i_r1, i_lon1, i_lat2, i_time, iday) + &
-                   w_r2 * w_lon1 * w_lat2 * beta_PSCX0(i_r2, i_lon1, i_lat2, i_time, iday) + &
-                   w_r1 * w_lon2 * w_lat2 * beta_PSCX0(i_r1, i_lon2, i_lat2, i_time, iday) + &
-                   w_r2 * w_lon2 * w_lat2 * beta_PSCX0(i_r2, i_lon2, i_lat2, i_time, iday)
+                   w_r1 * w_lon1 * w_lat1 * beta_PSCX(i_r1, i_lon1, i_lat1, i_time, iday) + &
+                   w_r2 * w_lon1 * w_lat1 * beta_PSCX(i_r2, i_lon1, i_lat1, i_time, iday) + &
+                   w_r1 * w_lon2 * w_lat1 * beta_PSCX(i_r1, i_lon2, i_lat1, i_time, iday) + &
+                   w_r2 * w_lon2 * w_lat1 * beta_PSCX(i_r2, i_lon2, i_lat1, i_time, iday) + &
+                   w_r1 * w_lon1 * w_lat2 * beta_PSCX(i_r1, i_lon1, i_lat2, i_time, iday) + &
+                   w_r2 * w_lon1 * w_lat2 * beta_PSCX(i_r2, i_lon1, i_lat2, i_time, iday) + &
+                   w_r1 * w_lon2 * w_lat2 * beta_PSCX(i_r1, i_lon2, i_lat2, i_time, iday) + &
+                   w_r2 * w_lon2 * w_lat2 * beta_PSCX(i_r2, i_lon2, i_lat2, i_time, iday)
       beta_PSCX1 = beta_PSCX_interp
       
    End Subroutine interpolate_exosphere
