@@ -579,41 +579,36 @@ contains
                    w_r2 * w_lon2 * w_lat2 * nH0(i_r2, i_lon2, i_lat2, it_nearest, iday)
       nH1 = nH_interp
 
-      if (i_r_nearest > nRadial_CX) then
-         beta_RCCX1 = 0.d0
-         beta_PSCX1 = 0.d0
-      else
-         beta_RCCX_interp = beta_RCCX_interp + &
-                     w_r1 * w_lon1 * w_lat1 * beta_RCCX(i_r1, i_lon1, i_lat1, it_nearest, iday) + &
-                     w_r2 * w_lon1 * w_lat1 * beta_RCCX(i_r2, i_lon1, i_lat1, it_nearest, iday) + &
-                     w_r1 * w_lon2 * w_lat1 * beta_RCCX(i_r1, i_lon2, i_lat1, it_nearest, iday) + &
-                     w_r2 * w_lon2 * w_lat1 * beta_RCCX(i_r2, i_lon2, i_lat1, it_nearest, iday) + &
-                     w_r1 * w_lon1 * w_lat2 * beta_RCCX(i_r1, i_lon1, i_lat2, it_nearest, iday) + &
-                     w_r2 * w_lon1 * w_lat2 * beta_RCCX(i_r2, i_lon1, i_lat2, it_nearest, iday) + &
-                     w_r1 * w_lon2 * w_lat2 * beta_RCCX(i_r1, i_lon2, i_lat2, it_nearest, iday) + &
-                     w_r2 * w_lon2 * w_lat2 * beta_RCCX(i_r2, i_lon2, i_lat2, it_nearest, iday)
-         beta_RCCX1 = beta_RCCX_interp
+      beta_RCCX_interp = beta_RCCX_interp + &
+                  w_r1 * w_lon1 * w_lat1 * beta_RCCX(i_r1, i_lon1, i_lat1, it_nearest, iday) + &
+                  w_r2 * w_lon1 * w_lat1 * beta_RCCX(i_r2, i_lon1, i_lat1, it_nearest, iday) + &
+                  w_r1 * w_lon2 * w_lat1 * beta_RCCX(i_r1, i_lon2, i_lat1, it_nearest, iday) + &
+                  w_r2 * w_lon2 * w_lat1 * beta_RCCX(i_r2, i_lon2, i_lat1, it_nearest, iday) + &
+                  w_r1 * w_lon1 * w_lat2 * beta_RCCX(i_r1, i_lon1, i_lat2, it_nearest, iday) + &
+                  w_r2 * w_lon1 * w_lat2 * beta_RCCX(i_r2, i_lon1, i_lat2, it_nearest, iday) + &
+                  w_r1 * w_lon2 * w_lat2 * beta_RCCX(i_r1, i_lon2, i_lat2, it_nearest, iday) + &
+                  w_r2 * w_lon2 * w_lat2 * beta_RCCX(i_r2, i_lon2, i_lat2, it_nearest, iday)
+      beta_RCCX1 = beta_RCCX_interp
 
-         !! FIX ME !!
-         !! Special case for 2008164 run for CIMI plasmasphere (nPS)
-         !! The nPS data is 0 for the first 3 hour in 2008/164.
-         !! So the lower bound of it_nearest is 4 for 2008/164.
-         !! Delete this part when using the new nPS data.
-         if (iday == 2008164 .and. it_nearest <= 3) then
-            it_nearest = 4
-         endif
-
-         beta_PSCX_interp = beta_PSCX_interp + &
-                     w_r1 * w_lon1 * w_lat1 * beta_PSCX(i_r1, i_lon1, i_lat1, it_nearest, iday) + &
-                     w_r2 * w_lon1 * w_lat1 * beta_PSCX(i_r2, i_lon1, i_lat1, it_nearest, iday) + &
-                     w_r1 * w_lon2 * w_lat1 * beta_PSCX(i_r1, i_lon2, i_lat1, it_nearest, iday) + &
-                     w_r2 * w_lon2 * w_lat1 * beta_PSCX(i_r2, i_lon2, i_lat1, it_nearest, iday) + &
-                     w_r1 * w_lon1 * w_lat2 * beta_PSCX(i_r1, i_lon1, i_lat2, it_nearest, iday) + &
-                     w_r2 * w_lon1 * w_lat2 * beta_PSCX(i_r2, i_lon1, i_lat2, it_nearest, iday) + &
-                     w_r1 * w_lon2 * w_lat2 * beta_PSCX(i_r1, i_lon2, i_lat2, it_nearest, iday) + &
-                     w_r2 * w_lon2 * w_lat2 * beta_PSCX(i_r2, i_lon2, i_lat2, it_nearest, iday)
-         beta_PSCX1 = beta_PSCX_interp
+      !! FIX ME !!
+      !! Special case for 2008164 run for CIMI plasmasphere (nPS)
+      !! The nPS data is 0 for the first 3 hour in 2008/164.
+      !! So the lower bound of it_nearest is 4 for 2008/164.
+      !! Delete this part when using the new nPS data.
+      if (iday == 2008164 .and. it_nearest <= 3) then
+         it_nearest = 4
       endif
+
+      beta_PSCX_interp = beta_PSCX_interp + &
+                  w_r1 * w_lon1 * w_lat1 * beta_PSCX(i_r1, i_lon1, i_lat1, it_nearest, iday) + &
+                  w_r2 * w_lon1 * w_lat1 * beta_PSCX(i_r2, i_lon1, i_lat1, it_nearest, iday) + &
+                  w_r1 * w_lon2 * w_lat1 * beta_PSCX(i_r1, i_lon2, i_lat1, it_nearest, iday) + &
+                  w_r2 * w_lon2 * w_lat1 * beta_PSCX(i_r2, i_lon2, i_lat1, it_nearest, iday) + &
+                  w_r1 * w_lon1 * w_lat2 * beta_PSCX(i_r1, i_lon1, i_lat2, it_nearest, iday) + &
+                  w_r2 * w_lon1 * w_lat2 * beta_PSCX(i_r2, i_lon1, i_lat2, it_nearest, iday) + &
+                  w_r1 * w_lon2 * w_lat2 * beta_PSCX(i_r1, i_lon2, i_lat2, it_nearest, iday) + &
+                  w_r2 * w_lon2 * w_lat2 * beta_PSCX(i_r2, i_lon2, i_lat2, it_nearest, iday)
+      beta_PSCX1 = beta_PSCX_interp
 
       return
       
