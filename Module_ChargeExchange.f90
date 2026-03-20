@@ -435,7 +435,8 @@ contains
       real*8 :: w_r1, w_r2, w_lon1, w_lon2, w_lat1, w_lat2
       real*8 :: nH_interp, beta_RCCX_interp, beta_PSCX_interp
       real*8 :: d_r, d_lon, d_lat
-      integer :: iday
+      integer :: iday, it_nearest
+      real*8 :: year_doy_frac, frac_day, hour_val
       
       ! Read exosphere data
       !call Read_Exosphere(nH0)
@@ -539,46 +540,82 @@ contains
          w_lat2 = 0.d0
       endif
       
-      ! 3D Trilinear interpolation 수행 (시간은 첫 번째 시간 스텝 사용)
-      i_time = 1
+      ! 3D Trilinear interpolation 수행 
       nH_interp = 0.d0
       beta_RCCX_interp = 0.d0
       beta_PSCX_interp = 0.d0
       
       iday = int(current_time)
+      year_doy_frac = mod(current_time, 1000.d0)
+      frac_day = year_doy_frac - dble(iday)
+      hour_val = frac_day * 24.d0
+      it_nearest = nint(hour_val) + 1
+      
+      ! 경계 처리: 23:30 이상(hour_val > 23.5)이 되어 반올림으로 25가 될 경우
+      ! 0시(index 1)로 순환
+      if (it_nearest > ntperday_CX) then
+         it_nearest = 1
+         iday=iday+1
+      endif
+      if (it_nearest < 1) then
+         it_nearest = ntperday_CX
+         iday=iday-1
+      endif
+      if (iday < Beta_CX_Start_Time_in_YYYYDOY) then
+         iday = Beta_CX_Start_Time_in_YYYYDOY
+         it_nearest = 1
+      endif
+
+
       ! 8개 corner points에 대한 interpolation
       nH_interp = nH_interp + &
-                   w_r1 * w_lon1 * w_lat1 * nH0(i_r1, i_lon1, i_lat1, i_time, iday) + &
-                   w_r2 * w_lon1 * w_lat1 * nH0(i_r2, i_lon1, i_lat1, i_time, iday) + &
-                   w_r1 * w_lon2 * w_lat1 * nH0(i_r1, i_lon2, i_lat1, i_time, iday) + &
-                   w_r2 * w_lon2 * w_lat1 * nH0(i_r2, i_lon2, i_lat1, i_time, iday) + &
-                   w_r1 * w_lon1 * w_lat2 * nH0(i_r1, i_lon1, i_lat2, i_time, iday) + &
-                   w_r2 * w_lon1 * w_lat2 * nH0(i_r2, i_lon1, i_lat2, i_time, iday) + &
-                   w_r1 * w_lon2 * w_lat2 * nH0(i_r1, i_lon2, i_lat2, i_time, iday) + &
-                   w_r2 * w_lon2 * w_lat2 * nH0(i_r2, i_lon2, i_lat2, i_time, iday)
+                   w_r1 * w_lon1 * w_lat1 * nH0(i_r1, i_lon1, i_lat1, i_nearest, iday) + &
+                   w_r2 * w_lon1 * w_lat1 * nH0(i_r2, i_lon1, i_lat1, i_nearest, iday) + &
+                   w_r1 * w_lon2 * w_lat1 * nH0(i_r1, i_lon2, i_lat1, i_nearest, iday) + &
+                   w_r2 * w_lon2 * w_lat1 * nH0(i_r2, i_lon2, i_lat1, i_nearest, iday) + &
+                   w_r1 * w_lon1 * w_lat2 * nH0(i_r1, i_lon1, i_lat2, i_nearest, iday) + &
+                   w_r2 * w_lon1 * w_lat2 * nH0(i_r2, i_lon1, i_lat2, i_nearest, iday) + &
+                   w_r1 * w_lon2 * w_lat2 * nH0(i_r1, i_lon2, i_lat2, i_nearest, iday) + &
+                   w_r2 * w_lon2 * w_lat2 * nH0(i_r2, i_lon2, i_lat2, i_nearest, iday)
       nH1 = nH_interp
 
-      beta_RCCX_interp = beta_RCCX_interp + &
-                   w_r1 * w_lon1 * w_lat1 * beta_RCCX(i_r1, i_lon1, i_lat1, i_time, iday) + &
-                   w_r2 * w_lon1 * w_lat1 * beta_RCCX(i_r2, i_lon1, i_lat1, i_time, iday) + &
-                   w_r1 * w_lon2 * w_lat1 * beta_RCCX(i_r1, i_lon2, i_lat1, i_time, iday) + &
-                   w_r2 * w_lon2 * w_lat1 * beta_RCCX(i_r2, i_lon2, i_lat1, i_time, iday) + &
-                   w_r1 * w_lon1 * w_lat2 * beta_RCCX(i_r1, i_lon1, i_lat2, i_time, iday) + &
-                   w_r2 * w_lon1 * w_lat2 * beta_RCCX(i_r2, i_lon1, i_lat2, i_time, iday) + &
-                   w_r1 * w_lon2 * w_lat2 * beta_RCCX(i_r1, i_lon2, i_lat2, i_time, iday) + &
-                   w_r2 * w_lon2 * w_lat2 * beta_RCCX(i_r2, i_lon2, i_lat2, i_time, iday)
-      beta_RCCX1 = beta_RCCX_interp
+      if (i_r_nearest > nRadial_CX) then
+         beta_RCCX1 = 0.d0
+         beta_PSCX1 = 0.d0
+      else
+         beta_RCCX_interp = beta_RCCX_interp + &
+                     w_r1 * w_lon1 * w_lat1 * beta_RCCX(i_r1, i_lon1, i_lat1, i_nearest, iday) + &
+                     w_r2 * w_lon1 * w_lat1 * beta_RCCX(i_r2, i_lon1, i_lat1, i_nearest, iday) + &
+                     w_r1 * w_lon2 * w_lat1 * beta_RCCX(i_r1, i_lon2, i_lat1, i_nearest, iday) + &
+                     w_r2 * w_lon2 * w_lat1 * beta_RCCX(i_r2, i_lon2, i_lat1, i_nearest, iday) + &
+                     w_r1 * w_lon1 * w_lat2 * beta_RCCX(i_r1, i_lon1, i_lat2, i_nearest, iday) + &
+                     w_r2 * w_lon1 * w_lat2 * beta_RCCX(i_r2, i_lon1, i_lat2, i_nearest, iday) + &
+                     w_r1 * w_lon2 * w_lat2 * beta_RCCX(i_r1, i_lon2, i_lat2, i_nearest, iday) + &
+                     w_r2 * w_lon2 * w_lat2 * beta_RCCX(i_r2, i_lon2, i_lat2, i_nearest, iday)
+         beta_RCCX1 = beta_RCCX_interp
 
-      beta_PSCX_interp = beta_PSCX_interp + &
-                   w_r1 * w_lon1 * w_lat1 * beta_PSCX(i_r1, i_lon1, i_lat1, i_time, iday) + &
-                   w_r2 * w_lon1 * w_lat1 * beta_PSCX(i_r2, i_lon1, i_lat1, i_time, iday) + &
-                   w_r1 * w_lon2 * w_lat1 * beta_PSCX(i_r1, i_lon2, i_lat1, i_time, iday) + &
-                   w_r2 * w_lon2 * w_lat1 * beta_PSCX(i_r2, i_lon2, i_lat1, i_time, iday) + &
-                   w_r1 * w_lon1 * w_lat2 * beta_PSCX(i_r1, i_lon1, i_lat2, i_time, iday) + &
-                   w_r2 * w_lon1 * w_lat2 * beta_PSCX(i_r2, i_lon1, i_lat2, i_time, iday) + &
-                   w_r1 * w_lon2 * w_lat2 * beta_PSCX(i_r1, i_lon2, i_lat2, i_time, iday) + &
-                   w_r2 * w_lon2 * w_lat2 * beta_PSCX(i_r2, i_lon2, i_lat2, i_time, iday)
-      beta_PSCX1 = beta_PSCX_interp
+         !! FIX ME !!
+         !! Special case for 2008164 run for CIMI plasmasphere (nPS)
+         !! The nPS data is 0 for the first 3 hour in 2008/164.
+         !! So the lower bound of it_nearest is 4 for 2008/164.
+         !! Delete this part when using the new nPS data.
+         if (iday == 2008164 .and. it_nearest <= 3) then
+            it_nearest = 4
+         endif
+         
+         beta_PSCX_interp = beta_PSCX_interp + &
+                     w_r1 * w_lon1 * w_lat1 * beta_PSCX(i_r1, i_lon1, i_lat1, i_nearest, iday) + &
+                     w_r2 * w_lon1 * w_lat1 * beta_PSCX(i_r2, i_lon1, i_lat1, i_nearest, iday) + &
+                     w_r1 * w_lon2 * w_lat1 * beta_PSCX(i_r1, i_lon2, i_lat1, i_nearest, iday) + &
+                     w_r2 * w_lon2 * w_lat1 * beta_PSCX(i_r2, i_lon2, i_lat1, i_nearest, iday) + &
+                     w_r1 * w_lon1 * w_lat2 * beta_PSCX(i_r1, i_lon1, i_lat2, i_nearest, iday) + &
+                     w_r2 * w_lon1 * w_lat2 * beta_PSCX(i_r2, i_lon1, i_lat2, i_nearest, iday) + &
+                     w_r1 * w_lon2 * w_lat2 * beta_PSCX(i_r1, i_lon2, i_lat2, i_nearest, iday) + &
+                     w_r2 * w_lon2 * w_lat2 * beta_PSCX(i_r2, i_lon2, i_lat2, i_nearest, iday)
+         beta_PSCX1 = beta_PSCX_interp
+      endif
+
+      return
       
    End Subroutine interpolate_exosphere
 
@@ -632,13 +669,9 @@ contains
       i_lat_nearest = nint((latitude-lat_min)/dlat1) + 1
 
       year_doy_frac = mod(current_time, 1000.d0)
-!      iday = int(year_doy_frac)
       iday = int(current_time)
-      
       frac_day = year_doy_frac - dble(iday)
-      
       hour_val = frac_day * 24.d0
-      
       it_nearest = nint(hour_val) + 1
       
       ! 경계 처리: 23:30 이상(hour_val > 23.5)이 되어 반올림으로 25가 될 경우
@@ -654,7 +687,6 @@ contains
       if (iday < Beta_CX_Start_Time_in_YYYYDOY) then
          iday = Beta_CX_Start_Time_in_YYYYDOY
          it_nearest = 1
-
       endif
 
      
