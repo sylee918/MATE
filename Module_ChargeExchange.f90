@@ -569,14 +569,14 @@ contains
 
       ! 8개 corner points에 대한 interpolation
       nH_interp = nH_interp + &
-                   w_r1 * w_lon1 * w_lat1 * nH0(i_r1, i_lon1, i_lat1, i_nearest, iday) + &
-                   w_r2 * w_lon1 * w_lat1 * nH0(i_r2, i_lon1, i_lat1, i_nearest, iday) + &
-                   w_r1 * w_lon2 * w_lat1 * nH0(i_r1, i_lon2, i_lat1, i_nearest, iday) + &
-                   w_r2 * w_lon2 * w_lat1 * nH0(i_r2, i_lon2, i_lat1, i_nearest, iday) + &
-                   w_r1 * w_lon1 * w_lat2 * nH0(i_r1, i_lon1, i_lat2, i_nearest, iday) + &
-                   w_r2 * w_lon1 * w_lat2 * nH0(i_r2, i_lon1, i_lat2, i_nearest, iday) + &
-                   w_r1 * w_lon2 * w_lat2 * nH0(i_r1, i_lon2, i_lat2, i_nearest, iday) + &
-                   w_r2 * w_lon2 * w_lat2 * nH0(i_r2, i_lon2, i_lat2, i_nearest, iday)
+                   w_r1 * w_lon1 * w_lat1 * nH0(i_r1, i_lon1, i_lat1, it_nearest, iday) + &
+                   w_r2 * w_lon1 * w_lat1 * nH0(i_r2, i_lon1, i_lat1, it_nearest, iday) + &
+                   w_r1 * w_lon2 * w_lat1 * nH0(i_r1, i_lon2, i_lat1, it_nearest, iday) + &
+                   w_r2 * w_lon2 * w_lat1 * nH0(i_r2, i_lon2, i_lat1, it_nearest, iday) + &
+                   w_r1 * w_lon1 * w_lat2 * nH0(i_r1, i_lon1, i_lat2, it_nearest, iday) + &
+                   w_r2 * w_lon1 * w_lat2 * nH0(i_r2, i_lon1, i_lat2, it_nearest, iday) + &
+                   w_r1 * w_lon2 * w_lat2 * nH0(i_r1, i_lon2, i_lat2, it_nearest, iday) + &
+                   w_r2 * w_lon2 * w_lat2 * nH0(i_r2, i_lon2, i_lat2, it_nearest, iday)
       nH1 = nH_interp
 
       if (i_r_nearest > nRadial_CX) then
@@ -584,14 +584,14 @@ contains
          beta_PSCX1 = 0.d0
       else
          beta_RCCX_interp = beta_RCCX_interp + &
-                     w_r1 * w_lon1 * w_lat1 * beta_RCCX(i_r1, i_lon1, i_lat1, i_nearest, iday) + &
-                     w_r2 * w_lon1 * w_lat1 * beta_RCCX(i_r2, i_lon1, i_lat1, i_nearest, iday) + &
-                     w_r1 * w_lon2 * w_lat1 * beta_RCCX(i_r1, i_lon2, i_lat1, i_nearest, iday) + &
-                     w_r2 * w_lon2 * w_lat1 * beta_RCCX(i_r2, i_lon2, i_lat1, i_nearest, iday) + &
-                     w_r1 * w_lon1 * w_lat2 * beta_RCCX(i_r1, i_lon1, i_lat2, i_nearest, iday) + &
-                     w_r2 * w_lon1 * w_lat2 * beta_RCCX(i_r2, i_lon1, i_lat2, i_nearest, iday) + &
-                     w_r1 * w_lon2 * w_lat2 * beta_RCCX(i_r1, i_lon2, i_lat2, i_nearest, iday) + &
-                     w_r2 * w_lon2 * w_lat2 * beta_RCCX(i_r2, i_lon2, i_lat2, i_nearest, iday)
+                     w_r1 * w_lon1 * w_lat1 * beta_RCCX(i_r1, i_lon1, i_lat1, it_nearest, iday) + &
+                     w_r2 * w_lon1 * w_lat1 * beta_RCCX(i_r2, i_lon1, i_lat1, it_nearest, iday) + &
+                     w_r1 * w_lon2 * w_lat1 * beta_RCCX(i_r1, i_lon2, i_lat1, it_nearest, iday) + &
+                     w_r2 * w_lon2 * w_lat1 * beta_RCCX(i_r2, i_lon2, i_lat1, it_nearest, iday) + &
+                     w_r1 * w_lon1 * w_lat2 * beta_RCCX(i_r1, i_lon1, i_lat2, it_nearest, iday) + &
+                     w_r2 * w_lon1 * w_lat2 * beta_RCCX(i_r2, i_lon1, i_lat2, it_nearest, iday) + &
+                     w_r1 * w_lon2 * w_lat2 * beta_RCCX(i_r1, i_lon2, i_lat2, it_nearest, iday) + &
+                     w_r2 * w_lon2 * w_lat2 * beta_RCCX(i_r2, i_lon2, i_lat2, it_nearest, iday)
          beta_RCCX1 = beta_RCCX_interp
 
          !! FIX ME !!
@@ -602,16 +602,16 @@ contains
          if (iday == 2008164 .and. it_nearest <= 3) then
             it_nearest = 4
          endif
-         
+
          beta_PSCX_interp = beta_PSCX_interp + &
-                     w_r1 * w_lon1 * w_lat1 * beta_PSCX(i_r1, i_lon1, i_lat1, i_nearest, iday) + &
-                     w_r2 * w_lon1 * w_lat1 * beta_PSCX(i_r2, i_lon1, i_lat1, i_nearest, iday) + &
-                     w_r1 * w_lon2 * w_lat1 * beta_PSCX(i_r1, i_lon2, i_lat1, i_nearest, iday) + &
-                     w_r2 * w_lon2 * w_lat1 * beta_PSCX(i_r2, i_lon2, i_lat1, i_nearest, iday) + &
-                     w_r1 * w_lon1 * w_lat2 * beta_PSCX(i_r1, i_lon1, i_lat2, i_nearest, iday) + &
-                     w_r2 * w_lon1 * w_lat2 * beta_PSCX(i_r2, i_lon1, i_lat2, i_nearest, iday) + &
-                     w_r1 * w_lon2 * w_lat2 * beta_PSCX(i_r1, i_lon2, i_lat2, i_nearest, iday) + &
-                     w_r2 * w_lon2 * w_lat2 * beta_PSCX(i_r2, i_lon2, i_lat2, i_nearest, iday)
+                     w_r1 * w_lon1 * w_lat1 * beta_PSCX(i_r1, i_lon1, i_lat1, it_nearest, iday) + &
+                     w_r2 * w_lon1 * w_lat1 * beta_PSCX(i_r2, i_lon1, i_lat1, it_nearest, iday) + &
+                     w_r1 * w_lon2 * w_lat1 * beta_PSCX(i_r1, i_lon2, i_lat1, it_nearest, iday) + &
+                     w_r2 * w_lon2 * w_lat1 * beta_PSCX(i_r2, i_lon2, i_lat1, it_nearest, iday) + &
+                     w_r1 * w_lon1 * w_lat2 * beta_PSCX(i_r1, i_lon1, i_lat2, it_nearest, iday) + &
+                     w_r2 * w_lon1 * w_lat2 * beta_PSCX(i_r2, i_lon1, i_lat2, it_nearest, iday) + &
+                     w_r1 * w_lon2 * w_lat2 * beta_PSCX(i_r1, i_lon2, i_lat2, it_nearest, iday) + &
+                     w_r2 * w_lon2 * w_lat2 * beta_PSCX(i_r2, i_lon2, i_lat2, it_nearest, iday)
          beta_PSCX1 = beta_PSCX_interp
       endif
 
