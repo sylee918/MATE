@@ -26,7 +26,6 @@ contains
       real*8, intent(in) :: current_time
       real*8 :: ICX, PSD_CX
       real*8 :: vrel, sigma, fac, cexo2, fac2, vsig_1eV, ICX_i
-!      real*8, allocatable :: beta_dt(:), nH_traj(:), vel2(:)
       real*8, dimension(nstep) :: beta_RCCX_dt, beta_PSCX_dt, nH_traj, vel2
       integer :: i, istep
 
@@ -42,29 +41,15 @@ contains
       call Trace_Again(iE,iv, ptl0, flag, current_time, beta_RCCX_dt, beta_PSCX_dt, nH_traj, vel2, istep)
       beta_PSCX_dt = beta_PSCX_dt * vsig_1eV
 
-!      allocate(beta_dt(nstep(iv,iE)), nH_traj(nstep(iv,iE)), vel2(nstep(iv,iE)))
-
       ! PSD_CX is the PSD of CX-created nH. Below is not necessary for RCCX.
       PSD_CX = 0.d0
       do i=1,istep
          ICX_i = sum(beta_PSCX_dt(1:i))
-!         PSD_CX = PSD_CX + abs(beta_dt(i)) * nH_traj(i) * vsig_1eV * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
          PSD_CX = PSD_CX + abs(beta_PSCX_dt(i)) * nH_traj(i) * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
       enddo
-!      print*, 'PSD_CX', PSD_CX
-!      print*, 'maxval(nH_traj)', maxval(nH_traj)
-
-!! FIX ME !!
-      if (PSD_CX < 0.d0) then
-         print*, "PSD_CX is negative", PSD_CX
-         stop
-      endif
 
       ICX = sum(beta_RCCX_dt + beta_PSCX_dt)
       ICX = abs(ICX)*(-1.d0)  ! Make sure to be negative.
-
-!      deallocate(beta_dt, nH_traj, vel2)
-
 
    End Subroutine Calculate_ChargeExchange
 
@@ -435,20 +420,20 @@ contains
    End Subroutine Read_Exosphere_GCPM
 
 
-   Subroutine interpolate_exosphere(current_time, one, nH1)
+   Subroutine interpolate_exosphere(current_time, one, nH1, beta_RCCX1, beta_PSCX1)
 
       IMPLICIT NONE
       
       real*8, dimension(7) :: one
       real*8, intent(in) :: current_time
-      real*8 :: nH1
+      real*8 :: nH1, beta_RCCX1, beta_PSCX1
       
       real*8 :: x, y, z, r, longitude, latitude
       real*8 :: r_min, r_max, lon_min, lon_max, lat_min, lat_max
       integer :: i_r, i_lon, i_lat, i_time
       integer :: i_r1, i_r2, i_lon1, i_lon2, i_lat1, i_lat2
       real*8 :: w_r1, w_r2, w_lon1, w_lon2, w_lat1, w_lat2
-      real*8 :: nH_interp
+      real*8 :: nH_interp, beta_RCCX_interp, beta_PSCX_interp
       real*8 :: d_r, d_lon, d_lat
       integer :: iday
       
@@ -479,11 +464,11 @@ contains
       lat_min = minval(latitudeNS_range)
       lat_max = maxval(latitudeNS_range)
       
-      ! Boundary check - 만약 입자가 exosphere grid 밖에 있으면 0 반환
-      if (r < r_min .or. r > r_max .or. &
-          longitude < lon_min .or. longitude > lon_max .or. &
-          latitude < lat_min .or. latitude > lat_max) then
+      ! Boundary check-1
+      if (r > r_max) then
          nH1 = 0.d0
+         beta_RCCX1 = 0.d0
+         beta_PSCX1 = 0.d0
          return
       endif
       
@@ -497,7 +482,13 @@ contains
             exit
          endif
       enddo
-      
+
+      ! Boundary check-2
+      if (r < r_min) then
+         i_r1 = 1
+         i_r2 = 1
+      endif
+
       ! longitude grid index 찾기
       i_lon1 = 1
       i_lon2 = nLon
@@ -551,6 +542,8 @@ contains
       ! 3D Trilinear interpolation 수행 (시간은 첫 번째 시간 스텝 사용)
       i_time = 1
       nH_interp = 0.d0
+      beta_RCCX_interp = 0.d0
+      beta_PSCX_interp = 0.d0
       
       iday = int(current_time)
       ! 8개 corner points에 대한 interpolation
@@ -563,8 +556,29 @@ contains
                    w_r2 * w_lon1 * w_lat2 * nH0(i_r2, i_lon1, i_lat2, i_time, iday) + &
                    w_r1 * w_lon2 * w_lat2 * nH0(i_r1, i_lon2, i_lat2, i_time, iday) + &
                    w_r2 * w_lon2 * w_lat2 * nH0(i_r2, i_lon2, i_lat2, i_time, iday)
-      
       nH1 = nH_interp
+
+      beta_RCCX_interp = beta_RCCX_interp + &
+                   w_r1 * w_lon1 * w_lat1 * beta_RCCX0(i_r1, i_lon1, i_lat1, i_time, iday) + &
+                   w_r2 * w_lon1 * w_lat1 * beta_RCCX0(i_r2, i_lon1, i_lat1, i_time, iday) + &
+                   w_r1 * w_lon2 * w_lat1 * beta_RCCX0(i_r1, i_lon2, i_lat1, i_time, iday) + &
+                   w_r2 * w_lon2 * w_lat1 * beta_RCCX0(i_r2, i_lon2, i_lat1, i_time, iday) + &
+                   w_r1 * w_lon1 * w_lat2 * beta_RCCX0(i_r1, i_lon1, i_lat2, i_time, iday) + &
+                   w_r2 * w_lon1 * w_lat2 * beta_RCCX0(i_r2, i_lon1, i_lat2, i_time, iday) + &
+                   w_r1 * w_lon2 * w_lat2 * beta_RCCX0(i_r1, i_lon2, i_lat2, i_time, iday) + &
+                   w_r2 * w_lon2 * w_lat2 * beta_RCCX0(i_r2, i_lon2, i_lat2, i_time, iday)
+      beta_RCCX1 = beta_RCCX_interp
+
+      beta_PSCX_interp = beta_PSCX_interp + &
+                   w_r1 * w_lon1 * w_lat1 * beta_PSCX0(i_r1, i_lon1, i_lat1, i_time, iday) + &
+                   w_r2 * w_lon1 * w_lat1 * beta_PSCX0(i_r2, i_lon1, i_lat1, i_time, iday) + &
+                   w_r1 * w_lon2 * w_lat1 * beta_PSCX0(i_r1, i_lon2, i_lat1, i_time, iday) + &
+                   w_r2 * w_lon2 * w_lat1 * beta_PSCX0(i_r2, i_lon2, i_lat1, i_time, iday) + &
+                   w_r1 * w_lon1 * w_lat2 * beta_PSCX0(i_r1, i_lon1, i_lat2, i_time, iday) + &
+                   w_r2 * w_lon1 * w_lat2 * beta_PSCX0(i_r2, i_lon1, i_lat2, i_time, iday) + &
+                   w_r1 * w_lon2 * w_lat2 * beta_PSCX0(i_r1, i_lon2, i_lat2, i_time, iday) + &
+                   w_r2 * w_lon2 * w_lat2 * beta_PSCX0(i_r2, i_lon2, i_lat2, i_time, iday)
+      beta_PSCX1 = beta_PSCX_interp
       
    End Subroutine interpolate_exosphere
 
@@ -754,30 +768,20 @@ contains
                goto 101
          endif
 
-!         call nearest_grid_plasmasphere(one, nps1)
-!         call nearest_grid_exosphere(one, nH1)
-!         call nearest_grid_exosphere(current_time, one, nH1, beta_RCCX1)
-         call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
-         !call interpolate_plasmasphere(one, nps1)
-         !call interpolate_exosphere(current_time, one, nH1)
-!         beta_dt(istep) = nps1*dt
+!         call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
+         call interpolate_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
          beta_RCCX_dt(istep) = beta_RCCX1*dt
          beta_PSCX_dt(istep) = beta_PSCX1*dt
          nH_traj(istep) = nH1
          vel2(istep) = vt**2
-!            print*, "beta_CX1, nps1, dt", beta_CX1, nps1, dt, rank
-!            stop
 
          radial_distance = sqrt(one(2)**2+one(3)**2+one(4)**2)
          if (radial_distance .lt. radial_boundary(1)) then
             flag = 1
             call calculate_final_timestep(old,one,dt,f0)
                istep = istep + 1
-!               call nearest_grid_plasmasphere(one, nps1)
-               call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
-               !call interpolate_plasmasphere(one, nps1)
-               !call interpolate_exosphere(one, nH1)
-!               beta_dt(istep) = nps1*dt
+               !call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
+               call interpolate_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
                beta_RCCX_dt(istep) = beta_RCCX1*dt
                beta_PSCX_dt(istep) = beta_PSCX1*dt
                nH_traj(istep) = nH1

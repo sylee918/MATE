@@ -82,6 +82,7 @@
                !!                    Current code is just the 0th-order interpolation.
             else ! Plasmasphere-origin particle
                n_BC = 0.d0
+               temp_BC = 1.d0  !! Set any finite value to avoid NaN
             endif
 
                if (i_Photoionization .eq. 1) then
@@ -100,13 +101,6 @@
 
                cexo2 = fac*temp_BC
                vel2 = sum(vel*vel)
-!               if (i_ChargeExchange .eq. 1) then
-!                  call cpu_time(cx_t0)
-!                  call Calculate_ChargeExchange(iE,iv, ptl(iv,iE,:), flags(iv,iE), current_time, ICX, PSD_CX)  !! Already used above?
-!                  call cpu_time(cx_t1)
-!                  cx_time_total = cx_time_total + (cx_t1 - cx_t0)
-!                  cx_calls = cx_calls + 1
-!               endif
                if (i_ChargeExchange .eq. 0) then
                   ICX = 0.d0     ! loss rate by CX
                   PSD_CX = 0.d0  ! PSD of CX-created H
@@ -114,7 +108,6 @@
                if (i_ChargeExchange .eq. 2) then  ! RCCX only
                   PSD_CX = 0.d0
                endif
-               !print*, "ICX, Iph", ICX, Iph, rank
 
                if (ICX .gt. 0.d0) then
                   print*, "ICX is positive", ICX
@@ -123,14 +116,7 @@
 
                !vel = (vel - vel_BC)
                PSD_exobase = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph + ICX) ! dt is negative, so ICX is already negative.
-!               each_n(iv,iE) = PSD_exobase * dV2(iE,iv)
-!               PSD_CX=0.d0
                each_n(iv,iE) = (PSD_exobase + PSD_CX) * dV2(iE,iv)
-
-!               if (current_time .gt. 2008164+2.d0/24.d0-1d-5) then
-!                  print *, "current_time = ", real(current_time-2008000), " PSD_CX = ", real(PSD_CX), " PSD_exobase = ", real(PSD_exobase)
-!               endif
-
 
          enddo
       enddo
