@@ -95,8 +95,10 @@
 !                        iflon = iflon - 360/bc_res
 !                     endif
 
-                     n_BC    = nH_BC(iflon,iflat,it,idoy)
-                     temp_BC = TH_BC(iflon,iflat,it,idoy)
+!                     n_BC    = nH_BC(iflon,iflat,it,idoy)
+!                     temp_BC = TH_BC(iflon,iflat,it,idoy)
+                     n_BC = 1.0d0
+                     temp_BC = 1.1d4
 
                      !! ** FIX ME (above): Trilinear interpolation is desired for more accurate calculation.
                      !!                    Current code is just the 0th-order interpolation.

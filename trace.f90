@@ -12,7 +12,7 @@
 !         pos => temp(1:3)
 !         vel => temp(4:6)
          ! FIX ME: f0 is 4 for the 1st paper
-!         f0=4.0
+         f0=4.0
 
          pos = temp(1:3)
          vel = temp(4:6)

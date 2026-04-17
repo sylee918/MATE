@@ -23,7 +23,8 @@
             else
                   if (nEnergy .eq. 61) then  ! for 0.001 - 1 eV
                         do iE=1,nEnergy 
-                              energy_range(iE) = 10.d0 ** ((iE-1)/20.d0 - 3.d0)
+!                              energy_range(iE) = 10.d0 ** ((iE-1)/20.d0 - 3.d0)  !! 1e-3 - 10 eV
+                              energy_range(iE) = 10.d0 ** ((iE-1)/15.d0 - 2.d0)  !! 1e-2 - 1e3 eV
                         enddo
                   else
                         print*, 'ERROR: Set a proper nEnergy'

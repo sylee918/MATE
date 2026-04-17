@@ -4,7 +4,7 @@
 !!**** Recommended to change the parameters for your run ***!!
 
    !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-      character*20, parameter :: Runname_in_10char              = "Cor_x100"
+      character*20, parameter :: Runname_in_10char              = "OSR3"
    
    !! TIME SETTING !!
       integer, parameter ::      Start_Time_in_YYYYDOY          = 1234010
@@ -12,7 +12,7 @@
       integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
    !! 3-D SPATIAL RESOLUTIONS !!
-      integer, parameter ::      GEO_Resolution_in_Degree       = 5
+      integer, parameter ::      GEO_Resolution_in_Degree       = 15
       real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
       real*8, parameter  ::      RadialRange_max                = 20.0
       real*8, parameter  ::      dR                             = 1.0
@@ -27,7 +27,7 @@
    !! DIRECTORIES SETTING !!
       character*70, parameter :: Lya_dir                          = "OMNI_extended.txt"         ! 1964 - 2024 (Oct)
       character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
-      character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0524/GRC/"
+      character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/XRP/"
 
    !! Including Physics !!
       integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
@@ -43,9 +43,9 @@
       integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1234010                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
    !! Particle Tracing Range !!
-      real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location
-      real*8, parameter :: outer_boundary                         = 100*Re
-      real*8, parameter :: Max_Travel_Time_in_Days                = 60                         ! DEFAULT = 60
+      real*8, parameter :: inner_boundary                         = Re *2                ! Exobase location
+      real*8, parameter :: outer_boundary                         = 60*Re
+      real*8, parameter :: Max_Travel_Time_in_Days                = 30                         ! DEFAULT = 60
 
 
 

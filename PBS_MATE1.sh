@@ -1,11 +1,12 @@
 #PBS -S /bin/csh
 #PBS -N slee122
-#PBS -l select=47:ncpus=27:mpiprocs=27:model=bro+1:ncpus=28:mpiprocs=28:model=bro
-#PBS -l walltime=2:00:00
+##PBS -l select=47:ncpus=27:mpiprocs=27:model=bro_ele+1:ncpus=28:mpiprocs=28:model=bro_ele
+#PBS -l select=4:ncpus=40:mpiprocs=40:model=sky_ele
+#PBS -l walltime=48:00:00
 #PBS -j oe
 #PBS -W group_list=s3015
 #PBS -m e
-#PBS -q devel
+#PBS -q long
 
 module load comp-intel mpi-hpe
 module load pkgsrc
@@ -13,8 +14,8 @@ module load pkgsrc
 cd $PBS_O_WORKDIR
 
 #mpirun -np 5 ./MATE.x
-mpirun -np 1297 ./MATE.x
-#mpirun -np 72 ./MATE.x
+#mpirun -np 1297 ./MATE.x
+mpirun -np 145 ./MATE.x
 #mpirun -np 48 ./MATE.x
 
 
