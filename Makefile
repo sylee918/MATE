@@ -1,5 +1,5 @@
-#FC = ifort
-FC = mpif90 -fc=ifort
+FC = ftn
+#FC = mpif90 -fc=ifort
 
 flags = -O2 -mcmodel=medium
 #flags = -mcmodel=medium -g -check all -warn external -warn declarations,interfaces -traceback

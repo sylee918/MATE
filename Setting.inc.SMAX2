@@ -7,7 +7,7 @@
       character*20, parameter :: Runname_in_10char              = "SMAX2"
    
    !! TIME SETTING !!
-      integer, parameter ::      Start_Time_in_YYYYDOY          = 2014189
+      integer, parameter ::      Start_Time_in_YYYYDOY          = 2014187
       integer, parameter ::      End_Time_in_YYYYDOY            = 2014202
       integer, parameter ::      Output_Time_Interval_in_Minute = 60
 
