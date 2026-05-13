@@ -25,13 +25,14 @@
       End
 
 
-      Subroutine Calculate_Density(fin, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
+      Subroutine Calculate_Density(fin, flags, current_time, energy_range, nH_BC, TH_BC, number_density_1D, bph, rank)
          ! "cdensity" in python code
 !         use omp_lib
          use Module_for_NVelocityDirection
          use, intrinsic :: ieee_arithmetic
          include "Setting.inc"
          external calculate_Velocity_Volume_Element
+         external gen_points
          external GSE2SPH
 
          real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: fin
@@ -39,9 +40,9 @@
          real*8, dimension(nEnergy,N_vel_directions) :: dV2
          real*8, dimension(start_ydoy_index:end_ydoy_index) :: bph
          real*8, dimension(:,:,:), allocatable :: each_n
+         real*8, dimension(:,:,:,:), allocatable :: each_u, each_T
          real*8 pos(3), vel(3), vel2
-         real*8 temp_BC, n_BC, vel_BC(3), fac, number_density
-         real*8 number_density_1D(nRadial), cexo2
+         real*8 temp_BC, n_BC, vel_BC(3), fac, PSD1, cexo2
          integer iR,iE,iv, i
          real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
          real*8 finlon, finlat
@@ -50,17 +51,33 @@
          character*30 fn2D, fn3D
          integer idoy, iday
 
+         real*8, dimension(nEnergy) :: energy_range
+         real*8, dimension(N_vel_directions,3) :: vel_dir
+         real*8, dimension(nRadial) :: number_density_1D
+         real*8, dimension(nRadial, 3) :: bulk_velocity_1D
+         real*8, dimension(nRadial, 3) :: temperature_1D
+
+
          vel_BC = 0.d0;
          call calculate_Velocity_Volume_Element(dV2)
 
          allocate(each_n(N_vel_directions,nRadial,nEnergy))
+         allocate(each_u(N_vel_directions,nRadial,nEnergy,3))
+         allocate(each_T(N_vel_directions,nRadial,nEnergy,3))
          each_n = 0.d0
+         each_u = 0.d0
+         each_T = 0.d0
          number_density_1D = 0.d0
+         bulk_velocity_1D = 0.d0
+         temperature_1D = 0.d0
 
          fac = 2.d0*kb/mH
 
+         call gen_points(vel_dir)
+
          do iR=1,nRadial      ! Outermost iR-loop
             do iE=1,nEnergy
+               energy_to_speed = sqrt(energy_range(iE)*e*2.d0/mH)
                do iv=1,N_vel_directions
                   t0 = current_time + fin(iv,iR,iE,1)/86400.    ! unit day
                   idoy = int(t0)                               ! yyyy+doy
@@ -114,13 +131,35 @@
 !                     vel = (vel - vel_BC)
                      cexo2 = fac*temp_BC
                      vel2 = sum(vel*vel)
-                     number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph)
-                     each_n(iv,iR,iE) = number_density * dV2(iE,iv) !* dV1(iR)
+                     PSD1 = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph)
+                  ! n_H
+                     each_n(iv,iR,iE) = PSD1 * dV2(iE,iv) !* dV1(iR)
+                  ! u_H
+                     each_u(iv,iR,iE,1) = vel_dir(iv,1)*energy_to_speed * PSD1 * dV2(iE,iv)  ! vx*f*dv3
+                     each_u(iv,iR,iE,2) = vel_dir(iv,2)*energy_to_speed * PSD1 * dV2(iE,iv)  ! vy*f*dv3
+                     each_u(iv,iR,iE,3) = vel_dir(iv,3)*energy_to_speed * PSD1 * dV2(iE,iv)  ! vz*f*dv3
 
                   endif
                enddo
             enddo
             number_density_1D(iR) = sum(each_n(:,iR,:))
+            bulk_velocity_1D(iR,1) = sum(each_u(:,iR,:,1))/number_density_1D(iR)  
+            bulk_velocity_1D(iR,2) = sum(each_u(:,iR,:,2))/number_density_1D(iR)  
+            bulk_velocity_1D(iR,3) = sum(each_u(:,iR,:,3))/number_density_1D(iR)  
+
+            do iE=1,nEnergy
+               energy_to_speed = sqrt(energy_range(iE)*e*2.d0/mH)
+               do iv=1,N_vel_directions
+                  each_T(iv,iR,iE,1) = (vel_dir(iv,1)*energy_to_speed - bulk_velocity_1D(iR,1))**2 * each_n(iv,iR,iE)
+                  each_T(iv,iR,iE,2) = (vel_dir(iv,2)*energy_to_speed - bulk_velocity_1D(iR,2))**2 * each_n(iv,iR,iE)
+                  each_T(iv,iR,iE,3) = (vel_dir(iv,3)*energy_to_speed - bulk_velocity_1D(iR,3))**2 * each_n(iv,iR,iE)
+               enddo
+            enddo
+            temperature_1D(iR,1) = sum(each_T(:,iR,:,1)) * mH / (e * number_density_1D(iR))
+            temperature_1D(iR,2) = sum(each_T(:,iR,:,2)) * mH / (e * number_density_1D(iR))
+            temperature_1D(iR,3) = sum(each_T(:,iR,:,3)) * mH / (e * number_density_1D(iR))
+
+
          enddo
          deallocate(each_n)
 

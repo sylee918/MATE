@@ -22,9 +22,11 @@
 
       real*8 number_density_1D(nRadial)
       real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: number_density_4D, number_density_4D_MPI
+      real*8, dimension(nRadial,nLon,nLat_NS,ntperday,3) :: bulk_velocity_5D, bulk_velocity_5D_MPI
+      real*8, dimension(nRadial,nLon,nLat_NS,ntperday,3) :: temperature_5D, temperature_5D_MPI
       real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
       character*30 tag
-      integer rank, nprocs, ierr, il, N_REDUCE
+      integer rank, nprocs, ierr, il, N_REDUCE, N_REDUCE_3
 
       integer doy, iday, ihour, iminute, it, year, hour
       real*8, dimension(start_ydoy_index:end_ydoy_index) :: Lya, bph
@@ -77,7 +79,7 @@
                      if (lat .gt. 0) then    ! N/S symmetry
                         ptl(:,:,:,4) = -ptl(:,:,:,4)
                         ptl(:,:,:,7) = -ptl(:,:,:,7)
-                        call Calculate_Density(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
+                        call Calculate_Density(ptl, flags, current_time, energy_range,nH_BC, TH_BC, number_density_1D, bph, rank)
 !                        call Calculate_Flux(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
                         number_density_4D_MPI(:,ilon,nLat_NS+1-ilat,it) = number_density_1D
                      endif
@@ -90,17 +92,26 @@
          call MPI_BARRIER(MPI_COMM_WORLD, ierr)
          N_REDUCE = nRadial * nLon * nLat_NS * ntperday
          call MPI_REDUCE(number_density_4D_MPI, number_density_4D, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
-         
+         N_REDUCE_3 = nRadial * nLon * nLat_NS * ntperday * 3
+         call MPI_REDUCE(bulk_velocity_5D_MPI, bulk_velocity_5D, N_REDUCE_3, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
+         call MPI_REDUCE(temperature_5D_MPI, temperature_5D, N_REDUCE_3, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
+
          if (rank .eq. 0) then
             do it=1,ntperday
                do ilon=2,nLong
                   number_density_4D(:,ilon,1,it)       = number_density_4D(:,1,1,it)         ! South pole
                   number_density_4D(:,ilon,nLat_NS,it) = number_density_4D(:,1,nLat_NS,it)   ! North pole
+                  bulk_velocity_5D(:,ilon,1,it, :)       = bulk_velocity_5D(:,1,1,it, :)         ! South pole
+                  bulk_velocity_5D(:,ilon,nLat_NS,it, :) = bulk_velocity_5D(:,1,nLat_NS,it, :)   ! North pole
+                  temperature_5D(:,ilon,1,it, :)       = temperature_5D(:,1,1,it, :)         ! South pole
+                  temperature_5D(:,ilon,nLat_NS,it, :) = temperature_5D(:,1,nLat_NS,it, :)   ! North pole
                enddo
             enddo ! it
 
             write(dayst, '(I7.7)') iday
             call write_density_4D(number_density_4D, iday)
+            call write_moment_5D(bulk_velocity_5D, temperature_5D, iday)
+
          endif
 
       enddo ! iday

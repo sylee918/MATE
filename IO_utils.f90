@@ -338,6 +338,43 @@
       End
 
 
+      Subroutine write_moment_5D(bulk_velocity_5D, temperature_5D, iday)
+
+         use Module_Physics_tag
+         include "Setting.inc"
+         
+         real*8 bulk_velocity_5D(3,nRadial,nLong,nLat_NS,ntperday)
+         real*8 temperature_5D(3,nRadial,nLong,nLat_NS,ntperday)
+         real, dimension(:,:,:,:,:), allocatable :: real_bulk_velocity_5D
+         real, dimension(:,:,:,:,:), allocatable :: real_temperature_5D
+         integer iday, nlen
+         character*10 dayst
+         character*100 filename
+
+         allocate(real_bulk_velocity_5D(3,nRadial,nLong,nLat_NS,ntperday))
+         allocate(real_temperature_5D(3,nRadial,nLong,nLat_NS,ntperday))
+         real_bulk_velocity_5D = real(bulk_velocity_5D)
+         real_temperature_5D = real(temperature_5D)
+
+         write(dayst, '(I7.7)') iday
+         filename = trim(outdir) // 'MATE_u_' // trim(tag_phys) // '_' // trim(tag0) // '_' // trim(dayst) // '.data'
+         inquire(iolength=nlen) real_bulk_velocity_5D
+         open(file=filename,unit=45,form='unformatted',access='direct',recl=nlen,status='replace')
+         write(45,rec=1) real_bulk_velocity_5D
+         close(45)
+
+         filename = trim(outdir) // 'MATE_T_' // trim(tag_phys) // '_' // trim(tag0) // '_' // trim(dayst) // '.data'
+         inquire(iolength=nlen) real_temperature_5D
+         open(file=filename,unit=46,form='unformatted',access='direct',recl=nlen,status='replace')
+         write(46,rec=1) real_temperature_5D
+         close(46)
+
+         deallocate(real_bulk_velocity_5D)
+         deallocate(real_temperature_5D)
+
+         return
+      End
+
       Subroutine Write_ESC_FLUX_2D(density_2D)
 
          use Module_Physics_tag
