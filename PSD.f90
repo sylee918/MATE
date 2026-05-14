@@ -25,7 +25,7 @@
       End
 
 
-      Subroutine Calculate_Density(fin, flags, current_time, energy_range, nH_BC, TH_BC, number_density_1D, bph, rank)
+      Subroutine Calculate_Density(fin, flags, current_time, energy_range, nH_BC, TH_BC, number_density_1D, bulk_velocity_1D, temperature_1D, bph, rank)
          ! "cdensity" in python code
 !         use omp_lib
          use Module_for_NVelocityDirection

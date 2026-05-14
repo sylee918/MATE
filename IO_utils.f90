@@ -343,16 +343,16 @@
          use Module_Physics_tag
          include "Setting.inc"
          
-         real*8 bulk_velocity_5D(3,nRadial,nLong,nLat_NS,ntperday)
-         real*8 temperature_5D(3,nRadial,nLong,nLat_NS,ntperday)
+         real*8 bulk_velocity_5D(nRadial,nLong,nLat_NS,ntperday,3)
+         real*8 temperature_5D(nRadial,nLong,nLat_NS,ntperday,3)
          real, dimension(:,:,:,:,:), allocatable :: real_bulk_velocity_5D
          real, dimension(:,:,:,:,:), allocatable :: real_temperature_5D
          integer iday, nlen
          character*10 dayst
          character*100 filename
 
-         allocate(real_bulk_velocity_5D(3,nRadial,nLong,nLat_NS,ntperday))
-         allocate(real_temperature_5D(3,nRadial,nLong,nLat_NS,ntperday))
+         allocate(real_bulk_velocity_5D(nRadial,nLong,nLat_NS,ntperday,3))
+         allocate(real_temperature_5D(nRadial,nLong,nLat_NS,ntperday,3))
          real_bulk_velocity_5D = real(bulk_velocity_5D)
          real_temperature_5D = real(temperature_5D)
 

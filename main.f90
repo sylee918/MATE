@@ -20,7 +20,7 @@
       real*8 lon,lat
       integer ilon, ilat, nLon0
 
-      real*8 number_density_1D(nRadial)
+      real*8 number_density_1D(nRadial), bulk_velocity_1D(nRadial, 3), temperature_1D(nRadial, 3)
       real*8, dimension(nRadial,nLon,nLat_NS,ntperday) :: number_density_4D, number_density_4D_MPI
       real*8, dimension(nRadial,nLon,nLat_NS,ntperday,3) :: bulk_velocity_5D, bulk_velocity_5D_MPI
       real*8, dimension(nRadial,nLon,nLat_NS,ntperday,3) :: temperature_5D, temperature_5D_MPI
@@ -52,6 +52,8 @@
 
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
+         bulk_velocity_5D_MPI=0.d0;  bulk_velocity_5D=0.d0
+         temperature_5D_MPI=0.d0;    temperature_5D=0.d0
          do it=1,ntperday
 !         do ihour=0,23
 !            it=ihour+1
@@ -67,21 +69,23 @@
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
                   il = ilon-1 + (ilat-nLat)*nLong
-                  if (rank .eq. il) then
+                  if (mod(il, nprocs) .eq. rank) then
                      print*, '  LON & LAT = ', int(lon*180/pi), int(lat*180/pi), '[deg]'
 
                      call Init_Particles(ptl, radial_distance_range, energy_range, lon,lat)
                      call Trace_particle(ptl, flags, radial_boundary, tmax, Lya, current_time)
-                     call Calculate_Density(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
-!                     call Calculate_Flux(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
+                     call Calculate_Density(ptl, flags, current_time, energy_range, nH_BC, TH_BC, number_density_1D, bulk_velocity_1D, temperature_1D, bph, rank)
                      number_density_4D_MPI(:,ilon,ilat,it) = number_density_1D
+                     bulk_velocity_5D_MPI(:,ilon,ilat,it, :) = bulk_velocity_1D
+                     temperature_5D_MPI(:,ilon,ilat,it, :) = temperature_1D
 
                      if (lat .gt. 0) then    ! N/S symmetry
                         ptl(:,:,:,4) = -ptl(:,:,:,4)
                         ptl(:,:,:,7) = -ptl(:,:,:,7)
-                        call Calculate_Density(ptl, flags, current_time, energy_range,nH_BC, TH_BC, number_density_1D, bph, rank)
-!                        call Calculate_Flux(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
+                        call Calculate_Density(ptl, flags, current_time, energy_range, nH_BC, TH_BC, number_density_1D, bulk_velocity_1D, temperature_1D, bph, rank)
                         number_density_4D_MPI(:,ilon,nLat_NS+1-ilat,it) = number_density_1D
+                        bulk_velocity_5D_MPI(:,ilon,nLat_NS+1-ilat,it, :) = bulk_velocity_1D
+                        temperature_5D_MPI(:,ilon,nLat_NS+1-ilat,it, :) = temperature_1D
                      endif
 
                   endif
