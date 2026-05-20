@@ -4,7 +4,7 @@
 !!**** Recommended to change the parameters for your run ***!!
 
    !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-      character*20, parameter :: Runname_in_10char              = "BC_test1"
+      character*20, parameter :: Runname_in_10char              = "BC_test2"
    
    !! TIME SETTING !!
       integer, parameter ::      Start_Time_in_YYYYDOY          = 2020001
