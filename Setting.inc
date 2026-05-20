@@ -4,18 +4,18 @@
 !!**** Recommended to change the parameters for your run ***!!
 
    !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-      character*20, parameter :: Runname_in_10char              = "SMAX2"
+      character*20, parameter :: Runname_in_10char              = "BC_test1"
    
    !! TIME SETTING !!
-      integer, parameter ::      Start_Time_in_YYYYDOY          = 2014189
-      integer, parameter ::      End_Time_in_YYYYDOY            = 2014202
-      integer, parameter ::      Output_Time_Interval_in_Minute = 60
+      integer, parameter ::      Start_Time_in_YYYYDOY          = 2020001
+      integer, parameter ::      End_Time_in_YYYYDOY            = 2020001
+      integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
    !! 3-D SPATIAL RESOLUTIONS !!
-      integer, parameter ::      GEO_Resolution_in_Degree       = 5
+      integer, parameter ::      GEO_Resolution_in_Degree       = 15
       real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
-      real*8, parameter  ::      RadialRange_max                = 15.0
-      real*8, parameter  ::      dR                             = 0.5
+      real*8, parameter  ::      RadialRange_max                = 10.0
+      real*8, parameter  ::      dR                             = 8.0
 
    !! Number of Particle Direction !!
       integer, parameter ::      dV_theta                         = 6                        ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
@@ -40,12 +40,12 @@
       character*10, parameter :: ExobaseBC_Model_Name             = "MSIS"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
       integer, parameter ::      BC_GEO_Resolution_in_Degree      = 5
       integer, parameter ::      BC_Time_Resolution_in_Minute     = 5
-      integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 2014174                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+      integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 2020001                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
    !! Particle Tracing Range !!
       real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location
-      real*8, parameter :: outer_boundary                         = 100*Re
-      real*8, parameter :: Max_Travel_Time_in_Days                = 60                         ! DEFAULT = 60
+      real*8, parameter :: outer_boundary                         = 60*Re
+      real*8, parameter :: Max_Travel_Time_in_Days                = 40                         ! DEFAULT = 60
 
 
 

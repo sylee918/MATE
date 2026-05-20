@@ -382,20 +382,10 @@
          real*8 pos(3)
          real*8 finlon,finlat
 
-         if (pos(2) .gt. 0) then
-            if (pos(1) .gt. 0) then
-               finlon = atan(pos(2)/pos(1))
-            else
-               finlon = atan(pos(2)/pos(1)) + pi
-            endif
-         else
-            if (pos(1) .lt. 0) then
-               finlon = atan(pos(2)/pos(1)) + pi
-            else
-               finlon = atan(pos(2)/pos(1)) + 2*pi
-            endif
-         endif
-         finlat = atan(pos(3)/sqrt(pos(1)*pos(1)+pos(2)*pos(2)))
+         finlon = atan2(pos(2), pos(1))
+         if (finlon .lt. 0.d0) finlon = finlon + 2.d0*pi
+
+         finlat = atan2(pos(3), sqrt(pos(1)*pos(1)+pos(2)*pos(2)))
 
          finlon = finlon * 180.d0/pi
          finlat = finlat * 180.d0/pi
