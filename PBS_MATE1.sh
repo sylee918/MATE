@@ -1,22 +1,24 @@
 #PBS -S /bin/csh
 #PBS -N slee122
-#PBS -l select=5:ncpus=256:mpiprocs=256:model=tur_ath+1:ncpus=17:mpiprocs=17:model=tur_ath
-#PBS -l walltime=120:00:00
+##PBS -l select=5:ncpus=256:mpiprocs=256:model=tur_ath+1:ncpus=17:mpiprocs=17:model=tur_ath
+#PBS -l select=4:ncpus=40:mpiprocs=40:model=sky_ele
+#PBS -l walltime=2:00:00
 #PBS -l place=scatter:excl
 #PBS -j oe
 #PBS -W group_list=s3015
 #PBS -m e
-#PBS -q long
-##PBS -q devel
+##PBS -q long
+#PBS -q devel
 ##PBS -q normal
 
-#module load comp-intel mpi-hpe
-#module load pkgsrc
+module load comp-intel mpi-hpe
+module load pkgsrc
 
 cd $PBS_O_WORKDIR
 
 #mpirun -np 1 ./MATE.x
-mpirun -np 1297 ./MATE.x
+#mpirun -np 1297 ./MATE.x
+mpirun -np 145 ./MATE.x
 #mpirun -np 72 ./MATE.x
 #mpirun -np 48 ./MATE.x
 
