@@ -74,19 +74,20 @@
                      enddo
 
                      call GSE2SPH(pos,finlon,finlat)
-!                     iflon=floor(finlon/bc_res)+1                !   0 < lon < 360
+                     iflon=floor(finlon/bc_res)+1                !   0 < lon < 360
+                     iflat=floor(finlat/bc_res)+1     ! 0 < lat < 180
 !                    ** It is due to the longitude is defined from -180 to 180 in python, not 0 to 360.
 !                    ** If it is defined from 0 to 360, then use the above one.
-                     iflon=floor(finlon/bc_res)+(180/bc_res)+1              
-                     iflat=floor(finlat/bc_res)+(90/bc_res)+1     ! -90 < lat < 90
-                     if (iflat .eq. 180/bc_res+1) then
-                        iflon = iflon + 180/bc_res
-                        iflat = 180/bc_res
-                     endif
-                     if (iflon .ge. 360/bc_res+1) then
-                        quotient = int(iflon/(360/bc_res))
-                        iflon = iflon - (360/bc_res)*quotient
-                     endif
+!                     iflon=floor(finlon/bc_res)+(180/bc_res)+1              
+!                     iflat=floor(finlat/bc_res)+(90/bc_res)+1     ! -90 < lat < 90
+!                     if (iflat .eq. 180/bc_res+1) then
+!                        iflon = iflon + 180/bc_res
+!                        iflat = 180/bc_res
+!                     endif
+!                     if (iflon .ge. 360/bc_res+1) then
+!                        quotient = int(iflon/(360/bc_res))
+!                        iflon = iflon - (360/bc_res)*quotient
+!                     endif
 
                      !! FIX ME (05.28.2024) : Temporarily fixed the 180 degree
                      !difference of MSIS longitude
@@ -116,6 +117,8 @@
                      vel2 = sum(vel*vel)
                      number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph)
                      each_n(iv,iR,iE) = number_density * dV2(iE,iv) !* dV1(iR)
+!
+                     each_n(iv,iR,iE) = n_BC
 
                   endif
                enddo
