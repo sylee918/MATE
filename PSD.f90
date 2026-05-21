@@ -119,7 +119,7 @@
                      number_density = n_BC * exp(-vel2/cexo2) / (pi*cexo2)**1.5 * exp(-Iph)
                      each_n(iv,iR,iE) = number_density * dV2(iE,iv) !* dV1(iR)
 !
-                     each_n(iv,iR,iE) = n_BC
+!                     each_n(iv,iR,iE) = n_BC
 
                   endif
                enddo

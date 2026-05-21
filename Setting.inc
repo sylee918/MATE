@@ -4,7 +4,7 @@
 !!**** Recommended to change the parameters for your run ***!!
 
    !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-      character*20, parameter :: Runname_in_10char              = "BC_test2"
+      character*20, parameter :: Runname_in_10char              = "BC_test3"
    
    !! TIME SETTING !!
       integer, parameter ::      Start_Time_in_YYYYDOY          = 2020001
@@ -15,7 +15,7 @@
       integer, parameter ::      GEO_Resolution_in_Degree       = 15
       real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
       real*8, parameter  ::      RadialRange_max                = 10.0
-      real*8, parameter  ::      dR                             = 1.0
+      real*8, parameter  ::      dR                             = 8.0
 
    !! Number of Particle Direction !!
       integer, parameter ::      dV_theta                         = 6                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
