@@ -15,14 +15,10 @@
       integer, parameter ::      GEO_Resolution_in_Degree       = 15
       real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
       real*8, parameter  ::      RadialRange_max                = 10.0
-      real*8, parameter  ::      dR                             = 8.0
+      real*8, parameter  ::      dR                             = 1.0
 
    !! Number of Particle Direction !!
-<<<<<<< HEAD
-      integer, parameter ::      dV_theta                         = 6                        ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
-=======
       integer, parameter ::      dV_theta                         = 6                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
->>>>>>> 1de97dae4ad7d2cad1f58d8c46d02ab6bf3af02b
       integer, parameter ::      nTheta                           = 180/dV_theta + 1          ! # of theta grids
 
    !! (FIX ME!!) Energy Grid !!
@@ -30,14 +26,8 @@
 
    !! DIRECTORIES SETTING !!
       character*70, parameter :: Lya_dir                          = "OMNI_extended.txt"         ! 1964 - 2024 (Oct)
-<<<<<<< HEAD
       character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
       character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0524/GRCP/"
-=======
-!      character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
-      character*70, parameter :: BC_dir                           = "~/exospherecode/MSIS/Fortran/BC/"
-      character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0524/GRC/"
->>>>>>> 1de97dae4ad7d2cad1f58d8c46d02ab6bf3af02b
 
    !! Including Physics !!
       integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
