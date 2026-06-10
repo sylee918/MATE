@@ -1,0 +1,7 @@
+slee122.o*
+*.o
+*.x
+*.in
+
+run*/
+/exobaseBC

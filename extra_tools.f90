@@ -5,7 +5,8 @@
          !  output : boolean; if 0, returns points as normal;
          !           if 1, returns array specifying how many points are at each theta value"
 
-         include "constants.inc"
+         use Module_for_NVelocityDirection
+         include "Setting.inc"
          integer :: nsize, n2
          integer :: i, j, i0
          real*8 piset(nTheta), piset2(0:nTheta), piset2_i
@@ -81,7 +82,7 @@
       Subroutine gen_points_for_each_row(row)
          ! "gen_points" with output=1 in python code.
 
-         include "constants.inc"
+         include "Setting.inc"
          integer :: i, j, k, n2
          integer row(0:nTheta)
          real*8 piset(nTheta), piset2(0:nTheta)
@@ -112,7 +113,8 @@
       Subroutine Solid_Angle_For_Velocity_Volume_Element(solid_angle)
          ! 'solid_angle' = sin(theta).d(theta).d(phi)
          ! 'solanglist' in python code
-         include "constants.inc"
+         use Module_for_NVelocityDirection
+         include "Setting.inc"
          external gen_points_for_each_row
 
          real*8 solid_angle(N_vel_directions)
@@ -155,7 +157,7 @@
       Subroutine Radial_Component_For_Velocity_Volume_Element(v2dv)
          ! 'v2dv' = v^2 dv (v=vr for initial condition)
          ! 'vollist' in python code.
-         include "constants.inc"
+         include "Setting.inc"
          external Init_Parameter
 
          real*8, dimension(nEnergy) :: energy_to_speed, v2dv
@@ -187,7 +189,8 @@
 
       Subroutine calculate_Velocity_Volume_Element(dV2)
 
-         include "constants.inc"
+         use Module_for_NVelocityDirection
+         include "Setting.inc"
          external Solid_Angle_For_Velocity_Volume_Element, Radial_Component_For_Velocity_Volume_Element
 
          real*8 solid_angle(N_vel_directions)
@@ -208,23 +211,79 @@
       End
 
 
+      Subroutine Radial_Component_Of_Velocity_Volume_Element_For_Flux(v3dv)
+         ! 'v3dv' = v^3 dv (v=vr for initial condition)
+         ! 'vollist' in python code.
+         include "Setting.inc"
+         external Init_Parameter
+
+         real*8, dimension(nEnergy) :: energy_to_speed, v3dv
+         real*8 v_spacing(nEnergy+1), half_dv
+         real*8 radial_distance_range(nRadial), energy_range(nEnergy), longitude_range(nLong), latitude_range(nLat), latitudeNS_range(nLat_NS)
+         real*8 radial_boundary(2), tmax
+         integer iE
+
+         call Init_Parameter(radial_distance_range, energy_range, longitude_range, latitude_range, latitudeNS_range, radial_boundary, tmax)
+         energy_to_speed = sqrt(energy_range*e*2.d0/mH)
+
+         v_spacing(1)=energy_to_speed(1)/2
+         do iE=2, nEnergy
+            if (iE .lt. nEnergy) then
+               half_dv = 0.5d0*(energy_to_speed(iE+1)-energy_to_speed(iE))
+            endif
+            !use old half_dv of iE=nEnergy for energy_to_speed(iE+1)
+            v_spacing(iE) = energy_to_speed(iE)-half_dv
+         enddo
+         v_spacing(nEnergy+1) = energy_to_speed(nEnergy)+half_dv
+
+         do iE=1, nEnergy
+            v3dv(iE) = (v_spacing(iE+1)**4 - v_spacing(iE)**4)/4.d0
+         enddo
+
+         return
+      End
+
+
+      Subroutine calculate_Velocity_Volume_Element_For_Flux(dV2)
+
+         use Module_for_NVelocityDirection
+         include "Setting.inc"
+         external Solid_Angle_For_Velocity_Volume_Element, Radial_Component_For_Velocity_Volume_Element
+
+         real*8 solid_angle(N_vel_directions)
+         real*8, dimension(nEnergy) :: v3dv
+         real*8 dV2(nEnergy,N_vel_directions)
+         integer iE, iv
+
+         call Solid_Angle_For_Velocity_Volume_Element(solid_angle)
+         call Radial_Component_Of_Velocity_Volume_Element_For_Flux(v3dv)
+
+         do iv=1,N_vel_directions
+            do iE=1,nEnergy
+               dV2(iE,iv) = v3dv(iE)*solid_angle(iv)
+            enddo
+         enddo
+
+         return
+      End
+
       Subroutine calculate_Configuration_Volume_Element(radial_distance_range, lat, dV1)
          ! For RadPres...
-         include "constants.inc"
+         include "Setting.inc"
          real*8 radial_distance_range(nRadial)
-         real*8 r, lat, dr, dV1(nRadial)
+         real*8 r, lat, dr1, dV1(nRadial)
          real*8 dlat, dphi
          integer iR, ilat
 
-         dr = 0.5d0
+         dr1 = 0.5d0
          dlat = 15.d0 *pi/180
          dphi = 15.d0 *pi/180
          ! Solid angle for configuration volume element
          do iR=1,nRadial
             r = radial_distance_range(iR)
 !            lat = latitude_range(ilat)
-!            dV1(iR,ilat) = ((r+dr)**3 - r**3)/3.d0 * (cos(lat-dlat/2)-cos(lat+dlat/2))*dphi
-            dV1(iR) = ((r+dr)**3 - r**3)/3.d0 * (cos(lat-dlat/2)-cos(lat+dlat/2))*dphi
+!            dV1(iR,ilat) = ((r+dr1)**3 - r**3)/3.d0 * (cos(lat-dlat/2)-cos(lat+dlat/2))*dphi
+            dV1(iR) = ((r+dr1)**3 - r**3)/3.d0 * (cos(lat-dlat/2)-cos(lat+dlat/2))*dphi
          enddo
 
          return
@@ -233,7 +292,8 @@
 
       Subroutine Volume_Element(radial_distance_range,lat, dV)
          ! dV = dx^3 * dv^3
-         include "constants.inc"
+         use Module_for_NVelocityDirection
+         include "Setting.inc"
          external calculate_Configuration_Volume_Element, calculate_Velocity_Volume_Element
 
          real*8 dV1(nRadial), dV2(nEnergy,N_vel_directions)
@@ -260,7 +320,7 @@
       Subroutine Generate_tag(lon,lat, tag)
          ! Generate "tag" in format "i3.3" considering negative latitudes.
          ! Example: tag = "_lon270_lat000"
-         include "constants.inc"
+         include "Setting.inc"
          real*8 lon, lat
          character*30 tag
 
@@ -274,9 +334,10 @@
       End
 
 
+
       Subroutine Get_exobaseBC(nH_BC, TH_BC, rank)
 
-         include "constants.inc"
+         include "Setting.inc"
          external read_exobaseBC
 
          real*8, dimension(nbx,nby,nbtperday,start_ydoy-nt_bwd_bc:end_ydoy) :: nH_BC, TH_BC
@@ -285,6 +346,14 @@
          character*7 ydoy_str, yearst
          character*100 filename_BC
 
+
+         if (ExobaseBC_Model_Name .eq. "CONST") then
+            nH_BC = 1.2e5
+            TH_BC = 1e3
+            return
+         endif
+
+
          if (start_ydoy/1000 .eq. end_ydoy/1000) then
          write(yearst, '(I4.4)') start_ydoy/1000
 
@@ -292,7 +361,7 @@
             nH_temp = 0.d0 ; TH_temp=0.d0
             write(ydoy_str,'(I7.7)') iday
             write(yearst, '(I4.4)') start_ydoy/1000
-            filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(exobaseBC_type) // "_" // trim(ydoy_str) //  ".bc"
+            filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(ExobaseBC_Model_Name) // "_" // trim(ydoy_str) //  ".bc"
             call read_exobaseBC(filename_BC, nH_temp,TH_temp, rank+12)
             nH_BC(:,:,:,iday) = nH_temp
             TH_BC(:,:,:,iday) = TH_temp
@@ -316,7 +385,7 @@
             nH_temp = 0.d0 ; TH_temp=0.d0
             write(ydoy_str,'(I7.7)') iday
             write(yearst, '(I4.4)') start_ydoy/1000
-            filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(exobaseBC_type) // "_" // trim(ydoy_str) //  ".bc"
+            filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(ExobaseBC_Model_Name) // "_" // trim(ydoy_str) //  ".bc"
             call read_exobaseBC(filename_BC, nH_temp,TH_temp, rank+12)
             nH_BC(:,:,:,iday) = nH_temp
             TH_BC(:,:,:,iday) = TH_temp
@@ -332,7 +401,7 @@
             nH_temp = 0.d0 ; TH_temp=0.d0
             write(ydoy_str,'(I7.7)') iday
             write(yearst, '(I4.4)') end_ydoy/1000
-            filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(exobaseBC_type) // "_" // trim(ydoy_str) //  ".bc"
+            filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(ExobaseBC_Model_Name) // "_" // trim(ydoy_str) //  ".bc"
             call read_exobaseBC(filename_BC, nH_temp,TH_temp, rank+12)
             nH_BC(:,:,:,iday) = nH_temp
             TH_BC(:,:,:,iday) = TH_temp

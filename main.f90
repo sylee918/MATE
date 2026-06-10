@@ -1,14 +1,19 @@
       Program main
 
+      use Module_for_NVelocityDirection
+      use Module_Physics_tag
+
       include "mpif.h"
-      include "constants.inc"
- 
+      include "Setting.inc"
+
       external Init_Parameter, Init_Particles, Trace_particle, Calculate_Density
-      external Get_exobaseBC, read_Lya_Bph, write_density_4D
+      external Get_exobaseBC, read_Lya_Bph, write_density_4D, Make_Parameters_OutFile
       external MPI_INIT, MPI_COMM_RANK, MPI_COMM_SIZE, MPI_FINALIZE, MPI_BARRIER, MPI_REDUCE
 
-      real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: ptl
-      integer :: flags(N_vel_directions,nRadial,nEnergy)
+!      real*8, dimension(N_vel_directions,nRadial,nEnergy,7) :: ptl
+!      integer :: flags(N_vel_directions,nRadial,nEnergy)
+      real*8, allocatable, dimension(:,:,:,:) :: ptl
+      integer, allocatable, dimension(:,:,:) :: flags
 
       real*8 radial_distance_range(nRadial), energy_range(nEnergy) 
       real*8 longitude_range(nLong), latitude_range(nLat), latitudeNS_range(nLat_NS), radial_boundary(2), tmax
@@ -31,13 +36,18 @@
       call MPI_COMM_SIZE(MPI_COMM_WORLD, nprocs, ierr)
 
       call Init_Parameter(radial_distance_range, energy_range, longitude_range, latitude_range, latitudeNS_range, radial_boundary, tmax)
-
       ! load BC
-      year = int(start_ydoy/1000)
-      write(yearst, '(I4.4)') year
+      year = int(start_ydoy/1000);  write(yearst, '(I4.4)') year
       call Get_exobaseBC(nH_BC, TH_BC, rank)
-      call read_Lya_Bph(Lya, bph)
-      
+      call read_Lya_Bph(Lya, bph);  if (i_Photoionization .eq. 0) bph = 0.d0
+      ! call modules
+      call Physics_tag(); call gen_points_for_NV()
+      if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not moduel, just making .in file
+      ! End Initialization
+
+      allocate(ptl(N_vel_directions,nRadial,nEnergy,7))
+      allocate(flags(N_vel_directions,nRadial,nEnergy))
+
       do iday=start_ydoy, end_ydoy
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
          do it=1,ntperday
@@ -49,9 +59,9 @@
             print*, 'Current time:', iday, ihour, iminute
 
             do ilat=nLat,nLat_NS
+!            do ilat=nLat,nLat
                lat = latitudeNS_range(ilat)
-               if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then;  nLon0=1  ! North & South poles
-               else;  nLon0=nLong;  endif
+               if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then; nLon0=1; else; nLon0=nLong; endif  ! North & South poles
                do ilon=1,nLon0
                   lon = longitude_range(ilon)
                   il = ilon-1 + (ilat-nLat)*nLong
@@ -61,12 +71,14 @@
                      call Init_Particles(ptl, radial_distance_range, energy_range, lon,lat)
                      call Trace_particle(ptl, flags, radial_boundary, tmax, Lya, current_time)
                      call Calculate_Density(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
+!                     call Calculate_Flux(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
                      number_density_4D_MPI(:,ilon,ilat,it) = number_density_1D
 
                      if (lat .gt. 0) then    ! N/S symmetry
                         ptl(:,:,:,4) = -ptl(:,:,:,4)
                         ptl(:,:,:,7) = -ptl(:,:,:,7)
                         call Calculate_Density(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
+!                        call Calculate_Flux(ptl, flags, current_time, nH_BC, TH_BC, number_density_1D, bph, rank)
                         number_density_4D_MPI(:,ilon,nLat_NS+1-ilat,it) = number_density_1D
                      endif
 
@@ -88,11 +100,12 @@
             enddo ! it
 
             write(dayst, '(I7.7)') iday
-            tag = '_' // trim(tag0) // '_' // trim(dayst)
-            call write_density_4D(number_density_4D, tag)
+            call write_density_4D(number_density_4D, iday)
          endif
 
       enddo ! iday
+
+      deallocate(ptl,flags)
 
       call MPI_FINALIZE(ierr)
 
