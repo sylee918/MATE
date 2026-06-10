@@ -74,23 +74,23 @@
                      enddo
 
                      call GSE2SPH(pos,finlon,finlat)
-                     iflon=floor(finlon/bc_res)+1                !   0 < lon < 360
-                     iflat=(90/bc_res)-floor(finlat/bc_res)
-                     if (iflat .lt. 1) iflat = 1
-                     if (iflat .gt. nby) iflat = nby
+!                     iflon=floor(finlon/bc_res)+1                !   0 < lon < 360
+!                     iflat=(90/bc_res)-floor(finlat/bc_res)
+!                     if (iflat .lt. 1) iflat = 1
+!                     if (iflat .gt. nby) iflat = nby
 !                     print*, 'flon,flat: ', real(finlon), iflon, real(finlat), iflat
 !                    ** It is due to the longitude is defined from -180 to 180 in python, not 0 to 360.
 !                    ** If it is defined from 0 to 360, then use the above one.
-!                     iflon=floor(finlon/bc_res)+(180/bc_res)+1              
-!                     iflat=floor(finlat/bc_res)+(90/bc_res)+1     ! -90 < lat < 90
-!                     if (iflat .eq. 180/bc_res+1) then
-!                        iflon = iflon + 180/bc_res
-!                        iflat = 180/bc_res
-!                     endif
-!                     if (iflon .ge. 360/bc_res+1) then
-!                        quotient = int(iflon/(360/bc_res))
-!                        iflon = iflon - (360/bc_res)*quotient
-!                     endif
+                     iflon=floor(finlon/bc_res)+(180/bc_res)+1              
+                     iflat=floor(finlat/bc_res)+(90/bc_res)+1     ! -90 < lat < 90
+                     if (iflat .eq. 180/bc_res+1) then
+                        iflon = iflon + 180/bc_res
+                        iflat = 180/bc_res
+                     endif
+                     if (iflon .ge. 360/bc_res+1) then
+                        quotient = int(iflon/(360/bc_res))
+                        iflon = iflon - (360/bc_res)*quotient
+                     endif
 
                      !! FIX ME (05.28.2024) : Temporarily fixed the 180 degree
                      !difference of MSIS longitude

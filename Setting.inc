@@ -13,9 +13,9 @@
 
    !! 3-D SPATIAL RESOLUTIONS !!
       integer, parameter ::      GEO_Resolution_in_Degree       = 15
-      real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
-      real*8, parameter  ::      RadialRange_max                = 10.0
-      real*8, parameter  ::      dR                             = 8.0
+      real*8, parameter  ::      RadialRange_min                = 1.2                         ! unit Re
+      real*8, parameter  ::      RadialRange_max                = 2.0
+      real*8, parameter  ::      dR                             = 0.2
 
    !! Number of Particle Direction !!
       integer, parameter ::      dV_theta                         = 6                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
@@ -56,7 +56,7 @@
       integer, parameter :: end_ydoy   = End_Time_in_YYYYDOY
       character*20, parameter :: tag0 = Runname_in_10char
 
-      integer, parameter :: nRadial = (RadialRange_max-RadialRange_min)/dR + 1  
+      integer, parameter :: nRadial = nint((RadialRange_max-RadialRange_min)/dR) + 1  
 
       integer, parameter :: geores = GEO_Resolution_in_Degree
       integer, parameter :: nLat = 90/geores +1
