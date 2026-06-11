@@ -26,7 +26,7 @@ contains
 
       ! 전체 그리드 포인트 수 계산
       total_grid_points = 0
-      do ilat=nLat,nLat_NS
+      do ilat=1,nLat_NS
          if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then
             nLon0 = 1
          else
@@ -52,7 +52,7 @@ contains
       nR_loc = 0
       grid_point_idx = 0
       
-      do ilat=nLat,nLat_NS
+      do ilat=1,nLat_NS
          if (ilat .eq. 1 .or. ilat .eq. nLat_NS) then
             nLon0 = 1
          else
@@ -61,11 +61,10 @@ contains
          
          do ilon=1,nLon0
             do irad=1,nRadial
-               grid_point_idx = grid_point_idx + 1
-               
                if (grid_point_idx >= start_grid .and. grid_point_idx <= end_grid) then
                   if (irad > nR_loc) nR_loc = irad
                endif
+               grid_point_idx = grid_point_idx + 1
             enddo
          enddo
       enddo

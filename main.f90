@@ -142,13 +142,13 @@
                   if (i_Dayside_1D .eq. 1 .and. ilon .ne. 1) cycle
 
                   lon = longitude_range(ilon)
-!                  i1 = ilon-1 + (ilat-nLat)*nLong      ! starts from 0
+!                  i1 = ilon-1 + (ilat-1)*nLong      ! starts from 0
                   do irad=1,nRadial
                      rad = radial_distance_range(irad)
                      global_task_idx = global_task_idx + 1  
 
                      if (i_Full_3D .eq. 1) then
-                        i1 = (ilon-1) + (ilat-nLat)*nLong
+                        i1 = (ilon-1) + (ilat-1)*nLong
                         grid_point_idx = i1*nRadial + irad-1
                         if (grid_point_idx >= start_grid .and. grid_point_idx <= end_grid) then
                            print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
