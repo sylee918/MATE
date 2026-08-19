@@ -1,6 +1,7 @@
 #PBS -S /bin/csh
 #PBS -N slee122
-#PBS -l select=7:ncpus=28:mpiprocs=28:model=bro+1:ncpus=14:mpiprocs=14:model=bro
+##PBS -l select=7:ncpus=28:mpiprocs=28:model=bro_ele+1:ncpus=14:mpiprocs=14:model=bro_ele
+#PBS -l select=6:ncpus=40:mpiprocs=40:model=sky_ele
 #PBS -l walltime=2:00:00
 #PBS -j oe
 #PBS -W group_list=s3015

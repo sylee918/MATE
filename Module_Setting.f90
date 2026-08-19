@@ -50,9 +50,9 @@ MODULE SETTING
 
 !! 3-D SPATIAL RESOLUTIONS !!
    integer, parameter ::      GEO_Resolution_in_Degree       = 5
-   real*8, parameter  ::      RadialRange_min                = 2.0                         ! unit Re
-   real*8, parameter  ::      RadialRange_max                = 10.0
-   real*8, parameter  ::      dR                             = 0.5
+   real*8, parameter  ::      RadialRange_min                = 1.0                         ! unit Re
+   real*8, parameter  ::      RadialRange_max                = 5.0
+   real*8, parameter  ::      dR                             = 0.2
 
 !! Number of Particle Direction !!
    integer, parameter ::      dV_theta                         = 30                         ! Angular Resolution of Velocity direction in Degree: DEFAULT = 6  (Recommended Values = [2, 3, 4, 6, 10])
@@ -63,12 +63,11 @@ MODULE SETTING
 
 !! DIRECTORIES SETTING !!
    character*70, parameter :: Lya_dir                          = "OMNI_extended.txt"         ! 1964 - 2024 (Oct)
-!   character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
-   character*70, parameter :: BC_dir                           = "/home/sylee/exospherecode/TIMEGCM/BC/"
-   
+   character*70, parameter :: BC_dir                           = "/nobackup/slee122/MATE/MSIS/BC/"
+!   character*70, parameter :: BC_dir                           = "/home/sylee/exospherecode/TIMEGCM/BC/"  
    character*70, parameter :: RCCX_dir                         = "RCCX/output/"
-!   character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/0728/"
-   character*70, parameter :: outdir                           = "/home/sylee/exospherecode/MATE/output/0728/"
+   character*70, parameter :: outdir                           = "/nobackup/slee122/MATE/Luna/"
+!   character*70, parameter :: outdir                           = "/home/sylee/exospherecode/MATE/output/0728/"
 
 !! Including Physics !!
    integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
