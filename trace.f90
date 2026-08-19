@@ -1,7 +1,7 @@
    Subroutine rk1(temp, dt, k_out, f0)
 
       USE SETTING, only: i_EarthGravity, i_SolarRadiationPressure, i_CoriolisForce_GSE
-      USE CONSTANTS, only: GM, arad, Wrot, Re2
+      USE CONSTANTS, only: GM, arad, Wrot, Re2, Rm2
       IMPLICIT NONE
 
       real*8, intent(in) :: temp(6), dt, f0
