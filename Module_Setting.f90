@@ -12,10 +12,13 @@ MODULE CONSTANTS
       real*8, parameter :: Re = 6.371009d6                  ! Earth radius [m]
       real*8, parameter :: Re2 = Re**2                      ! Square of Earth radius [m^2]
       real*8, parameter :: mEarth = 5.9722e24               ! Earth mass [kg]
+      real*8, parameter :: Rm = 1.7374d6                  ! Moon radius [m]
+      real*8, parameter :: Mm = 7.34767309d22               ! Moon mass [kg]
       real*8, parameter :: constG = 6.6743e-11              ! Gravitational constant
-      real*8, parameter :: GM = constG * mEarth             ! For convenience
+      real*8, parameter :: GM = constG * Mm             ! For convenience
       real*8, parameter :: arad = 0.1774d-2                 ! For radiation pressure [m/s^2]
-      real*8, parameter :: Wrot = 1.9910d-7                 ! Earth's angular speed [rad/s]
+!      real*8, parameter :: Wrot = 1.9910d-7                 ! Earth's angular speed [rad/s]
+      real*8, parameter :: Wrot = 2.6619d-6                 ! Moon's angular speed [rad/s]
 
 END MODULE CONSTANTS
 
@@ -32,17 +35,17 @@ MODULE SETTING
 !!**** Recommended to change the parameters for your run ***!!
 
 !! TAG for an Unique Runname !! ex. output_filename = "MATE_nH_GRC_{tag}_2008174.data" !! Example
-   character*20, parameter :: Runname_in_10char              = "test"
+   character*20, parameter :: Runname_in_10char              = "Moon1"
 
 !! Output Setting !!
    integer, parameter ::      i_Full_3D                        = 0                          ! 0 for turn off / 1 for turn on
-   integer, parameter ::      i_Three_Slices                   = 0                          ! 0 for turn off / 1 for turn on
-   integer, parameter ::      i_Dayside_1D                     = 1                          ! 0 for turn off / 1 for turn on
+   integer, parameter ::      i_Three_Slices                   = 1                          ! 0 for turn off / 1 for turn on
+   integer, parameter ::      i_Dayside_1D                     = 0                          ! 0 for turn off / 1 for turn on
 
 !! TIME SETTING !!
-   integer, parameter ::      Start_Time_in_YYYYDOY          = 2008164
-   integer, parameter ::      End_Time_in_YYYYDOY            = 2008164
-   integer, parameter ::      Output_Time_Interval_in_Minute = 60
+   integer, parameter ::      Start_Time_in_YYYYDOY          = 1234567
+   integer, parameter ::      End_Time_in_YYYYDOY            = 1234567
+   integer, parameter ::      Output_Time_Interval_in_Minute = 60*24
 
 !! 3-D SPATIAL RESOLUTIONS !!
    integer, parameter ::      GEO_Resolution_in_Degree       = 5
@@ -70,20 +73,20 @@ MODULE SETTING
    integer, parameter ::      i_EarthGravity                   = 1                          ! 0 for turn off / 1 for turn on
    integer, parameter ::      i_SolarRadiationPressure         = 1                          ! If you set these values as N, then the force is N-times stronger as a coefficient.
    integer, parameter ::      i_CoriolisForce_GSE              = 1
-   integer, parameter ::      i_Photoionization                = 1
-   integer, parameter ::      i_ChargeExchange                 = 1                          ! (1,2,3) for (PS,RC,both)
+   integer, parameter ::      i_Photoionization                = 0
+   integer, parameter ::      i_ChargeExchange                 = 0                          ! (1,2,3) for (PS,RC,both)
 
 !! Exobase Boundary Condition (BC) Setting !!
-   character*10, parameter :: ExobaseBC_Model_Name             = "TIMEGCM"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
+   character*10, parameter :: ExobaseBC_Model_Name             = "CONST"                  ! "MSIS", "TIMEGCM", "WACCMX", "CONST"
    integer, parameter ::      BC_GEO_Resolution_in_Degree      = 5
    integer, parameter ::      BC_Time_Resolution_in_Minute     = 5
-   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 2008164                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
+   integer, parameter ::      BC_Start_Time_in_YYYYDOY         = 1234567                    ! BC covers from this time: A few days before {Start_Time_in_YYYYDOY} for tracing.
 
 !! Beta_CX (Charge Exchange Loss Rate) Setting !!   (Only for Ring current now.)
    integer, parameter ::      Beta_CX_nRadial                  = 17                         ! 2-10 Re with dR=0.5
    integer, parameter ::      Beta_CX_GEO_Resolution_in_Degree = 5
    integer, parameter ::      Beta_CX_Time_Resolution_in_Minute = 60
-   integer, parameter ::      Beta_CX_Start_Time_in_YYYYDOY    = 2008164
+   integer, parameter ::      Beta_CX_Start_Time_in_YYYYDOY    = 1234567
 
 
 !! Particle Tracing Range !!

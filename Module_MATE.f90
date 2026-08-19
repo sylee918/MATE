@@ -93,7 +93,8 @@ contains
       integer index_Emin
 
       do iR=1,nRadial   ;  radial_distance_range(iR) = RadialRange_min + (iR-1)*dR         ;  enddo
-      radial_distance_range = radial_distance_range * Re
+!      radial_distance_range = radial_distance_range * Re
+      radial_distance_range = radial_distance_range * Rm
 
       if (nEnergy .eq. 121) then  ! for 0.0025 - 10 eV
 !            index_Emin = -33              ! Emin at 0.001 eV
