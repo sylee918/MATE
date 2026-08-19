@@ -2,9 +2,9 @@
       ! "cdensity" in python code
 !         use omp_lib
       USE SETTING
-      USE EXOBASE_BC, only: nH_BC, TH_BC
+      USE EXOBASE_BC, only: nH_BC, TH_BC, Interpolate_exobaseBC
       USE SOLAR_LYMAN_ALPHA, only: bph
-      USE MPI_MATE, only: nR_loc
+      USE MPI_MATE, only: nR_loc, rad, lon, lat, irad
       USE VOLUME_ELEMENT
       USE ChargeExchange
       use, intrinsic :: ieee_arithmetic
@@ -27,6 +27,15 @@
       integer iflon, iflat, it, quotient
       integer idoy, iday
 
+
+      ! For inner boundary (surface, radial index = 1), directly interpolate from BC
+      if (irad .eq. 1 .or. rad .le. inner_boundary) then
+         idoy = int(current_time)
+         t1 = (current_time - idoy) * 86400.d0
+         it = floor(t1 / tb_res) + 1
+         call Interpolate_exobaseBC(lon, lat, it, idoy, number_density_0D)
+         return
+      endif
 
       vel_BC = 0.d0;
       allocate(dV2(nEnergy,nvel), solid_angle(nvel))

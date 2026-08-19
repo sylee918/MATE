@@ -104,7 +104,7 @@ MODULE SETTING
    integer, parameter :: end_ydoy   = End_Time_in_YYYYDOY
    character*20, parameter :: tag0 = Runname_in_10char
 
-   integer, parameter :: nRadial = (RadialRange_max-RadialRange_min)/dR + 1  
+   integer, parameter :: nRadial = nint((RadialRange_max-RadialRange_min)/dR) + 1  
 
    integer, parameter :: geores = GEO_Resolution_in_Degree
    integer, parameter :: nLat = 90/geores +1

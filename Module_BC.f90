@@ -195,4 +195,80 @@
          return
       End Subroutine Set_Lunar_Surface_BC
 
+
+      Subroutine Interpolate_exobaseBC(lon_in, lat_in, it_in, iday_in, n_interp)
+      ! Written by Antigravity
+
+         IMPLICIT NONE
+
+         real*8, intent(in)  :: lon_in, lat_in   ! in radians: lon [0, 2*pi), lat [-pi/2, pi/2]
+         integer, intent(in) :: it_in, iday_in
+         real*8, intent(out) :: n_interp
+
+         real*8  :: lon_deg, lat_deg, lon_rel
+         real*8  :: x_grid, y_grid, wx, wy
+         integer :: i1, i2, j1, j2
+         real*8  :: n1, n2
+         integer :: it_bc, iday_bc
+
+         it_bc = it_in
+         iday_bc = iday_in
+         if (iday_bc < start_ydoy - nt_bwd_bc) then
+            iday_bc = start_ydoy - nt_bwd_bc
+            it_bc = 1
+         endif
+         if (iday_bc > end_ydoy) iday_bc = end_ydoy
+         if (it_bc < 1) it_bc = 1
+         if (it_bc > nbtperday) it_bc = nbtperday
+
+         ! Convert radians to degrees
+         lon_deg = lon_in * 180.0d0 / pi
+         lat_deg = lat_in * 180.0d0 / pi
+
+         ! Wrap to [-180, 180] degree coordinate for BC array indexing
+         if (lon_deg > 180.0d0) then
+            lon_rel = lon_deg - 360.0d0
+         else
+            lon_rel = lon_deg
+         endif
+
+         ! Continuous grid coordinate relative to cell centers
+         ! Cell centers: lon_c(i) = -180 + (i - 0.5)*bc_res
+         !               lat_c(j) = -90 + (j - 0.5)*bc_res
+         x_grid = (lon_rel + 180.0d0) / bc_res + 0.5d0
+         y_grid = (lat_deg + 90.0d0) / bc_res + 0.5d0
+
+         ! Longitude indices with periodic wrapping
+         i1 = floor(x_grid)
+         i2 = i1 + 1
+         wx = x_grid - real(i1, 8)
+
+         if (i1 < 1) i1 = i1 + nbx
+         if (i1 > nbx) i1 = i1 - nbx
+         if (i2 < 1) i2 = i2 + nbx
+         if (i2 > nbx) i2 = i2 - nbx
+
+         ! Latitude indices with clamping to poles
+         if (y_grid <= 1.0d0) then
+            j1 = 1
+            j2 = 1
+            wy = 0.0d0
+         else if (y_grid >= real(nby, 8)) then
+            j1 = nby
+            j2 = nby
+            wy = 0.0d0
+         else
+            j1 = floor(y_grid)
+            j2 = j1 + 1
+            wy = y_grid - real(j1, 8)
+         endif
+
+         ! Bilinear interpolation
+         n1 = (1.0d0 - wx) * nH_BC(i1, j1, it_bc, iday_bc) + wx * nH_BC(i2, j1, it_bc, iday_bc)
+         n2 = (1.0d0 - wx) * nH_BC(i1, j2, it_bc, iday_bc) + wx * nH_BC(i2, j2, it_bc, iday_bc)
+         n_interp = (1.0d0 - wy) * n1 + wy * n2
+
+         return
+      End Subroutine Interpolate_exobaseBC
+
    END MODULE EXOBASE_BC
