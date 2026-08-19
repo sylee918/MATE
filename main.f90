@@ -150,7 +150,7 @@
                      if (i_Full_3D .eq. 1) then
                         grid_point_idx = global_task_idx - 1
                         if (grid_point_idx >= start_grid .and. grid_point_idx <= end_grid) then
-                           print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
+                           print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Rm, int(lon*180/pi), int(lat*180/pi)
 
                            call Calculate_Density(current_time, number_density_0D)                      
                            number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D

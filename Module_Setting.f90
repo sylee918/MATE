@@ -13,6 +13,7 @@ MODULE CONSTANTS
       real*8, parameter :: Re2 = Re**2                      ! Square of Earth radius [m^2]
       real*8, parameter :: mEarth = 5.9722e24               ! Earth mass [kg]
       real*8, parameter :: Rm = 1.7374d6                  ! Moon radius [m]
+      real*8, parameter :: Rm2 = Rm**2                      ! Square of Moon radius [m^2]
       real*8, parameter :: Mm = 7.34767309d22               ! Moon mass [kg]
       real*8, parameter :: constG = 6.6743e-11              ! Gravitational constant
       real*8, parameter :: GM = constG * Mm             ! For convenience
@@ -90,9 +91,9 @@ MODULE SETTING
 
 
 !! Particle Tracing Range !!
-   real*8, parameter :: inner_boundary                         = Re + 500.d3                ! Exobase location
-   real*8, parameter :: outer_boundary                         = 50*Re
-   real*8, parameter :: Max_Travel_Time_in_Days                = 30                         ! DEFAULT = 60
+   real*8, parameter :: inner_boundary                         = Rm                         ! Inner boundary of Moon exobase (Rm is the radius of Moon)
+   real*8, parameter :: outer_boundary                         = 10*Rm                    ! Outer boundary of Moon exobase
+   real*8, parameter :: Max_Travel_Time_in_Days                = 30                         ! Maximum travel time in days for particle tracing
 
    integer, parameter :: nstep = 50000 ! 10000                                               ! Maximum number of steps for particle tracing (typical maximum is 3e4)
 

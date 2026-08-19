@@ -34,7 +34,7 @@
          deriv(4) = deriv(4) - coeff_R
       else
          rho2 = pos(2)**2 + pos(3)**2
-         if (rho2 .gt. Re2) then
+         if (rho2 .gt. Rm2) then
             deriv(4) = deriv(4) - coeff_R
          endif
       endif
