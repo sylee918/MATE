@@ -127,7 +127,7 @@
       real*8 :: radial_distance, radial_distance_old
       integer :: iE, iv, i
       real*8 :: dt, vt,vt_old,dv, ds
-      real*8, parameter :: max_ds = 1.d6
+      real*8, parameter :: max_ds = 1.d5
       real*8 :: x0, f0, current_time, trace_time
       integer :: ydoy, ii, istep
 
