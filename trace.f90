@@ -114,6 +114,7 @@
    Subroutine Trace_particle(ptl,flags, current_time)
 
       USE SETTING
+      USE TIME_UTILS, only: ydoy_add_days
       USE GRID_PARAMETERS, only: radial_boundary
       USE SOLAR_LYMAN_ALPHA, only: Lya
       USE ChargeExchange, only: nstep
@@ -139,7 +140,7 @@
 
          radial_distance_old = sqrt(one(2)**2+one(3)**2+one(4)**2)
          vt = sqrt(one(5)**2 + one(6)**2 + one(7)**2)
-         trace_time = current_time - 1e-5
+         trace_time = ydoy_add_days(current_time, -1.d-5)
 
          do while (abs(one(1)) < tmax)
 
@@ -148,19 +149,12 @@
             vt_old = sqrt(one(5)**2 + one(6)**2 + one(7)**2)
 
             dt = -1.d0*max_ds / vt_old     ! -1e6 or 4e6 is a "factor" in python code. The maximum distance jump at single time step.
-            if (mod(trace_time-1,1000.0) .gt. 500) then               ! eg. trace_time=2010000.98, then it should be 2009365.98, 
-               ii=1000-mod(int(trace_time-1),1000)                  ! eg. trace_time-1 = 2009999.98, ii=1000-999=1
-               if (mod(int((trace_time-1)/1000),4) .eq. 0) then
-                  trace_time = int((trace_time-1)/1000)*1000 + (367-ii) + mod(trace_time,1.0)      ! For leap years (400-year period is not applied)
-               else
-                  trace_time = int((trace_time-1)/1000)*1000 + (366-ii) + mod(trace_time,1.0)      ! eg. trace_time = 2009000+365+0.98 = 2009365.98
-               endif
-            endif
+            trace_time = ydoy_add_days(current_time, one(1)/86400.d0)
 
             ydoy = int(trace_time)
             f0 = Lya(ydoy)
-            if (int(trace_time + dt/86400) .ne. int(trace_time)) then
-               dt = (int(trace_time)-trace_time)*86400 - 1e-5    ! trace_time always hits the time (00:00:00) for daily-varying Lya.
+            if (int(ydoy_add_days(trace_time, dt/86400.d0)) .ne. int(trace_time)) then
+               dt = (int(trace_time)-trace_time)*86400.d0 - 1e-5    ! trace_time always hits the time (00:00:00) for daily-varying Lya.
                if (abs(dt) .lt. 1e-6) then
                   print*, "ERROR: dt is too small"
                   stop
@@ -170,8 +164,7 @@
             old = one
 100 continue
             call rk4(one,dt,f0)
-            trace_time = current_time + one(1)/86400  ! one(2) < 0
-            ! FIX ME (if time cross year)
+            trace_time = ydoy_add_days(current_time, one(1)/86400.d0)
 
             radial_distance = sqrt(one(2)**2+one(3)**2+one(4)**2)
             vt = sqrt(one(5)**2 + one(6)**2 + one(7)**2)

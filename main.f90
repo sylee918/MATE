@@ -8,6 +8,7 @@
       USE SOLAR_LYMAN_ALPHA
       USE CHARGEEXCHANGE
       USE PHYSICS_TAG
+      USE TIME_UTILS, only: ydoy_add_days_int, ydoy_diff_days
       IMPLICIT NONE
 
       include "mpif.h"
@@ -21,6 +22,7 @@
       real*8 :: number_density_0D
 
       integer doy, iday, ihour, iminute, it, year, hour, nLon0
+      integer cur_sim_day, day_idx
       real*8 current_time
       integer:: N_REDUCE, dnLon0
       real*8, dimension(7) :: one
@@ -50,22 +52,24 @@
          if (i_Photoionization .eq. 0) then; bph = 0.d0; endif
          if (i_Photoionization .eq. 1 .and. ExobaseBC_Model_Name .eq. "CONST") then; bph = 1.5d-7; endif
 
+      beta_RCCX = 0.d0 ; beta_PSCX = 0.d0 ; nps_PSCX = 0.d0 ; nps=0.d0
       if (i_ChargeExchange .eq. 1 .or. i_ChargeExchange .eq. 3) then
 !         call Read_Plasmasphere_GCPM
-         beta_RCCX = 0.d0 ; beta_PSCX = 0.d0 ; nps_PSCX = 0.d0 ; nps=0.d0
          call Get_Beta_PSCX()
 !         call Read_Exosphere_GCPM    ! for CX-created nH
       endif
       if (i_ChargeExchange .eq. 2 .or. i_ChargeExchange .eq. 3) then
-         beta_RCCX = 0.d0 ; beta_PSCX = 0.d0 ; nps_PSCX = 0.d0 ; nps=0.d0
          call Get_Beta_RCCX() 
       endif
       if (i_ChargeExchange .eq. 0) then
          beta_RCCX = 0.d0 ; beta_PSCX = 0.d0 ; nps_PSCX = 0.d0 ; nps=0.d0
       endif
       
-      !! ERASE ME !!
-!      nH0(:,:,:,1,Start_Time_in_YYYYDOY) = 1.d0
+      if (.not. allocated(nH0)) then
+         total_cx_days = ydoy_diff_days(end_ydoy, Beta_CX_Start_Time_in_YYYYDOY) + 1
+         allocate(nH0(nRadial,nLon,nLat_NS,ntperday,total_cx_days))
+         nH0 = 0.d0
+      endif
 
       if (rank .eq. 0) call Make_Parameters_OutFile()  ! It's not module, just making .in file
 
@@ -113,7 +117,13 @@
 
       global_task_idx = 0 ! 카운터 초기화
 
-      do iday=start_ydoy, end_ydoy
+      cur_sim_day = start_ydoy
+      do while (cur_sim_day <= end_ydoy)
+         iday = cur_sim_day
+         day_idx = ydoy_diff_days(iday, Beta_CX_Start_Time_in_YYYYDOY) + 1
+         if (day_idx < 1) day_idx = 1
+         if (day_idx > total_cx_days) day_idx = total_cx_days
+
          number_density_4D_MPI=0.d0; number_density_4D=0.d0
          do it=1,ntperday  ! hour loop
 
@@ -173,24 +183,25 @@
 
             call MPI_BARRIER(MPI_COMM_WORLD, ierr)
             N_REDUCE = nRadial * nLon * nLat_NS
-            call MPI_REDUCE(number_density_4D_MPI(:,:,:,it), number_density_3D, N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
+            call MPI_REDUCE(number_density_4D_MPI(:,:,:,it), number_density_3D, &
+               N_REDUCE, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD, ierr)
             if (rank .eq. 0) then
                do ilon=2,nLong
                   number_density_3D(:,ilon,1)       = number_density_3D(:,1,1)         ! South pole
                   number_density_3D(:,ilon,nLat_NS) = number_density_3D(:,1,nLat_NS)   ! North pole
                enddo
-               nH0(:,:,:,it,iday) = number_density_3D(:,:,:)
+               nH0(:,:,:,it,day_idx) = number_density_3D(:,:,:)
 
                if (i_Dayside_1D .eq. 1) then
                   do ilat=1,nLat_NS
                      do ilon=1,nLong
-                        nH0(:,ilon,ilat,it,iday) = nH0(:,1,nLat,it,iday)
+                        nH0(:,ilon,ilat,it,day_idx) = nH0(:,1,nLat,it,day_idx)
                      enddo
                   enddo
                endif
 
             endif
-            call MPI_BCAST(nH0(:,:,:,it,iday), N_REDUCE, MPI_DOUBLE, 0, MPI_COMM_WORLD, ierr)
+            call MPI_BCAST(nH0(:,:,:,it,day_idx), N_REDUCE, MPI_DOUBLE, 0, MPI_COMM_WORLD, ierr)
 
          enddo ! ihour
 
@@ -204,12 +215,13 @@
 !                  number_density_4D(:,ilon,nLat_NS,it) = number_density_4D(:,1,nLat_NS,it)   ! North pole
 !               enddo
 !            enddo ! it
-            number_density_4D(:,:,:,:) = nH0(:,:,:,:,iday)
+            number_density_4D(:,:,:,:) = nH0(:,:,:,:,day_idx)
             call write_density_4D(number_density_4D, iday)
 
          endif
 
-      enddo ! iday
+         cur_sim_day = ydoy_add_days_int(cur_sim_day, 1)
+      enddo ! cur_sim_day
 
       print*, "maxnH", rank, maxval(number_density_4D), maxval(number_density_4D_MPI)
 

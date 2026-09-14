@@ -15,6 +15,9 @@ contains
       integer :: year, doy, i, yyyydoy, IO_unit
       real :: f10_7, f107a, ap, lyman_alpha, beta_ph, factor
 
+      Lya = 0.d0
+      bph = 0.d0
+
       open(newunit=IO_unit, file=trim(Lya_dir), status='old', action='read')
       read(IO_unit, '(A)', iostat=i) line   ! Skip the header line
       do while (.true.)
@@ -32,7 +35,9 @@ contains
 
       ! Convert line-integrated Lya to line-centered Lya [Emerich et al., 2005]
       factor = (h*c/121.6d-9)*1e11*1e4       !  121.6e-9 m for the wavelength of Lyman-alpha, 1e4 for m2->cm2, and 1e12 from Emmerich et al. (2005)
-      Lya = 0.64*(Lya/factor)**1.21        
+      where (Lya > 0.d0)
+         Lya = 0.64*(Lya/factor)**1.21
+      end where        
 
       return
    End

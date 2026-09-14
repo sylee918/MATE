@@ -15,18 +15,12 @@ Model for Atmospheric Terrestrial Exosphere (MATE) simulation codes
 
 # Update Notes
 (09.05.2024) SYLee created this git repository.
-<<<<<<< HEAD
- Version: Earth gravity + solar radiation pressure + Coriolis force around the Sun + Photoionization
+Version: Earth gravity + solar radiation pressure + Coriolis force around the Sun + Photoionization + Charge Exchange
 
 # Calculation Time
  NAS Pleiades Broadwell (bro)
  - 15-degree GEO resolution & 10-degree N_Vdirection (412): 30 minutes walltime for 1-day simulation
- - 5-degree GEO resolution & 6-degree N_Vdirection (1148): 150 minutes walltime for 1-day simulation 
-
-=======
-
-123
->>>>>>> refs/remotes/origin/main
+ - 5-degree GEO resolution & 6-degree N_Vdirection (1148): 150 minutes walltime for 1-day simulation
 
 
 

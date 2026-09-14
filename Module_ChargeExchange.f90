@@ -1,7 +1,7 @@
 Module ChargeExchange
 
    USE GRID_PARAMETERS
-!     USE SETTING
+   USE TIME_UTILS, only: ydoy_add_days, ydoy_diff_days, ydoy_add_days_int
    USE MPI_MATE, only: rank
 IMPLICIT NONE
 
@@ -9,9 +9,9 @@ IMPLICIT NONE
    real*8, dimension(nh,nMLT,nz) :: nps, Tps
    real*8 :: rho(nh), MLT(nMLT), zps(nz)
    real*8, dimension(nh) :: rho_ps
-!   integer, allocatable, dimension(:,:) :: nstep
-   real*8, dimension(nRadial,nLon,nLat_NS,ntperday,start_ydoy-nt_bwd_CX:end_ydoy) :: nH0
-   real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,start_ydoy-nt_bwd_CX:end_ydoy) :: beta_RCCX, beta_PSCX, nps_PSCX
+   integer :: total_cx_days
+   real*8, dimension(:,:,:,:,:), allocatable :: nH0
+   real*8, dimension(:,:,:,:,:), allocatable :: beta_RCCX, beta_PSCX, nps_PSCX
    real*8, parameter :: T_PS_eV=0.5d0, T_PS_K=T_PS_eV*11604.525d0
 
 contains
@@ -43,12 +43,13 @@ contains
 
       ! PSD_CX is the PSD of CX-created nH. Below is not necessary for RCCX.
       PSD_CX = 0.d0
+      ICX_i = 0.d0
       do i=1,istep
-         ICX_i = sum(beta_PSCX_dt(1:i))
+         ICX_i = ICX_i + beta_PSCX_dt(i)
          PSD_CX = PSD_CX + abs(beta_PSCX_dt(i)) * nH_traj(i) * exp(-vel2(i)/cexo2) * fac2 * exp(ICX_i)
       enddo
 
-      ICX = sum(beta_RCCX_dt + beta_PSCX_dt)
+      ICX = sum(beta_RCCX_dt(1:istep) + beta_PSCX_dt(1:istep))
       ICX = abs(ICX)*(-1.d0)  ! Make sure to be negative.
 
    End Subroutine Calculate_ChargeExchange
@@ -61,20 +62,23 @@ contains
 
       real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: beta_ring_current
       character(len=100) :: filename_RC
-      character(len=7) :: ydoy_str, yearst
-      integer :: iday, nlen, IO_unit
-      logical :: iexist
+      character(len=7) :: ydoy_str
+      integer :: iday_idx, cur_day
 
-      if (start_ydoy/1000 .eq. end_ydoy/1000) then
-!         write(yearst, '(I4.4)') start_ydoy/1000
-
-         do iday=start_ydoy-nt_bwd_CX,end_ydoy
-            write(ydoy_str,'(I7.7)') iday
-            filename_RC = trim(RCCX_dir) // "RCCX_p_" // trim(ydoy_str) //  ".data"
-            call Read_beta_Ring_Current(filename_RC, beta_ring_current)
-            beta_RCCX(:,:,:,:,iday) = beta_ring_current
-         enddo
+      total_cx_days = ydoy_diff_days(end_ydoy, Beta_CX_Start_Time_in_YYYYDOY) + 1
+      if (.not. allocated(beta_RCCX)) then
+         allocate(beta_RCCX(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,total_cx_days))
+         beta_RCCX = 0.d0
       endif
+
+      cur_day = Beta_CX_Start_Time_in_YYYYDOY
+      do iday_idx=1,total_cx_days
+         write(ydoy_str,'(I7.7)') cur_day
+         filename_RC = trim(RCCX_dir) // "RCCX_p_" // trim(ydoy_str) //  ".data"
+         call Read_beta_Ring_Current(filename_RC, beta_ring_current)
+         beta_RCCX(:,:,:,:,iday_idx) = beta_ring_current
+         cur_day = ydoy_add_days_int(cur_day, 1)
+      enddo
 
    End Subroutine Get_Beta_RCCX
 
@@ -109,21 +113,25 @@ contains
 
       real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: PSdensity_PSCX
       character(len=100) :: filename_PS
-      character(len=7) :: ydoy_str, yearst
-      integer :: iday, nlen, IO_unit
-      logical :: iexist
-      real*8 :: vrel, sigma
+      character(len=7) :: ydoy_str
+      integer :: iday_idx, cur_day
 
-      if (start_ydoy/1000 .eq. end_ydoy/1000) then
-!         write(yearst, '(I4.4)') start_ydoy/1000
-
-         do iday=start_ydoy-nt_bwd_CX,end_ydoy
-            write(ydoy_str,'(I7.7)') iday
-            filename_PS = trim(RCCX_dir) // "nPS_p_" // trim(ydoy_str) //  ".data"
-            call Read_Plasmasphere_CIMI(filename_PS, PSdensity_PSCX)
-            nps_PSCX(:,:,:,:,iday) = PSdensity_PSCX
-         enddo
+      total_cx_days = ydoy_diff_days(end_ydoy, Beta_CX_Start_Time_in_YYYYDOY) + 1
+      if (.not. allocated(nps_PSCX)) then
+         allocate(nps_PSCX(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,total_cx_days))
+         allocate(beta_PSCX(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX,total_cx_days))
+         nps_PSCX = 0.d0
+         beta_PSCX = 0.d0
       endif
+
+      cur_day = Beta_CX_Start_Time_in_YYYYDOY
+      do iday_idx=1,total_cx_days
+         write(ydoy_str,'(I7.7)') cur_day
+         filename_PS = trim(RCCX_dir) // "nPS_p_" // trim(ydoy_str) //  ".data"
+         call Read_Plasmasphere_CIMI(filename_PS, PSdensity_PSCX)
+         nps_PSCX(:,:,:,:,iday_idx) = PSdensity_PSCX
+         cur_day = ydoy_add_days_int(cur_day, 1)
+      enddo
       beta_PSCX = nps_PSCX * 1e-6 ! m^-3 to cm^-3
 
    End Subroutine Get_Beta_PSCX
@@ -412,7 +420,12 @@ contains
          close(IO_unit)
       endif
       
-      nH0(:,:,:,:,start_ydoy-nt_bwd_CX) = nH_temp*1.d0
+      if (.not. allocated(nH0)) then
+         total_cx_days = ydoy_diff_days(end_ydoy, Beta_CX_Start_Time_in_YYYYDOY) + 1
+         allocate(nH0(nRadial,nLon,nLat_NS,ntperday,total_cx_days))
+         nH0 = 0.d0
+      endif
+      nH0(:,:,:,:,1) = nH_temp*1.d0
       deallocate(nH_temp)
 
       return
@@ -435,7 +448,7 @@ contains
       real*8 :: w_r1, w_r2, w_lon1, w_lon2, w_lat1, w_lat2
       real*8 :: nH_interp, beta_RCCX_interp, beta_PSCX_interp
       real*8 :: d_r, d_lon, d_lat
-      integer :: iday, it_nearest
+      integer :: iday, it_nearest, day_idx
       real*8 :: year_doy_frac, frac_day, hour_val
       
       ! Read exosphere data
@@ -546,8 +559,7 @@ contains
       beta_PSCX_interp = 0.d0
       
       iday = int(current_time)
-      year_doy_frac = mod(current_time, 1000.d0)
-      frac_day = year_doy_frac - dble(iday)
+      frac_day = current_time - dble(iday)
       hour_val = frac_day * 24.d0
       it_nearest = nint(hour_val) + 1
       
@@ -555,40 +567,52 @@ contains
       ! 0시(index 1)로 순환
       if (it_nearest > ntperday_CX) then
          it_nearest = 1
-         iday=iday+1
+         iday = ydoy_add_days_int(iday, 1)
       endif
       if (it_nearest < 1) then
          it_nearest = ntperday_CX
-         iday=iday-1
+         iday = ydoy_add_days_int(iday, -1)
       endif
       if (iday < Beta_CX_Start_Time_in_YYYYDOY) then
          iday = Beta_CX_Start_Time_in_YYYYDOY
          it_nearest = 1
       endif
 
+      day_idx = ydoy_diff_days(iday, Beta_CX_Start_Time_in_YYYYDOY) + 1
+      if (day_idx < 1) day_idx = 1
+      if (day_idx > total_cx_days) day_idx = total_cx_days
+
 
       ! 8개 corner points에 대한 interpolation
-      nH_interp = nH_interp + &
-                   w_r1 * w_lon1 * w_lat1 * nH0(i_r1, i_lon1, i_lat1, it_nearest, iday) + &
-                   w_r2 * w_lon1 * w_lat1 * nH0(i_r2, i_lon1, i_lat1, it_nearest, iday) + &
-                   w_r1 * w_lon2 * w_lat1 * nH0(i_r1, i_lon2, i_lat1, it_nearest, iday) + &
-                   w_r2 * w_lon2 * w_lat1 * nH0(i_r2, i_lon2, i_lat1, it_nearest, iday) + &
-                   w_r1 * w_lon1 * w_lat2 * nH0(i_r1, i_lon1, i_lat2, it_nearest, iday) + &
-                   w_r2 * w_lon1 * w_lat2 * nH0(i_r2, i_lon1, i_lat2, it_nearest, iday) + &
-                   w_r1 * w_lon2 * w_lat2 * nH0(i_r1, i_lon2, i_lat2, it_nearest, iday) + &
-                   w_r2 * w_lon2 * w_lat2 * nH0(i_r2, i_lon2, i_lat2, it_nearest, iday)
-      nH1 = nH_interp
+      if (allocated(nH0)) then
+         nH_interp = nH_interp + &
+                      w_r1 * w_lon1 * w_lat1 * nH0(i_r1, i_lon1, i_lat1, it_nearest, day_idx) + &
+                      w_r2 * w_lon1 * w_lat1 * nH0(i_r2, i_lon1, i_lat1, it_nearest, day_idx) + &
+                      w_r1 * w_lon2 * w_lat1 * nH0(i_r1, i_lon2, i_lat1, it_nearest, day_idx) + &
+                      w_r2 * w_lon2 * w_lat1 * nH0(i_r2, i_lon2, i_lat1, it_nearest, day_idx) + &
+                      w_r1 * w_lon1 * w_lat2 * nH0(i_r1, i_lon1, i_lat2, it_nearest, day_idx) + &
+                      w_r2 * w_lon1 * w_lat2 * nH0(i_r2, i_lon1, i_lat2, it_nearest, day_idx) + &
+                      w_r1 * w_lon2 * w_lat2 * nH0(i_r1, i_lon2, i_lat2, it_nearest, day_idx) + &
+                      w_r2 * w_lon2 * w_lat2 * nH0(i_r2, i_lon2, i_lat2, it_nearest, day_idx)
+         nH1 = nH_interp
+      else
+         nH1 = 0.d0
+      endif
 
-      beta_RCCX_interp = beta_RCCX_interp + &
-                  w_r1 * w_lon1 * w_lat1 * beta_RCCX(i_r1, i_lon1, i_lat1, it_nearest, iday) + &
-                  w_r2 * w_lon1 * w_lat1 * beta_RCCX(i_r2, i_lon1, i_lat1, it_nearest, iday) + &
-                  w_r1 * w_lon2 * w_lat1 * beta_RCCX(i_r1, i_lon2, i_lat1, it_nearest, iday) + &
-                  w_r2 * w_lon2 * w_lat1 * beta_RCCX(i_r2, i_lon2, i_lat1, it_nearest, iday) + &
-                  w_r1 * w_lon1 * w_lat2 * beta_RCCX(i_r1, i_lon1, i_lat2, it_nearest, iday) + &
-                  w_r2 * w_lon1 * w_lat2 * beta_RCCX(i_r2, i_lon1, i_lat2, it_nearest, iday) + &
-                  w_r1 * w_lon2 * w_lat2 * beta_RCCX(i_r1, i_lon2, i_lat2, it_nearest, iday) + &
-                  w_r2 * w_lon2 * w_lat2 * beta_RCCX(i_r2, i_lon2, i_lat2, it_nearest, iday)
-      beta_RCCX1 = beta_RCCX_interp
+      if (allocated(beta_RCCX)) then
+         beta_RCCX_interp = beta_RCCX_interp + &
+                     w_r1 * w_lon1 * w_lat1 * beta_RCCX(i_r1, i_lon1, i_lat1, it_nearest, day_idx) + &
+                     w_r2 * w_lon1 * w_lat1 * beta_RCCX(i_r2, i_lon1, i_lat1, it_nearest, day_idx) + &
+                     w_r1 * w_lon2 * w_lat1 * beta_RCCX(i_r1, i_lon2, i_lat1, it_nearest, day_idx) + &
+                     w_r2 * w_lon2 * w_lat1 * beta_RCCX(i_r2, i_lon2, i_lat1, it_nearest, day_idx) + &
+                     w_r1 * w_lon1 * w_lat2 * beta_RCCX(i_r1, i_lon1, i_lat2, it_nearest, day_idx) + &
+                     w_r2 * w_lon1 * w_lat2 * beta_RCCX(i_r2, i_lon1, i_lat2, it_nearest, day_idx) + &
+                     w_r1 * w_lon2 * w_lat2 * beta_RCCX(i_r1, i_lon2, i_lat2, it_nearest, day_idx) + &
+                     w_r2 * w_lon2 * w_lat2 * beta_RCCX(i_r2, i_lon2, i_lat2, it_nearest, day_idx)
+         beta_RCCX1 = beta_RCCX_interp
+      else
+         beta_RCCX1 = 0.d0
+      endif
 
       !! FIX ME !!
       !! Special case for 2008164 run for CIMI plasmasphere (nPS)
@@ -599,16 +623,20 @@ contains
          it_nearest = 4
       endif
 
-      beta_PSCX_interp = beta_PSCX_interp + &
-                  w_r1 * w_lon1 * w_lat1 * beta_PSCX(i_r1, i_lon1, i_lat1, it_nearest, iday) + &
-                  w_r2 * w_lon1 * w_lat1 * beta_PSCX(i_r2, i_lon1, i_lat1, it_nearest, iday) + &
-                  w_r1 * w_lon2 * w_lat1 * beta_PSCX(i_r1, i_lon2, i_lat1, it_nearest, iday) + &
-                  w_r2 * w_lon2 * w_lat1 * beta_PSCX(i_r2, i_lon2, i_lat1, it_nearest, iday) + &
-                  w_r1 * w_lon1 * w_lat2 * beta_PSCX(i_r1, i_lon1, i_lat2, it_nearest, iday) + &
-                  w_r2 * w_lon1 * w_lat2 * beta_PSCX(i_r2, i_lon1, i_lat2, it_nearest, iday) + &
-                  w_r1 * w_lon2 * w_lat2 * beta_PSCX(i_r1, i_lon2, i_lat2, it_nearest, iday) + &
-                  w_r2 * w_lon2 * w_lat2 * beta_PSCX(i_r2, i_lon2, i_lat2, it_nearest, iday)
-      beta_PSCX1 = beta_PSCX_interp
+      if (allocated(beta_PSCX)) then
+         beta_PSCX_interp = beta_PSCX_interp + &
+                     w_r1 * w_lon1 * w_lat1 * beta_PSCX(i_r1, i_lon1, i_lat1, it_nearest, day_idx) + &
+                     w_r2 * w_lon1 * w_lat1 * beta_PSCX(i_r2, i_lon1, i_lat1, it_nearest, day_idx) + &
+                     w_r1 * w_lon2 * w_lat1 * beta_PSCX(i_r1, i_lon2, i_lat1, it_nearest, day_idx) + &
+                     w_r2 * w_lon2 * w_lat1 * beta_PSCX(i_r2, i_lon2, i_lat1, it_nearest, day_idx) + &
+                     w_r1 * w_lon1 * w_lat2 * beta_PSCX(i_r1, i_lon1, i_lat2, it_nearest, day_idx) + &
+                     w_r2 * w_lon1 * w_lat2 * beta_PSCX(i_r2, i_lon1, i_lat2, it_nearest, day_idx) + &
+                     w_r1 * w_lon2 * w_lat2 * beta_PSCX(i_r1, i_lon2, i_lat2, it_nearest, day_idx) + &
+                     w_r2 * w_lon2 * w_lat2 * beta_PSCX(i_r2, i_lon2, i_lat2, it_nearest, day_idx)
+         beta_PSCX1 = beta_PSCX_interp
+      else
+         beta_PSCX1 = 0.d0
+      endif
 
       return
       
@@ -627,7 +655,7 @@ contains
       integer :: i_r_nearest, i_lon_nearest, i_lat_nearest
       real*8 :: dr1, dlon1, dlat1
 
-      integer :: it_nearest, iday, iyear
+      integer :: it_nearest, iday, iyear, day_idx
       real*8 :: year_doy_frac, frac_day, hour_val
       integer :: days_in_year
       logical :: is_leap_year
@@ -663,9 +691,8 @@ contains
       dlat1=pi/(nLat_NS-1)
       i_lat_nearest = nint((latitude-lat_min)/dlat1) + 1
 
-      year_doy_frac = mod(current_time, 1000.d0)
       iday = int(current_time)
-      frac_day = year_doy_frac - dble(iday)
+      frac_day = current_time - dble(iday)
       hour_val = frac_day * 24.d0
       it_nearest = nint(hour_val) + 1
       
@@ -673,28 +700,32 @@ contains
       ! 0시(index 1)로 순환
       if (it_nearest > ntperday_CX) then
          it_nearest = 1
-         iday=iday+1
+         iday = ydoy_add_days_int(iday, 1)
       endif
       if (it_nearest < 1) then
          it_nearest = ntperday_CX
-         iday=iday-1
+         iday = ydoy_add_days_int(iday, -1)
       endif
       if (iday < Beta_CX_Start_Time_in_YYYYDOY) then
          iday = Beta_CX_Start_Time_in_YYYYDOY
          it_nearest = 1
       endif
 
+      day_idx = ydoy_diff_days(iday, Beta_CX_Start_Time_in_YYYYDOY) + 1
+      if (day_idx < 1) day_idx = 1
+      if (day_idx > total_cx_days) day_idx = total_cx_days
+
      
       ! r grid index 찾기 (nearest grid point)
       dr1=dR
       i_r_nearest = nint((r-r_min)/dr1) + 1
       if (i_r_nearest < 1) i_r_nearest = 1
-      if (i_r_nearest > nRadial) then
+      if (i_r_nearest > nRadial .or. (.not. allocated(nH0))) then
          nH1 = 0.d0
          beta_RCCX1=0.d0
          beta_PSCX1=0.d0
       else
-         nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
+         nH1 = nH0(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, day_idx)
       endif
 
 !      i_r_nearest_CX = nint((r-r_min)/dr1) + 1  
@@ -703,7 +734,11 @@ contains
          beta_RCCX1 = 0.d0
          beta_PSCX1 = 0.d0
       else
-         beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
+         if (allocated(beta_RCCX)) then
+            beta_RCCX1 = beta_RCCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, day_idx)
+         else
+            beta_RCCX1 = 0.d0
+         endif
          !! FIX ME !!
          !! Special case for 2008164 run for CIMI plasmasphere (nPS)
          !! The nPS data is 0 for the first 3 hour in 2008/164.
@@ -712,7 +747,11 @@ contains
          if (iday == 2008164 .and. it_nearest <= 3) then
             it_nearest = 4
          endif
-         beta_PSCX1 = beta_PSCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, iday)
+         if (allocated(beta_PSCX)) then
+            beta_PSCX1 = beta_PSCX(i_r_nearest, i_lon_nearest, i_lat_nearest, it_nearest, day_idx)
+         else
+            beta_PSCX1 = 0.d0
+         endif
       endif
 
 
@@ -749,7 +788,7 @@ contains
 
       radial_distance_old = sqrt(one(2)**2+one(3)**2+one(4)**2)
       vt = sqrt(one(5)**2 + one(6)**2 + one(7)**2)
-      trace_time = current_time - 1e-5
+      trace_time = ydoy_add_days(current_time, -1.d-5)
 
       do while (abs(one(1)) < tmax)
 
@@ -758,19 +797,12 @@ contains
          vt_old = sqrt(one(5)**2 + one(6)**2 + one(7)**2)
 
          dt = -1.d0*max_ds / vt_old     ! -1e6 or 4e6 is a "factor" in python code. The maximum distance jump at single time step.
-         if (mod(trace_time-1,1000.0) .gt. 500) then               ! eg. trace_time=2010000.98, then it should be 2009365.98, 
-            ii=1000-mod(int(trace_time-1),1000)                  ! eg. trace_time-1 = 2009999.98, ii=1000-999=1
-            if (mod(int((trace_time-1)/1000),4) .eq. 0) then
-               trace_time = int((trace_time-1)/1000)*1000 + (367-ii) + mod(trace_time,1.0)      ! For leap years (400-year period is not applied)
-            else
-               trace_time = int((trace_time-1)/1000)*1000 + (366-ii) + mod(trace_time,1.0)      ! eg. trace_time = 2009000+365+0.98 = 2009365.98
-            endif
-         endif
+         trace_time = ydoy_add_days(current_time, one(1)/86400.d0)
 
          ydoy = int(trace_time)
          f0 = Lya(ydoy)
-         if (int(trace_time + dt/86400) .ne. int(trace_time)) then
-            dt = (int(trace_time)-trace_time)*86400 - 1e-5    ! trace_time always hits the time (00:00:00) for daily-varying Lya.
+         if (int(ydoy_add_days(trace_time, dt/86400.d0)) .ne. int(trace_time)) then
+            dt = (int(trace_time)-trace_time)*86400.d0 - 1e-5    ! trace_time always hits the time (00:00:00) for daily-varying Lya.
             if (abs(dt) .lt. 1e-6) then
                print*, "ERROR: dt is too small"
                stop
@@ -780,8 +812,7 @@ contains
          old = one
    101 continue
          call rk4(one,dt,f0)
-         trace_time = current_time + one(1)/86400  ! one(2) < 0
-         ! FIX ME (if time cross year)
+         trace_time = ydoy_add_days(current_time, one(1)/86400.d0)
 
          radial_distance = sqrt(one(2)**2+one(3)**2+one(4)**2)
          vt = sqrt(one(5)**2 + one(6)**2 + one(7)**2)
@@ -806,6 +837,7 @@ contains
          if (radial_distance .lt. radial_boundary(1)) then
             flag = 1
             call calculate_final_timestep(old,one,dt,f0)
+            if (istep < nstep) then
                istep = istep + 1
                !call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
                call interpolate_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
@@ -813,6 +845,7 @@ contains
                beta_PSCX_dt(istep) = beta_PSCX1*dt
                nH_traj(istep) = nH1
                vel2(istep) = vt**2
+            endif
          else if (radial_distance .gt. radial_boundary(2)) then
             flag = 2
          endif
@@ -823,6 +856,8 @@ contains
 
          if (istep .ge. nstep) then
             print*, "WARNING: istep >= nstep"
+            flag = 3
+            exit
          endif
 
       enddo ! end while

@@ -2,7 +2,8 @@
       ! "cdensity" in python code
 !         use omp_lib
       USE SETTING
-      USE EXOBASE_BC, only: nH_BC, TH_BC
+      USE TIME_UTILS, only: ydoy_add_days, ydoy_diff_days, ydoy_add_days_int
+      USE EXOBASE_BC, only: nH_BC, TH_BC, total_bc_days
       USE SOLAR_LYMAN_ALPHA, only: bph
       USE MPI_MATE, only: nR_loc
       USE VOLUME_ELEMENT
@@ -25,7 +26,7 @@
 !       real*8 :: cx_t0, cx_t1, cx_time_total
 !       integer :: cx_calls
       integer iflon, iflat, it, quotient
-      integer idoy, iday
+      integer idoy, iday, day_idx, cur_day
 
 
       vel_BC = 0.d0;
@@ -49,11 +50,16 @@
             call Calculate_ChargeExchange(iE,iv, ptl0, flags(iv,iE), current_time, ICX, PSD_CX)
             ptl(iv,iE,:) = ptl0
 
-            t0 = current_time + ptl(iv,iE,1)/86400.    ! unit day
+            t0 = ydoy_add_days(current_time, ptl(iv,iE,1)/86400.d0)    ! unit day
             idoy = int(t0)                               ! yyyy+doy
-            t1 = (t0 - idoy)*86400.                       ! hms in seconds
+            t1 = (t0 - idoy)*86400.d0                    ! hms in seconds
             it = floor(t1/tb_res)+1
-            if (idoy .lt. start_ydoy-nt_bwd_bc) then ; idoy=start_ydoy-nt_bwd_bc ; it=1 ; endif
+            if (it < 1) it = 1
+            if (it > nbtperday) it = nbtperday
+            if (idoy .lt. BC_Start_Time_in_YYYYDOY) then
+               idoy = BC_Start_Time_in_YYYYDOY
+               it = 1
+            endif
 
 
 
@@ -75,8 +81,12 @@
                   iflon = iflon - (360/bc_res)*quotient
                endif
 
-               n_BC    = nH_BC(iflon,iflat,it,idoy)
-               temp_BC = TH_BC(iflon,iflat,it,idoy)
+               day_idx = ydoy_diff_days(idoy, BC_Start_Time_in_YYYYDOY) + 1
+               if (day_idx < 1) day_idx = 1
+               if (day_idx > total_bc_days) day_idx = total_bc_days
+
+               n_BC    = nH_BC(iflon,iflat,it,day_idx)
+               temp_BC = TH_BC(iflon,iflat,it,day_idx)
 
                !! ** FIX ME (above): Trilinear interpolation is desired for more accurate calculation.
                !!                    Current code is just the 0th-order interpolation.
@@ -89,11 +99,13 @@
                   if (idoy .eq. int(current_time)) then
                      Iph = bph(idoy) * abs(ptl(iv,iE,1))
                   else
-                     Iph = bph(idoy) * (86400.-t1)
-                     do iday=idoy+1,int(current_time)-1
-                        Iph = Iph + bph(iday)*86400.
+                     Iph = bph(idoy) * (86400.d0 - t1)
+                     cur_day = ydoy_add_days_int(idoy, 1)
+                     do while (cur_day < int(current_time))
+                        Iph = Iph + bph(cur_day)*86400.d0
+                        cur_day = ydoy_add_days_int(cur_day, 1)
                      enddo
-                     Iph = Iph + bph(iday) * (current_time-int(current_time))*86400.
+                     Iph = Iph + bph(int(current_time)) * (current_time-int(current_time))*86400.d0
                   endif
                else
                   Iph = 0.d0
