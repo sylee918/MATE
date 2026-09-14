@@ -30,8 +30,6 @@
 
 
       vel_BC = 0.d0;
-      allocate(dV2(nEnergy,nvel), solid_angle(nvel))
-      call calculate_Velocity_Volume_Element(dV2)
 
       allocate(each_n(nvel,nEnergy))
       each_n = 0.d0
@@ -141,7 +139,6 @@
 !       stop
 
       deallocate(each_n)
-      deallocate(dV2,solid_angle)
       return
    End
 

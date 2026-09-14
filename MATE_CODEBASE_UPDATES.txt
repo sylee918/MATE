@@ -1,0 +1,157 @@
+================================================================================
+MATE (Model for Atmospheric Terrestrial Exosphere) - Codebase Update Summary
+================================================================================
+
+Date: September 2026
+Branch: RCCX2
+Target Architecture: Linux / MPI (Intel oneAPI ifort / mpif90)
+
+This document details the complete technical record of the two major rounds of
+updates applied to the MATE Fortran simulation codebase based on the comprehensive
+codebase diagnosis report.
+
+================================================================================
+UPDATE 1: Critical Bug Fixes & Year-Boundary / Dynamic Array Refactoring
+================================================================================
+
+1. Charge Exchange Dual-Activation State Reset Bug
+   - File: main.f90
+   - Issue: When running with i_ChargeExchange = 3 (both Plasmasphere and Ring
+     Current active), the second if-block reset beta_PSCX = 0.d0, erasing the
+     loaded plasmaspheric charge exchange rates.
+   - Fix: Moved array zero-initializations outside the conditional blocks so
+     both beta_PSCX and beta_RCCX are preserved and co-exist properly.
+
+2. Particle Tracing Buffer Overflow & Segfault Prevention
+   - File: Module_ChargeExchange.f90 (Subroutine Trace_Again)
+   - Issue: Arrays beta_RCCX_dt, beta_PSCX_dt, nH_traj, and vel2 were statically
+     dimensioned to nstep (50,000). When istep reached nstep, the code printed a
+     warning but continued the loop without exiting, causing out-of-bounds writes.
+     Additionally, reaching the exobase boundary incremented istep unconditionally.
+   - Fix: Added strict bounds protection (if (istep < nstep) istep = istep + 1)
+     and set flag = 3 with an immediate 'exit' statement when istep >= nstep.
+
+3. Year-Boundary & Multi-Day Date Arithmetic Refactoring (Option A)
+   - New Module: Module_TimeUtils.f90
+     * is_leap_year(year): Accurately detects leap years according to Gregorian rules.
+     * days_in_year(year): Returns 365 or 366 days.
+     * ydoy_diff_days(ydoy2, ydoy1): Computes the exact signed number of elapsed
+       days between two YYYYDOY dates across leap years and century boundaries.
+     * ydoy_add_days_int(ydoy, idays): Advances or rewinds a YYYYDOY integer date
+       by an arbitrary number of days.
+     * ydoy_add_days(ydoy_real, ddays_real): Safely advances/rewinds fractional
+       double-precision date-times (YYYYDOY.fraction) without precision loss.
+   - Files: Module_BC.f90, Module_ChargeExchange.f90, PSD.f90, trace.f90, main.f90
+     * Replaced fragile leap-year hacks (e.g. mod(trace_time-1, 1000.0) > 500)
+       with ydoy_add_days across all particle tracing subroutines.
+     * Converted fixed YYYYDOY-indexed arrays (nH_BC, TH_BC, nH0, beta_RCCX,
+       beta_PSCX) to dynamic 'allocatable' arrays sized strictly to the simulation
+       span (1:total_days).
+     * Mapped day indexing to relative 1-based indices (day_idx = ydoy_diff_days + 1)
+       preventing multi-gigabyte memory bloat and index-out-of-bounds crashes
+       when crossing December 31 -> January 1.
+     * Converted main simulation loop to 'do while (cur_sim_day <= end_ydoy)' with
+       cur_sim_day = ydoy_add_days_int(cur_sim_day, 1).
+
+4. Lyman-Alpha / Photoionization Stability & Day 2 Discontinuity Fix
+   - File: Module_Lyman.f90
+     * Initialized Lya = 0.d0 and bph = 0.d0 across all indices before file reading.
+     * Guarded line-center conversion with 'where (Lya > 0.d0)' to eliminate
+       floating-point exceptions (NaNs or crashes under -fpe0) on unpopulated dates.
+   - File: PSD.f90
+     * Fixed the Day 2 photoionization anomaly: In the original code, particles
+       tracing back into previous days triggered an else-block with a zero-trip
+       DO loop ('do iday = idoy + 1, int(current_time) - 1'). Standard Fortran
+       leaves the loop variable undefined upon 0 trips, which then accessed
+       uninitialized bph memory.
+     * Converted the integral to use double precision (86400.d0) and rewritten as
+       a robust while-loop using ydoy_add_days_int, referencing the current day
+       explicitly via bph(int(current_time)).
+
+5. Algorithm Optimization: Charge Exchange Cumulative Sum
+   - File: Module_ChargeExchange.f90 (Subroutine Calculate_ChargeExchange)
+   - Issue: The loop over istep calculated ICX_i = sum(beta_PSCX_dt(1:i)) at every
+     step, creating an O(N^2) complexity with tens of thousands of additions per particle.
+   - Fix: Converted to an O(N) running cumulative sum (ICX_i = ICX_i + beta_PSCX_dt(i)).
+
+6. Missing File Exception Handling & Repository Clean-Up
+   - File: Module_BC.f90: Added explicit halt with diagnostic message if a BC file is missing.
+   - File: README.md: Removed legacy Git merge conflict markers (<<<<<<<, =======, >>>>>>>).
+
+
+================================================================================
+UPDATE 2: Performance Optimizations & HPC Scalability (Report Items 3.2 - 3.4)
+================================================================================
+
+1. [3.2] Skip 3D Trilinear Interpolation When Charge Exchange Is Disabled
+   - File: Module_ChargeExchange.f90
+   - Description:
+     * When i_ChargeExchange = 0 (pure exospheric simulation without CX loss/source),
+       particles only need spatial trajectory tracing. Previously, Trace_Again
+       performed expensive 3D trilinear interpolation (interpolate_exosphere) across
+       3 spatial grids (nH0, beta_RCCX, beta_PSCX) at every RK4 step and at the
+       boundary step, only to discard the results in PSD.f90.
+     * Added 'if (i_ChargeExchange > 0)' guards around all interpolate_exosphere calls.
+     * Added an early return in Calculate_ChargeExchange when i_ChargeExchange = 0,
+       bypassing post-processing integration loops.
+     * Within interpolate_exosphere, added conditional branches so that only
+       relevant physical fields are interpolated (e.g. skipping beta_RCCX when
+       in PS-only mode, and skipping nH0/beta_PSCX when in RC-only mode).
+
+2. [3.3] Cache Velocity Directions (vel_dir) and Volume Elements (dV2)
+   - Files: Module_MATE.f90, init.f90, Module_Vol.f90, PSD.f90, main.f90
+   - Description:
+     * Previously, every spatial grid point and simulation time step invoked
+       gen_points(vel_dir), repeatedly allocating/deallocating dynamic memory and
+       recomputing hundreds of trigonometric sine/cosine functions for velocity angles.
+     * Similarly, Calculate_Density repeatedly allocated and freed dV2 and solid_angle,
+       calling calculate_Velocity_Volume_Element on every grid point.
+     * Declared 'cached_vel_dir' in Module SET_VELOCITY_DIRECTION and added
+       subroutine Init_Velocity_Directions().
+     * Added subroutine Init_Volume_Elements() in Module VOLUME_ELEMENT.
+     * Called both initializers once in main.f90 at startup.
+     * Refactored init.f90 and PSD.f90 to directly reference precomputed module
+       caches, eliminating thousands of runtime allocation/deallocation syscalls.
+
+3. [3.4] Eliminate Parallel I/O Storm via Rank 0 Read + MPI_Bcast
+   - Files: Module_BC.f90, Module_Lyman.f90, Module_ChargeExchange.f90
+   - Description:
+     * On large HPC clusters (e.g. NASA Pleiades Lustre filesystem), having hundreds
+       of MPI ranks open and read identical binary and text files simultaneously
+       causes extreme I/O contention, metadata server locks, and runtime hangs.
+     * Exobase BC (Get_exobaseBC): Only Rank 0 opens and reads .bc files; data is
+       broadcast to all processes via MPI_BCAST(nH_BC, ...) and MPI_BCAST(TH_BC, ...).
+     * Lyman-Alpha & Beta_ph (read_Lya_Bph): Only Rank 0 opens OMNI_extended.txt;
+       broadcast via MPI_BCAST(Lya, ...) and MPI_BCAST(bph, ...).
+     * Charge Exchange (Get_Beta_RCCX & Get_Beta_PSCX): Only Rank 0 reads RCCX and
+       CIMI plasmasphere binary files; broadcast via MPI_BCAST.
+
+4. Build System Refinement
+   - File: Makefile
+   - Updated explicit object prerequisites for all module targets to ensure clean,
+     deterministic parallel builds.
+   - Added '-f' flags to clean rules (rm -f *.o *.x *.mod) to prevent build errors
+     when cleaning clean trees.
+
+
+================================================================================
+VERIFICATION & TEST RESULTS
+================================================================================
+
+1. Compilation:
+   - Toolchain: Intel oneAPI Fortran Compiler (mpif90 wrapper with ifort)
+   - Flags: -O2 -mcmodel=medium
+   - Result: 0 errors, 0 warnings across all 12 modules and source files. Binary MATE.x
+     generated successfully.
+
+2. Single-Rank Execution:
+   - Command: mpirun -np 1 ./MATE.x
+   - Result: Verified clean initialization, single Rank-0 BC read, and uninterrupted
+     time-stepping.
+
+3. Multi-Rank Parallel Execution:
+   - Command: mpirun -np 2 ./MATE.x
+   - Result: Confirmed that Rank 0 alone logged file reading, MPI_Bcast distributed
+     memory cleanly without deadlocks, and both ranks computed assigned spatial
+     tasks in parallel with high throughput.
+================================================================================

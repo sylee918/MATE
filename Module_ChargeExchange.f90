@@ -1,5 +1,6 @@
 Module ChargeExchange
 
+   USE SETTING, only: i_ChargeExchange
    USE GRID_PARAMETERS
    USE TIME_UTILS, only: ydoy_add_days, ydoy_diff_days, ydoy_add_days_int
    USE MPI_MATE, only: rank
@@ -39,6 +40,13 @@ contains
 
       beta_RCCX_dt = 0.d0; beta_PSCX_dt = 0.d0; nH_traj = 0.d0; vel2 = 0.d0
       call Trace_Again(iE,iv, ptl0, flag, current_time, beta_RCCX_dt, beta_PSCX_dt, nH_traj, vel2, istep)
+
+      if (i_ChargeExchange .eq. 0) then
+         ICX = 0.d0
+         PSD_CX = 0.d0
+         return
+      endif
+
       beta_PSCX_dt = beta_PSCX_dt * vsig_1eV
 
       ! PSD_CX is the PSD of CX-created nH. Below is not necessary for RCCX.
@@ -59,11 +67,12 @@ contains
    Subroutine Get_Beta_RCCX()
 
       IMPLICIT NONE
+      include "mpif.h"
 
       real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: beta_ring_current
       character(len=100) :: filename_RC
       character(len=7) :: ydoy_str
-      integer :: iday_idx, cur_day
+      integer :: iday_idx, cur_day, ierr
 
       total_cx_days = ydoy_diff_days(end_ydoy, Beta_CX_Start_Time_in_YYYYDOY) + 1
       if (.not. allocated(beta_RCCX)) then
@@ -71,14 +80,18 @@ contains
          beta_RCCX = 0.d0
       endif
 
-      cur_day = Beta_CX_Start_Time_in_YYYYDOY
-      do iday_idx=1,total_cx_days
-         write(ydoy_str,'(I7.7)') cur_day
-         filename_RC = trim(RCCX_dir) // "RCCX_p_" // trim(ydoy_str) //  ".data"
-         call Read_beta_Ring_Current(filename_RC, beta_ring_current)
-         beta_RCCX(:,:,:,:,iday_idx) = beta_ring_current
-         cur_day = ydoy_add_days_int(cur_day, 1)
-      enddo
+      if (rank .eq. 0) then
+         cur_day = Beta_CX_Start_Time_in_YYYYDOY
+         do iday_idx=1,total_cx_days
+            write(ydoy_str,'(I7.7)') cur_day
+            filename_RC = trim(RCCX_dir) // "RCCX_p_" // trim(ydoy_str) //  ".data"
+            call Read_beta_Ring_Current(filename_RC, beta_ring_current)
+            beta_RCCX(:,:,:,:,iday_idx) = beta_ring_current
+            cur_day = ydoy_add_days_int(cur_day, 1)
+         enddo
+      endif
+
+      call MPI_BCAST(beta_RCCX, size(beta_RCCX), MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)
 
    End Subroutine Get_Beta_RCCX
 
@@ -110,11 +123,12 @@ contains
    Subroutine Get_Beta_PSCX()
 
       IMPLICIT NONE
+      include "mpif.h"
 
       real*8, dimension(nRadial_CX,nLon_CX,nLat_CX,ntperday_CX) :: PSdensity_PSCX
       character(len=100) :: filename_PS
       character(len=7) :: ydoy_str
-      integer :: iday_idx, cur_day
+      integer :: iday_idx, cur_day, ierr
 
       total_cx_days = ydoy_diff_days(end_ydoy, Beta_CX_Start_Time_in_YYYYDOY) + 1
       if (.not. allocated(nps_PSCX)) then
@@ -124,15 +138,20 @@ contains
          beta_PSCX = 0.d0
       endif
 
-      cur_day = Beta_CX_Start_Time_in_YYYYDOY
-      do iday_idx=1,total_cx_days
-         write(ydoy_str,'(I7.7)') cur_day
-         filename_PS = trim(RCCX_dir) // "nPS_p_" // trim(ydoy_str) //  ".data"
-         call Read_Plasmasphere_CIMI(filename_PS, PSdensity_PSCX)
-         nps_PSCX(:,:,:,:,iday_idx) = PSdensity_PSCX
-         cur_day = ydoy_add_days_int(cur_day, 1)
-      enddo
-      beta_PSCX = nps_PSCX * 1e-6 ! m^-3 to cm^-3
+      if (rank .eq. 0) then
+         cur_day = Beta_CX_Start_Time_in_YYYYDOY
+         do iday_idx=1,total_cx_days
+            write(ydoy_str,'(I7.7)') cur_day
+            filename_PS = trim(RCCX_dir) // "nPS_p_" // trim(ydoy_str) //  ".data"
+            call Read_Plasmasphere_CIMI(filename_PS, PSdensity_PSCX)
+            nps_PSCX(:,:,:,:,iday_idx) = PSdensity_PSCX
+            cur_day = ydoy_add_days_int(cur_day, 1)
+         enddo
+         beta_PSCX = nps_PSCX * 1e-6 ! m^-3 to cm^-3
+      endif
+
+      call MPI_BCAST(nps_PSCX, size(nps_PSCX), MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)
+      call MPI_BCAST(beta_PSCX, size(beta_PSCX), MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)
 
    End Subroutine Get_Beta_PSCX
 
@@ -584,7 +603,7 @@ contains
 
 
       ! 8개 corner points에 대한 interpolation
-      if (allocated(nH0)) then
+      if ((i_ChargeExchange .eq. 1 .or. i_ChargeExchange .eq. 3) .and. allocated(nH0)) then
          nH_interp = nH_interp + &
                       w_r1 * w_lon1 * w_lat1 * nH0(i_r1, i_lon1, i_lat1, it_nearest, day_idx) + &
                       w_r2 * w_lon1 * w_lat1 * nH0(i_r2, i_lon1, i_lat1, it_nearest, day_idx) + &
@@ -599,7 +618,7 @@ contains
          nH1 = 0.d0
       endif
 
-      if (allocated(beta_RCCX)) then
+      if ((i_ChargeExchange .eq. 2 .or. i_ChargeExchange .eq. 3) .and. allocated(beta_RCCX)) then
          beta_RCCX_interp = beta_RCCX_interp + &
                      w_r1 * w_lon1 * w_lat1 * beta_RCCX(i_r1, i_lon1, i_lat1, it_nearest, day_idx) + &
                      w_r2 * w_lon1 * w_lat1 * beta_RCCX(i_r2, i_lon1, i_lat1, it_nearest, day_idx) + &
@@ -614,16 +633,16 @@ contains
          beta_RCCX1 = 0.d0
       endif
 
-      !! FIX ME !!
-      !! Special case for 2008164 run for CIMI plasmasphere (nPS)
-      !! The nPS data is 0 for the first 3 hour in 2008/164.
-      !! So the lower bound of it_nearest is 4 for 2008/164.
-      !! Delete this part when using the new nPS data.
-      if (iday == 2008164 .and. it_nearest <= 3) then
-         it_nearest = 4
-      endif
+      if ((i_ChargeExchange .eq. 1 .or. i_ChargeExchange .eq. 3) .and. allocated(beta_PSCX)) then
+         !! FIX ME !!
+         !! Special case for 2008164 run for CIMI plasmasphere (nPS)
+         !! The nPS data is 0 for the first 3 hour in 2008/164.
+         !! So the lower bound of it_nearest is 4 for 2008/164.
+         !! Delete this part when using the new nPS data.
+         if (iday == 2008164 .and. it_nearest <= 3) then
+            it_nearest = 4
+         endif
 
-      if (allocated(beta_PSCX)) then
          beta_PSCX_interp = beta_PSCX_interp + &
                      w_r1 * w_lon1 * w_lat1 * beta_PSCX(i_r1, i_lon1, i_lat1, it_nearest, day_idx) + &
                      w_r2 * w_lon1 * w_lat1 * beta_PSCX(i_r2, i_lon1, i_lat1, it_nearest, day_idx) + &
@@ -827,11 +846,13 @@ contains
          endif
 
 !         call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
-         call interpolate_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
-         beta_RCCX_dt(istep) = beta_RCCX1*dt
-         beta_PSCX_dt(istep) = beta_PSCX1*dt
-         nH_traj(istep) = nH1
-         vel2(istep) = vt**2
+         if (i_ChargeExchange > 0) then
+            call interpolate_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
+            beta_RCCX_dt(istep) = beta_RCCX1*dt
+            beta_PSCX_dt(istep) = beta_PSCX1*dt
+            nH_traj(istep) = nH1
+            vel2(istep) = vt**2
+         endif
 
          radial_distance = sqrt(one(2)**2+one(3)**2+one(4)**2)
          if (radial_distance .lt. radial_boundary(1)) then
@@ -839,12 +860,13 @@ contains
             call calculate_final_timestep(old,one,dt,f0)
             if (istep < nstep) then
                istep = istep + 1
-               !call nearest_grid_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
-               call interpolate_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
-               beta_RCCX_dt(istep) = beta_RCCX1*dt
-               beta_PSCX_dt(istep) = beta_PSCX1*dt
-               nH_traj(istep) = nH1
-               vel2(istep) = vt**2
+               if (i_ChargeExchange > 0) then
+                  call interpolate_exosphere(trace_time, one, nH1, beta_RCCX1, beta_PSCX1)
+                  beta_RCCX_dt(istep) = beta_RCCX1*dt
+                  beta_PSCX_dt(istep) = beta_PSCX1*dt
+                  nH_traj(istep) = nH1
+                  vel2(istep) = vt**2
+               endif
             endif
          else if (radial_distance .gt. radial_boundary(2)) then
             flag = 2

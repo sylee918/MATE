@@ -14,9 +14,10 @@
 
       Subroutine Get_exobaseBC
 
-         integer :: iday_idx, cur_day
+         integer :: iday_idx, cur_day, ierr
          character*7 :: ydoy_str
          character*4 :: yearst
+         include "mpif.h"
 
          total_bc_days = ydoy_diff_days(end_ydoy, BC_Start_Time_in_YYYYDOY) + 1
 
@@ -31,21 +32,26 @@
             return
          endif
 
-         cur_day = BC_Start_Time_in_YYYYDOY
-         do iday_idx = 1, total_bc_days
-            write(ydoy_str, '(I7.7)') cur_day
-            write(yearst, '(I4.4)') cur_day / 1000
-            filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(ExobaseBC_Model_Name) // "_" // trim(ydoy_str) // ".bc"
-            call read_exobaseBC()
-            nH_BC(:,:,:,iday_idx) = nH_temp
-            TH_BC(:,:,:,iday_idx) = TH_temp
-            if (minval(nH_temp) .lt. 1e-15 .or. minval(TH_temp) .lt. 1e-15) then
-               print*, 'extra_tools', minval(nH_temp), minval(TH_temp)
-               print*, "ERROR: BC has zero or invalid values in: ", trim(filename_BC)
-               stop
-            endif
-            cur_day = ydoy_add_days_int(cur_day, 1)
-         enddo
+         if (rank .eq. 0) then
+            cur_day = BC_Start_Time_in_YYYYDOY
+            do iday_idx = 1, total_bc_days
+               write(ydoy_str, '(I7.7)') cur_day
+               write(yearst, '(I4.4)') cur_day / 1000
+               filename_BC = trim(BC_dir) // trim(yearst) // "/" // trim(ExobaseBC_Model_Name) // "_" // trim(ydoy_str) // ".bc"
+               call read_exobaseBC()
+               nH_BC(:,:,:,iday_idx) = nH_temp
+               TH_BC(:,:,:,iday_idx) = TH_temp
+               if (minval(nH_temp) .lt. 1e-15 .or. minval(TH_temp) .lt. 1e-15) then
+                  print*, 'extra_tools', minval(nH_temp), minval(TH_temp)
+                  print*, "ERROR: BC has zero or invalid values in: ", trim(filename_BC)
+                  stop
+               endif
+               cur_day = ydoy_add_days_int(cur_day, 1)
+            enddo
+         endif
+
+         call MPI_BCAST(nH_BC, size(nH_BC), MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)
+         call MPI_BCAST(TH_BC, size(TH_BC), MPI_DOUBLE_PRECISION, 0, MPI_COMM_WORLD, ierr)
 
          return
       End Subroutine Get_exobaseBC

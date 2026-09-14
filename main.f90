@@ -8,6 +8,7 @@
       USE SOLAR_LYMAN_ALPHA
       USE CHARGEEXCHANGE
       USE PHYSICS_TAG
+      USE VOLUME_ELEMENT, only: Init_Volume_Elements
       USE TIME_UTILS, only: ydoy_add_days_int, ydoy_diff_days
       IMPLICIT NONE
 
@@ -44,7 +45,9 @@
       endif
 
       call gen_points_for_NV
+      call Init_Velocity_Directions
       call Init_Parameter
+      call Init_Volume_Elements
       call Get_exobaseBC
       call Physical_tag
       call read_Lya_Bph  

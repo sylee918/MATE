@@ -27,33 +27,37 @@ Module_TimeUtils.o: Module_TimeUtils.f90
 Module_Setting.o: Module_Setting.f90
 	$(FC) -c $(flags) Module_Setting.f90
 
-Module_BC.o: Module_BC.f90
-	$(FC) -c $(flags) Module_BC.f90
-
-Module_Lyman.o: Module_Lyman.f90
-	$(FC) -c $(flags) Module_Lyman.f90
-
-Module_MATE.o: Module_MATE.f90
+Module_MATE.o: Module_MATE.f90 Module_Setting.o
 	$(FC) -c $(flags) Module_MATE.f90
 
-Module_Vol.o: Module_Vol.f90
+Module_BC.o: Module_BC.f90 Module_Setting.o Module_TimeUtils.o Module_MATE.o
+	$(FC) -c $(flags) Module_BC.f90
+
+Module_Lyman.o: Module_Lyman.f90 Module_Setting.o Module_MATE.o
+	$(FC) -c $(flags) Module_Lyman.f90
+
+Module_Vol.o: Module_Vol.f90 Module_Setting.o Module_MATE.o
 	$(FC) -c $(flags) Module_Vol.f90
 
-Module_ChargeExchange.o: Module_ChargeExchange.f90
+Module_ChargeExchange.o: Module_ChargeExchange.f90 Module_Setting.o Module_MATE.o Module_TimeUtils.o Module_Lyman.o
 	$(FC) -c $(flags) Module_ChargeExchange.f90
 
 #main_esc.o: main_esc.f90
 #	$(FC) -c $(flags) main_esc.f90
 
-main.o: main.f90
+main.o: main.f90 Module_MATE.o Module_Setting.o Module_BC.o Module_Lyman.o Module_Vol.o Module_ChargeExchange.o Module_TimeUtils.o
 	$(FC) -c $(flags) main.f90
-trace.o: trace.f90
+
+trace.o: trace.f90 Module_Setting.o Module_MATE.o Module_TimeUtils.o Module_Lyman.o Module_ChargeExchange.o
 	$(FC) -c $(flags) trace.f90
-init.o: init.f90
+
+init.o: init.f90 Module_Setting.o Module_MATE.o
 	$(FC) -c $(flags) init.f90
-IO_utils.o: IO_utils.f90
+
+IO_utils.o: IO_utils.f90 Module_Setting.o Module_MATE.o
 	$(FC) -c $(flags) IO_utils.f90
-PSD.o: PSD.f90
+
+PSD.o: PSD.f90 Module_Setting.o Module_BC.o Module_Lyman.o Module_Vol.o Module_ChargeExchange.o Module_TimeUtils.o Module_MATE.o
 	$(FC) -c $(flags) PSD.f90
 	
 #extra_tools.o: extra_tools.f90
@@ -61,9 +65,9 @@ PSD.o: PSD.f90
 
 
 clean:
-	rm *.o *.x *.mod
+	rm -f *.o *.x *.mod
 clean2:
-	rm *.o *.x *.data *.dat
+	rm -f *.o *.x *.data *.dat
 clean3:
-	rm *.o *.x *.data *.dat *__genmod*
+	rm -f *.o *.x *.data *.dat *__genmod*
 

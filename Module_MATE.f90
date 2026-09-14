@@ -131,7 +131,17 @@ Module SET_VELOCITY_DIRECTION
    USE SETTING
    IMPLICIT NONE
 
+   real*8, dimension(:,:), allocatable, save :: cached_vel_dir
+
 contains
+
+   Subroutine Init_Velocity_Directions()
+      IMPLICIT NONE
+      if (.not. allocated(cached_vel_dir)) then
+         allocate(cached_vel_dir(nvel, 3))
+      endif
+      call gen_points(cached_vel_dir)
+   End Subroutine Init_Velocity_Directions
 
    Subroutine gen_points_for_NV
 

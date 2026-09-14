@@ -11,6 +11,13 @@ MODULE VOLUME_ELEMENT
 
    contains
 
+      Subroutine Init_Volume_Elements()
+         IMPLICIT NONE
+         if (.not. allocated(dV2)) allocate(dV2(nEnergy, nvel))
+         if (.not. allocated(solid_angle)) allocate(solid_angle(nvel))
+         call calculate_Velocity_Volume_Element(dV2)
+      End Subroutine Init_Volume_Elements
+
       Subroutine Solid_Angle_For_Velocity_Volume_Element(solid_angle)
       ! 'solid_angle' = sin(theta).d(theta).d(phi)
       ! 'solanglist' in python code
