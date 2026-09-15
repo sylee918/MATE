@@ -109,14 +109,11 @@
       tasks_per_proc = total_valid_tasks / nProcs
       remainder = mod(total_valid_tasks, nProcs)
 
-      ! 랭크별 시작/끝 인덱스 계산 (나머지 처리 포함)
+      ! Round-Robin task distribution
       if (rank < remainder) then
          tasks_per_proc = tasks_per_proc + 1
-         my_start_idx = rank * tasks_per_proc + 1
-      else
-         my_start_idx = rank * tasks_per_proc + remainder + 1
       endif
-      my_end_idx = my_start_idx + tasks_per_proc - 1
+      print '(a, i4, a, i6, a, i6, a)', "Rank ", rank, " assigned ", tasks_per_proc, " of ", total_valid_tasks, " tasks (Round-Robin)"
 
       global_task_idx = 0 ! 카운터 초기화
 
@@ -160,24 +157,13 @@
                      rad = radial_distance_range(irad)
                      global_task_idx = global_task_idx + 1  
 
-                     if (i_Full_3D .eq. 1) then
-                        grid_point_idx = global_task_idx - 1
-                        if (grid_point_idx >= start_grid .and. grid_point_idx <= end_grid) then
-                           print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
+                     ! Round-Robin task execution for all modes (Full_3D, Three_Slices, Dayside_1D)
+                     if (mod(global_task_idx - 1, nProcs) .eq. rank) then
+                        print *, "Rank", rank, "computing task:", global_task_idx                    
+                        print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
-                           call Calculate_Density(current_time, number_density_0D)                      
-                           number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
-                        endif
-                     endif
-
-                     if (i_Three_Slices .eq. 1 .or. i_Dayside_1D .eq. 1) then
-                        if (global_task_idx >= my_start_idx .and. global_task_idx <= my_end_idx) then
-                           print *, "Rank", rank, "computing idx:", global_task_idx                    
-                           print '(a, i4, i4)', "(LON, LAT) = ", int(lon*180/pi), int(lat*180/pi)
-
-                           call Calculate_Density(current_time, number_density_0D)                      
-                           number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
-                        endif 
+                        call Calculate_Density(current_time, number_density_0D)                      
+                        number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D
                      endif
 
                   enddo ! irad

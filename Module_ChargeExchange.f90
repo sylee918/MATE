@@ -796,7 +796,7 @@ contains
       real*8 :: radial_distance, radial_distance_old
       integer :: i
       real*8 :: dt, vt,vt_old,dv, ds
-      real*8, parameter :: max_ds = 1.d6
+      real*8 :: cur_max_ds
       real*8 :: x0, f0, trace_time
       integer :: ydoy, ii
       real*8 ::  nps1, nH1, beta_RCCX1, beta_PSCX1
@@ -815,7 +815,8 @@ contains
          radial_distance_old = sqrt(one(2)**2+one(3)**2+one(4)**2)
          vt_old = sqrt(one(5)**2 + one(6)**2 + one(7)**2)
 
-         dt = -1.d0*max_ds / vt_old     ! -1e6 or 4e6 is a "factor" in python code. The maximum distance jump at single time step.
+         cur_max_ds = max(1.d6, 0.05d0 * radial_distance_old)
+         dt = -1.d0*cur_max_ds / vt_old     ! Adaptive spatial step proportional to radial distance
          trace_time = ydoy_add_days(current_time, one(1)/86400.d0)
 
          ydoy = int(trace_time)
@@ -839,7 +840,7 @@ contains
          dv = vt-vt_old
 
          ! If the solution is diverging ...
-         if (abs(ds/radial_distance_old) .gt. 1e-1 .or. abs(ds)/max_ds .gt. 1.2 .or. dv/vt_old .gt. 10) then
+         if (abs(ds/radial_distance_old) .gt. 1e-1 .or. abs(ds)/cur_max_ds .gt. 1.2 .or. dv/vt_old .gt. 10) then
                dt=dt/2
                one=old
                goto 101

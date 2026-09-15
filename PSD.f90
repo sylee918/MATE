@@ -145,7 +145,8 @@
 
 
    Subroutine GSE2SPH(pos,finlon,finlat)
-   !  Just transform GSE to GEO without considering Earth's rotation. FIX IT when considering the temporal effect of Earth's rotation.
+   !  Transforms GSE Cartesian coordinates to GSE spherical coordinates (lon, lat).
+   !  Note: Exobase BC files (.bc) are already pre-converted from GEO to GSE in the preprocessing stage.
 
       USE SETTING
       real*8 pos(3)
