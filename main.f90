@@ -113,7 +113,7 @@
       if (rank < remainder) then
          tasks_per_proc = tasks_per_proc + 1
       endif
-      print '(a, i4, a, i6, a, i6, a)', "Rank ", rank, " assigned ", tasks_per_proc, " of ", total_valid_tasks, " tasks (Round-Robin)"
+!      print '(a, i4, a, i6, a, i6, a)', "Rank ", rank, " assigned ", tasks_per_proc, " of ", total_valid_tasks, " tasks (Round-Robin)"
 
       global_task_idx = 0 ! 카운터 초기화
 
@@ -159,8 +159,8 @@
 
                      ! Round-Robin task execution for all modes (Full_3D, Three_Slices, Dayside_1D)
                      if (mod(global_task_idx - 1, nProcs) .eq. rank) then
-                        print *, "Rank", rank, "computing task:", global_task_idx                    
-                        print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
+!                        print *, "Rank", rank, "computing task:", global_task_idx                    
+!                        print '(a, f5.2, i4, i4)', "(RAD, LON, LAT) = ", rad/Re, int(lon*180/pi), int(lat*180/pi)
 
                         call Calculate_Density(current_time, number_density_0D)                      
                         number_density_4D_MPI(irad,ilon,ilat,it) = number_density_0D

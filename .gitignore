@@ -3,6 +3,7 @@ slee122.o*
 *.x
 *.in
 *.mod
+*.png
 
 run*/
 /exobaseBC/*
